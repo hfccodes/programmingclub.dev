@@ -12,13 +12,14 @@ import { Graveyard } from "#/components/graveyard";
 import { HauntedHunt, useLocks } from "#/components/haunted";
 import { SpookyBoard, SpookyMessage, SpookyShift, clockRunning, screenKey } from "#/components/spooky-stage";
 import { InstagramGlyph, InstagramQr } from "#/components/instagram";
+import { Lights, Pines, Snow } from "#/components/winter";
 import { OfficerGate, useAction, useJoinCode } from "#/components/officer";
 import { GAME_TILE, Picto, ordinal, weekTile } from "#/components/ui";
 import { BUGS, GAMES } from "#/lib/content";
 import { heldLabel, roundOf } from "#/lib/flow";
 import { cardKey, drawKey, isAnswerGame, placeOf, wikiKey } from "#/lib/grading";
 import { nextMeeting, useJustEnded, useSchedule } from "#/lib/schedule";
-import { CLUB, fmtDate } from "#/lib/season";
+import { CLUB, fmtDate, isWinter } from "#/lib/season";
 import { playMusic, setVolume, sfx, unlockAudio } from "#/lib/sound";
 import { teamWords } from "#/lib/words";
 import type { TeamWords } from "#/lib/words";
@@ -67,13 +68,17 @@ function TvScreen() {
   }, [live]);
   const week = live ? live.week : last ? last.week : last === undefined ? seen : null;
   const spooky = week !== null && plan[week - 1]?.theme === "spooky";
+  // In winter, the screens between games (the lobby, standings, messages, and the attract screen) get snow, lights, and
+  // pines. The games themselves stay plain, so nothing moves behind the code or the drawing.
+  const winter = isWinter() && !spooky && (!live || ["lobby", "scoreboard", "message"].includes(live.screen.mode));
   return (
     // Sound is run from the host's console, so the TV shows no button for it: browsers still need one click on this page
     // before they'll play anything, and a click anywhere does it.
     <div
-      className={`theme-pine relative flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
+      className={`theme-pine relative isolate flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
       onClick={() => !sound && unlockAudio().then(() => setSound(true))}
     >
+      {winter && <WinterTv />}
       {live && code ? <LiveTv live={live} code={code} sound={sound} /> : live === null ? <AfterNight spooky={spooky} /> : null}
       {spooky && (
         <SpookyShift
@@ -81,6 +86,17 @@ function TvScreen() {
           clear={!!live && clockRunning(live.screen, live.timer, live.scored)}
         />
       )}
+    </div>
+  );
+}
+
+/** Winter behind the TV's screens between games. It keeps moving with reduced motion, like the spooky night's TV. */
+function WinterTv() {
+  return (
+    <div aria-hidden className="absolute inset-0 -z-10 [--bulb:0.85vw] [--lights-h:3.4vw] [--snow-unit:0.5vw] [--wire:#06140f]">
+      <Pines />
+      <Snow count={110} always />
+      <Lights swags={7} per={5} always />
     </div>
   );
 }

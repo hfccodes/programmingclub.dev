@@ -12,6 +12,7 @@ import { CardView, Hint, PuzzleExample, Rich, fmtClock, fmtElapsed, useRemaining
 import { PhoneDraw } from "#/components/draw";
 import { JoinNight, clockRunning, screenKey } from "#/components/spooky-stage";
 import { InstagramLink } from "#/components/instagram";
+import { Lights, Snow } from "#/components/winter";
 import { AnswerBox, InputBox } from "#/components/puzzle";
 import { Picto, Wrap, ordinal, weekTile } from "#/components/ui";
 import { WikiPair, WikiRound } from "#/components/wiki";
@@ -22,7 +23,7 @@ import { usePython } from "#/lib/python";
 import type { AnswerGame } from "#/lib/grading";
 import { IDEA_MAX } from "#/lib/ideas";
 import { gamesIn, useJustEnded, useSchedule, usesTeamComputer } from "#/lib/schedule";
-import { CLUB, isHfcEmail } from "#/lib/season";
+import { CLUB, isHfcEmail, isWinter } from "#/lib/season";
 import { SPOOKY_ART } from "#/lib/spooky";
 import { teamWords } from "#/lib/words";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -172,11 +173,32 @@ function NightOver({ me }: { me: Me }) {
 
 function Center({ children }: { children: React.ReactNode }) {
   return (
-    <Wrap className="grid min-h-dvh place-items-center py-8 text-center">
-      <div>{children}</div>
-    </Wrap>
+    <>
+      <JoinWinter />
+      <Wrap className="grid min-h-dvh place-items-center py-8 text-center">
+        <div>{children}</div>
+      </Wrap>
+    </>
   );
 }
+
+/** In winter, snow behind the page and lights along its top, on every screen but a game's (nothing moves behind a
+ *  card). Pages that show it start below the lights (`winterTop`). */
+function JoinWinter() {
+  if (!isWinter()) return null;
+  return (
+    <div aria-hidden className="[--bulb:0.6rem] [--lights-h:2.4rem] [--snow-unit:0.45rem] [--snow:#a6cbe3]">
+      <div className="fixed inset-0 -z-10">
+        <Snow count={50} />
+      </div>
+      <div className="absolute inset-x-0 top-0 -z-10">
+        <Lights swags={4} className="sm:hidden" />
+        <Lights swags={9} className="max-sm:hidden" />
+      </div>
+    </div>
+  );
+}
+const winterTop = () => (isWinter() ? "pt-14 pb-5" : "py-5");
 
 function JoinForm({ initialCode, sessionId, onJoined }: { initialCode: string; sessionId: string; onJoined: (t: string) => void }) {
   const join = useMutation(api.players.join);
@@ -250,141 +272,148 @@ function JoinForm({ initialCode, sessionId, onJoined }: { initialCode: string; s
   const here = code ? `/join?code=${code}` : "/join";
   const askName = !officer && !(member && account.name);
   return (
-    <Wrap className="flex min-h-dvh max-w-xl flex-col py-5">
-      <form onSubmit={submit} className="flex flex-1 flex-col gap-4 [&_input,&_textarea]:scroll-mb-36">
-        <div>
-          <h1 className="text-[clamp(2.2rem,10vw,3.2rem)] leading-[0.9] lowercase">{officer ? "officer check-in" : "join the game"}</h1>
-          {(officer || wrongAccount) && (
-            <p className="mt-2 text-dim">
-              {officer
-                ? `You’re checking in as ${account.email}, an officer. You’ll play like everyone else (in Pictionary, don’t peek at the word on the host page); switch to Just hosting anytime. Joining someone else on this phone? Sign out first.`
-                : `You’re signed in as ${account.email}, which isn’t an HFC email. Sign out and sign in with your HawkMail, or join with it below.`}
+    <>
+      <JoinWinter />
+      <Wrap className={`flex min-h-dvh max-w-xl flex-col ${winterTop()}`}>
+        <form onSubmit={submit} className="flex flex-1 flex-col gap-4 [&_input,&_textarea]:scroll-mb-36">
+          <div>
+            <h1 className="text-[clamp(2.2rem,10vw,3.2rem)] leading-[0.9] lowercase">{officer ? "officer check-in" : "join the game"}</h1>
+            {(officer || wrongAccount) && (
+              <p className="mt-2 text-dim">
+                {officer
+                  ? `You’re checking in as ${account.email}, an officer. You’ll play like everyone else (in Pictionary, don’t peek at the word on the host page); switch to Just hosting anytime. Joining someone else on this phone? Sign out first.`
+                  : `You’re signed in as ${account.email}, which isn’t an HFC email. Sign out and sign in with your HawkMail, or join with it below.`}
+              </p>
+            )}
+          </div>
+
+          {!officer && (
+            <label className="block">
+              <span className="font-bold">Code on the TV</span>
+              <span className="relative mt-1.5 grid grid-cols-4 gap-[3px]">
+                {letters.map((c, i) => (
+                  <span
+                    key={i}
+                    aria-hidden
+                    className={`narrow grid h-14 place-items-center text-4xl font-extrabold ${c.trim() ? "bg-ink text-paper" : "bg-mist"} ${focused && i === Math.min(code.length, 3) ? "outline-[3px] -outline-offset-[3px] outline-sun" : ""}`}
+                  >
+                    {c}
+                  </span>
+                ))}
+                <input
+                  className="absolute inset-0 h-full w-full cursor-text uppercase opacity-0"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/[^a-z]/gi, "").toUpperCase())}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
+                  maxLength={4}
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  required
+                  aria-label="Code on the TV"
+                />
+              </span>
+            </label>
+          )}
+
+          {(askName || officer) && (
+            <label className="block">
+              <span className="font-bold">Your name</span>
+              <input
+                className="field mt-1.5"
+                value={profile.name}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                autoComplete="name"
+                required
+                maxLength={40}
+              />
+            </label>
+          )}
+          {!member && !officer && (
+            <label className="block">
+              <span className="font-bold">HawkMail</span> <span className="text-sm text-dim">Keeps your XP together week to week.</span>
+              <input
+                className="field mt-1.5"
+                type="email"
+                value={profile.email}
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                onBlur={() => setEmailLeft(true)}
+                autoComplete="email"
+                required
+                placeholder="jsmith@hawkmail.hfcc.edu"
+                aria-invalid={emailBad}
+                aria-describedby={emailBad ? "email-error" : undefined}
+              />
+              {emailBad && (
+                <span id="email-error" className="mt-1 block text-sm font-semibold text-signal">
+                  Use your HawkMail (@hawkmail.hfcc.edu). The club is for HFC students.
+                </span>
+              )}
+            </label>
+          )}
+          {!officer && firstPhone && (
+            <label className="block">
+              <span className="font-bold">What do you want from this club?</span>
+              <span className="block text-sm text-dim">
+                Optional. Things to learn or build, events to run, hackathons or trips to go to together.
+              </span>
+              <textarea
+                className="field mt-1.5 block resize-none"
+                rows={3}
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                maxLength={IDEA_MAX}
+                placeholder="A Python workshop, a group trip to a hackathon, a game jam…"
+              />
+              {idea.length > IDEA_MAX - 100 && (
+                <span className="mt-1 block text-right text-sm text-dim">
+                  {idea.length}/{IDEA_MAX}
+                </span>
+              )}
+            </label>
+          )}
+          {/* Signed-in members skip it after their first night, to keep joining one tap. */}
+          {!officer && (!member || firstPhone) && (
+            <label className="block">
+              <span className="font-bold">Who brought you?</span> <span className="text-sm text-dim">Optional. You both get +2 XP.</span>
+              <input className="field mt-1.5" value={broughtBy} onChange={(e) => setBroughtBy(e.target.value)} maxLength={40} />
+            </label>
+          )}
+          {error && (
+            <p role="alert" className="rounded-[6px] bg-signal/10 px-4 py-3 font-semibold text-signal">
+              {error}
             </p>
           )}
-        </div>
-
-        {!officer && (
-          <label className="block">
-            <span className="font-bold">Code on the TV</span>
-            <span className="relative mt-1.5 grid grid-cols-4 gap-[3px]">
-              {letters.map((c, i) => (
-                <span
-                  key={i}
-                  aria-hidden
-                  className={`narrow grid h-14 place-items-center text-4xl font-extrabold ${c.trim() ? "bg-ink text-paper" : "bg-mist"} ${focused && i === Math.min(code.length, 3) ? "outline-[3px] -outline-offset-[3px] outline-sun" : ""}`}
-                >
-                  {c}
-                </span>
-              ))}
-              <input
-                className="absolute inset-0 h-full w-full cursor-text uppercase opacity-0"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/[^a-z]/gi, "").toUpperCase())}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                maxLength={4}
-                autoComplete="off"
-                autoCapitalize="characters"
-                spellCheck={false}
-                required
-                aria-label="Code on the TV"
-              />
-            </span>
-          </label>
-        )}
-
-        {(askName || officer) && (
-          <label className="block">
-            <span className="font-bold">Your name</span>
-            <input
-              className="field mt-1.5"
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              autoComplete="name"
-              required
-              maxLength={40}
-            />
-          </label>
-        )}
-        {!member && !officer && (
-          <label className="block">
-            <span className="font-bold">HawkMail</span> <span className="text-sm text-dim">Keeps your XP together week to week.</span>
-            <input
-              className="field mt-1.5"
-              type="email"
-              value={profile.email}
-              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              onBlur={() => setEmailLeft(true)}
-              autoComplete="email"
-              required
-              placeholder="jsmith@hawkmail.hfcc.edu"
-              aria-invalid={emailBad}
-              aria-describedby={emailBad ? "email-error" : undefined}
-            />
-            {emailBad && (
-              <span id="email-error" className="mt-1 block text-sm font-semibold text-signal">
-                Use your HawkMail (@hawkmail.hfcc.edu). The club is for HFC students.
-              </span>
-            )}
-          </label>
-        )}
-        {!officer && firstPhone && (
-          <label className="block">
-            <span className="font-bold">What do you want from this club?</span>
-            <span className="block text-sm text-dim">
-              Optional. Things to learn or build, events to run, hackathons or trips to go to together.
-            </span>
-            <textarea
-              className="field mt-1.5 block resize-none"
-              rows={3}
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              maxLength={IDEA_MAX}
-              placeholder="A Python workshop, a group trip to a hackathon, a game jam…"
-            />
-            {idea.length > IDEA_MAX - 100 && (
-              <span className="mt-1 block text-right text-sm text-dim">
-                {idea.length}/{IDEA_MAX}
-              </span>
-            )}
-          </label>
-        )}
-        {/* Signed-in members skip it after their first night, to keep joining one tap. */}
-        {!officer && (!member || firstPhone) && (
-          <label className="block">
-            <span className="font-bold">Who brought you?</span> <span className="text-sm text-dim">Optional. You both get +2 XP.</span>
-            <input className="field mt-1.5" value={broughtBy} onChange={(e) => setBroughtBy(e.target.value)} maxLength={40} />
-          </label>
-        )}
-        {error && (
-          <p role="alert" className="rounded-[6px] bg-signal/10 px-4 py-3 font-semibold text-signal">
-            {error}
-          </p>
-        )}
-        {/* Pinned to the bottom of the screen so Join is always one tap away. */}
-        <div className="sticky bottom-0 mt-auto bg-paper pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-          <button className="btn btn-primary w-full text-lg" disabled={busy}>
-            {busy ? "Joining…" : officer ? "Check in" : member && account.name ? `Join as ${account.name}` : "Join the game"}
-          </button>
-          <p className="mt-2 text-center text-sm text-dim">
-            {isAuthenticated ? (
-              <SignOutButton redirectUrl={here}>
-                <button type="button" className="link py-2.5">
-                  Not you? Sign out
-                </button>
-              </SignOutButton>
-            ) : (
-              <SignInButton mode="modal" withSignUp forceRedirectUrl={here} initialValues={{ emailAddress: profile.email || undefined }}>
-                {/* Keeps the name typed so far for after signing in. */}
-                <button type="button" className="link py-2.5" onClick={() => localStorage.setItem("hwc.profile", JSON.stringify(profile))}>
-                  Sign in with your HawkMail to join in one tap next time
-                </button>
-              </SignInButton>
-            )}
-          </p>
-        </div>
-      </form>
-    </Wrap>
+          {/* Pinned to the bottom of the screen so Join is always one tap away. */}
+          <div className="sticky bottom-0 mt-auto bg-paper pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+            <button className="btn btn-primary w-full text-lg" disabled={busy}>
+              {busy ? "Joining…" : officer ? "Check in" : member && account.name ? `Join as ${account.name}` : "Join the game"}
+            </button>
+            <p className="mt-2 text-center text-sm text-dim">
+              {isAuthenticated ? (
+                <SignOutButton redirectUrl={here}>
+                  <button type="button" className="link py-2.5">
+                    Not you? Sign out
+                  </button>
+                </SignOutButton>
+              ) : (
+                <SignInButton mode="modal" withSignUp forceRedirectUrl={here} initialValues={{ emailAddress: profile.email || undefined }}>
+                  {/* Keeps the name typed so far for after signing in. */}
+                  <button
+                    type="button"
+                    className="link py-2.5"
+                    onClick={() => localStorage.setItem("hwc.profile", JSON.stringify(profile))}
+                  >
+                    Sign in with your HawkMail to join in one tap next time
+                  </button>
+                </SignInButton>
+              )}
+            </p>
+          </div>
+        </form>
+      </Wrap>
+    </>
   );
 }
 
@@ -485,8 +514,9 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
     <>
       {/* The spooky night's paper and change of screen, behind and over the page; a running clock is never covered. */}
       {spooky && <JoinNight screen={screenKey(s)} clear={clockRunning(s, live.timer, live.scored)} />}
+      {!spooky && !game && <JoinWinter />}
       <Wrap
-        className={`flex min-h-dvh flex-col py-5 ${wide ? "" : split || bugHunt ? "max-w-2xl lg:w-[min(80rem,100%-2.5rem)] lg:max-w-none" : "max-w-2xl"} ${drawing ? "short:max-w-none" : ""} ${spooky ? "relative isolate" : ""}`}
+        className={`flex min-h-dvh flex-col ${!spooky && !game ? winterTop() : "py-5"} ${wide ? "" : split || bugHunt ? "max-w-2xl lg:w-[min(80rem,100%-2.5rem)] lg:max-w-none" : "max-w-2xl"} ${drawing ? "short:max-w-none" : ""} ${spooky ? "relative isolate" : ""}`}
       >
         <div className={split ? `lg:grid lg:items-start lg:justify-center lg:gap-12 ${columns}` : ""}>
           {/* On a phone on its side, a drawing takes the bar beside it instead. */}

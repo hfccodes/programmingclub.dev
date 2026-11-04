@@ -64,6 +64,12 @@ export function fmtDate(d: Date, opts: Intl.DateTimeFormatOptions = { weekday: "
 
 export const isCupWeek = (week: number) => week === 4 || week === 6;
 
+/** The month in Detroit, 1 to 12. */
+const monthOf = (now: Date) => Number(new Intl.DateTimeFormat("en-US", { month: "numeric", timeZone: CLUB.timeZone }).format(now));
+
 /** True during October in Detroit, when the site wears its Halloween touches. */
-export const isHalloweenMonth = (now = new Date()) =>
-  new Intl.DateTimeFormat("en-US", { month: "numeric", timeZone: CLUB.timeZone }).format(now) === "10";
+export const isHalloweenMonth = (now = new Date()) => monthOf(now) === 10;
+
+/** True from November through February in Detroit, when the site, the TV, and the join page wear winter: falling snow
+ *  and a string of holiday lights (components/winter.tsx). */
+export const isWinter = (now = new Date()) => [11, 12, 1, 2].includes(monthOf(now));

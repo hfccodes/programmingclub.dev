@@ -10,10 +10,11 @@ import { InstagramGlyph, InstagramLink } from "#/components/instagram";
 import { useLikelyOfficer } from "#/components/officer";
 import { ClubLogo } from "#/components/site";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
-import { CLUB, INSTAGRAM_URL, isHalloweenMonth } from "#/lib/season";
+import { CLUB, INSTAGRAM_URL, isHalloweenMonth, isWinter } from "#/lib/season";
 import { APPS, appFor, countdown } from "./apps";
 import { Scene } from "./scene";
 import { SpookyScene } from "./spooky-scene";
+import { Lights, Snow } from "#/components/winter";
 import type { App, AppId } from "./apps";
 
 type Pt = { x: number; y: number };
@@ -87,6 +88,7 @@ export function Desktop() {
   const root = useRef<HTMLDivElement>(null);
   const iconApps = useIconApps();
   const october = isHalloweenMonth();
+  const winter = isWinter();
   // Startup stagger: each icon (and the "About this site" card after them) waits for the one before.
   const bootIn: BootIn = (i) =>
     boot ? { className: "boot-icon", style: { "--i": i } as CSSProperties } : { className: "", style: undefined };
@@ -161,6 +163,14 @@ export function Desktop() {
       <div aria-hidden className={`absolute inset-0 ${boot ? "boot-wallpaper" : ""}`}>
         <div className="desk-aerial" />
         {october ? <SpookyScene /> : <Scene />}
+        {/* Winter: snow over the shore and lights along the top. Reduced motion stills both. */}
+        {winter && (
+          <div className="absolute inset-0 [--bulb:0.65rem] [--lights-h:2.6rem] [--snow-unit:0.5vmax] [--wire:#081833]">
+            <Snow count={90} />
+            <Lights swags={4} className="md:hidden" />
+            <Lights swags={9} per={5} className="max-md:hidden" />
+          </div>
+        )}
       </div>
 
       {/* Desktop (tablets and up) */}
