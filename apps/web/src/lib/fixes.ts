@@ -33,57 +33,57 @@ export interface FixCard {
 
 export const FIXES: FixCard[] = [
   {
-    name: "pumpkin patch",
+    name: "cookie tray",
     level: "easy",
-    task: "Read how many pumpkins you have, then how many more you picked, and print the new total. More than 10 pumpkins means pie.",
-    code: `print("Welcome to the pumpkin patch!")
-pumpkins = input()
-picked = int(input())
-total = pumpkins + picked
-print("You now have", total, "pumpkins")
+    task: 'The first input is how many cookies are already on the tray. The second is how many newly baked cookies you add. Print the new total. If it is more than 10, also print "Save some for Santa!".',
+    code: `print("Welcome to the cookie kitchen!")
+cookies_on_tray = input()
+new_cookies = int(input())
+total = cookies_on_tray + new_cookies
+print("You now have", total, "cookies")
 if total > 10:
-    print("That's a lot of pie!")`,
+    print("Save some for Santa!")`,
     tests: [
-      { input: "3\n2", output: "Welcome to the pumpkin patch!\nYou now have 5 pumpkins", show: true },
-      { input: "8\n4", output: "Welcome to the pumpkin patch!\nYou now have 12 pumpkins\nThat's a lot of pie!" },
-      { input: "10\n0", output: "Welcome to the pumpkin patch!\nYou now have 10 pumpkins" },
-      { input: "0\n11", output: "Welcome to the pumpkin patch!\nYou now have 11 pumpkins\nThat's a lot of pie!" },
+      { input: "3\n2", output: "Welcome to the cookie kitchen!\nYou now have 5 cookies", show: true },
+      { input: "8\n4", output: "Welcome to the cookie kitchen!\nYou now have 12 cookies\nSave some for Santa!" },
+      { input: "10\n0", output: "Welcome to the cookie kitchen!\nYou now have 10 cookies" },
+      { input: "0\n11", output: "Welcome to the cookie kitchen!\nYou now have 11 cookies\nSave some for Santa!" },
     ],
-    fix: `print("Welcome to the pumpkin patch!")
-pumpkins = int(input())
-picked = int(input())
-total = pumpkins + picked
-print("You now have", total, "pumpkins")
+    fix: `print("Welcome to the cookie kitchen!")
+cookies_on_tray = int(input())
+new_cookies = int(input())
+total = cookies_on_tray + new_cookies
+print("You now have", total, "cookies")
 if total > 10:
-    print("That's a lot of pie!")`,
-    why: "input() always gives back text, so pumpkins is a string and Python can’t add a string to a number. Wrap it in int().",
+    print("Save some for Santa!")`,
+    why: "input() returns text, so cookies_on_tray is a string. Convert it to a number with int() before adding new_cookies.",
     hint: "Read the TypeError, then compare how line 2 and line 3 read their input.",
   },
   {
-    name: "candy haul",
+    name: "stocking stuffers",
     level: "medium",
-    task: "The first line is how many houses you visited, then one line per house with how many candies you got. Print the total candy.",
-    code: `houses = int(input())
-for house in range(houses):
+    task: "The first line is how many stockings hang by the fire, then one line per stocking with how many treats are inside. Print the total treats.",
+    code: `stockings = int(input())
+for stocking in range(stockings):
     total = 0
-    candy = int(input())
-    total = total + candy
-print("Total candy:", total)`,
+    treats = int(input())
+    total = total + treats
+print("Total treats:", total)`,
     tests: [
-      { input: "3\n4\n2\n5", output: "Total candy: 11", show: true },
-      { input: "1\n7", output: "Total candy: 7" },
-      { input: "4\n0\n6\n3\n0", output: "Total candy: 9" },
-      { input: "2\n10\n10", output: "Total candy: 20" },
-      { input: "5\n1\n1\n1\n1\n1", output: "Total candy: 5" },
+      { input: "3\n4\n2\n5", output: "Total treats: 11", show: true },
+      { input: "1\n7", output: "Total treats: 7" },
+      { input: "4\n0\n6\n3\n0", output: "Total treats: 9" },
+      { input: "2\n10\n10", output: "Total treats: 20" },
+      { input: "5\n1\n1\n1\n1\n1", output: "Total treats: 5" },
     ],
-    fix: `houses = int(input())
+    fix: `stockings = int(input())
 total = 0
-for house in range(houses):
-    candy = int(input())
-    total = total + candy
-print("Total candy:", total)`,
-    why: "total = 0 is inside the loop, so the count resets at every house. Start it at 0 once, before the loop.",
-    hint: "The answer is always just the last house’s candy. What happens to total each time the loop starts over?",
+for stocking in range(stockings):
+    treats = int(input())
+    total = total + treats
+print("Total treats:", total)`,
+    why: "total = 0 is inside the loop, so the count resets at every stocking. Start it at 0 once, before the loop.",
+    hint: "The answer is always just the last stocking’s treats. What happens to total each time the loop starts over?",
   },
   {
     name: "scariest costume",

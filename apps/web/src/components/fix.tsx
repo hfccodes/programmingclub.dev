@@ -1,7 +1,7 @@
 // Fix it for real on a laptop: the task, the examples, an editor with the buggy program, Run, and Check.
 // Presentational: components/workspace.tsx wires it to Convex, and the officer test page drives it with local state.
 import { ConvexError } from "convex/values";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { FIXES } from "#/lib/fixes";
 import type { FixTest } from "#/lib/fixes";
 import { TIMEOUT_MS, runTests } from "#/lib/python";
@@ -205,7 +205,7 @@ function Examples({ tests }: { tests: FixTest[] }) {
         <div key={i} className="space-y-2 text-sm">
           <div>
             <p className="font-bold text-dim">{tests.length > 1 ? `Example ${i + 1} input` : "Example input"}</p>
-            <pre className={`code mt-1 ${WRAP}`}>{t.input || "(no input)"}</pre>
+            <InputLines input={t.input} />
           </div>
           <div>
             <p className="font-bold text-dim">Should print</p>
@@ -214,6 +214,28 @@ function Examples({ tests }: { tests: FixTest[] }) {
         </div>
       ))}
     </div>
+  );
+}
+
+/**
+ * What the program reads, each line labelled by its position in the input, so bare values like "3" and "2" read as what
+ * gets typed in rather than as lines of code. The labels can't be selected, so copying takes just the input.
+ */
+function InputLines({ input }: { input: string }) {
+  if (!input) return <pre className={`code mt-1 ${WRAP}`}>(no input)</pre>;
+  const rows = input.split("\n");
+  return (
+    <pre className={`code mt-1 grid grid-cols-[minmax(0,auto)_max-content] justify-start gap-x-6 ${WRAP}`}>
+      {rows.map((line, i) => (
+        <Fragment key={i}>
+          <span>{line || " "}</span>
+          <span className="t-com select-none">
+            ← input line {i + 1}
+            {"\n"}
+          </span>
+        </Fragment>
+      ))}
+    </pre>
   );
 }
 
@@ -316,7 +338,9 @@ function Results({ kind, list, planned, total }: { kind: "run" | "check"; list: 
           </div>
         );
       })}
-      {list.length < planned && <p className="text-sm text-dim @min-[56rem]:w-full">The other tests didn’t run. Fix the loop, then try again.</p>}
+      {list.length < planned && (
+        <p className="text-sm text-dim @min-[56rem]:w-full">The other tests didn’t run. Fix the loop, then try again.</p>
+      )}
     </div>
   );
 }

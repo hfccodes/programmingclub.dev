@@ -194,7 +194,7 @@ export const CUP_AGENDA: Agenda[] = [
     t: "5:09",
     len: 8,
     what: "Round 1: Output? Lightning",
-    detail: "6 quick questions at 1 point each, and the last one is worth 3. Gets everyone warmed up.",
+    detail: "5 quick questions, 30 seconds and 1 point each. Gets everyone warmed up.",
   },
   {
     t: "5:17",
@@ -213,7 +213,7 @@ export const CUP_AGENDA: Agenda[] = [
     len: 9,
     what: "Final round, double points: Fix it for real",
     detail:
-      "One buggy Python program and 4 minutes. Teams fix it and run it on a laptop, right on the join page, and the first fix earns extra. Every point counts double, so any team can still win.",
+      "Two buggy Python programs, 4 minutes each. Teams fix and run them on a laptop, right on the join page, and the first fix earns extra. Every point counts double, so any team can still win.",
   },
   {
     t: "5:52",
