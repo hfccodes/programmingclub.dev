@@ -126,16 +126,39 @@ export function PuzzleExample({ p, part2, big = false }: { p: Puzzle; part2: boo
   );
 }
 
-/** Code as big as its box allows, sized from its longest line and line count, so the TV never scrolls or clips it. */
-function FitCode({ code, mark }: { code: string; mark?: number[] }) {
+/**
+ * Code on the TV, as big as its box allows: sized from its longest line and line count against the box (a size
+ * container), so a one-liner reads from the back of the room and a 19-line program still fits without clipping.
+ * `max` caps short snippets so they don't turn into a poster.
+ */
+function StageCode({
+  code,
+  mark,
+  lang,
+  numbered = true,
+  max,
+  align = "center",
+}: {
+  code: string;
+  mark?: number[];
+  lang?: string;
+  numbered?: boolean;
+  max: string;
+  align?: "center" | "start";
+}) {
   const lines = code.split("\n");
   const cols = Math.max(...lines.map((l) => l.replace(/\t/g, "    ").length));
   return (
-    <div className="min-h-0 [container-type:size]" style={{ "--cols": cols, "--rows": lines.length } as CSSProperties}>
+    <div
+      className={`flex min-h-0 flex-1 [container-type:size] ${align === "center" ? "items-center" : "items-start"}`}
+      style={{ "--cols": cols + (numbered ? 2 : 0), "--rows": lines.length, "--max": max } as CSSProperties}
+    >
       <Code
         code={code}
         mark={mark}
-        className="m-0 h-full overflow-hidden p-[0.8em_1em] text-[length:min(calc(100cqw/(var(--cols)*0.64+4.6)),calc(100cqh/(var(--rows)*1.5+1.7)),2.2vw)] leading-[1.5]"
+        lang={lang}
+        numbered={numbered}
+        className="m-0 max-h-full max-w-full overflow-hidden p-[0.6em_1em] text-[length:min(calc(100cqw/(var(--cols)*0.64+2.6)),calc(100cqh/(var(--rows)*1.5+1.3)),var(--max))] leading-[1.5]"
       />
     </div>
   );
@@ -167,11 +190,10 @@ export function CardView({
   size?: "md" | "xl";
   /** A solo night: puzzles are solved alone, on your own computer. */
   solo?: boolean;
-  /** On the TV, what goes beside a Fix it for real card's code, like who has fixed it. */
+  /** On the TV, what goes beside a Fix it for real or Bug Hunt card's code, like who has fixed it or the results. */
   aside?: ReactNode;
 }) {
   const big = size === "xl";
-  const codeCls = big ? "text-[clamp(1.4rem,2.6vw,3rem)]" : "";
   if (game === "puzzle") {
     const p = PUZZLES[index];
     // The TV swaps the story for the example walkthrough on reveal; the host console shows everything.
@@ -221,7 +243,7 @@ export function CardView({
   }
   if (game === "fix") {
     const f = FIXES[index];
-    // The TV fills its screen: the task (on reveal, why it broke) over the code, as big as it fits, and `aside` the
+    // The TV fills its screen (its title row names the card): the task (on reveal, why it broke) over the code, as big as it fits, and `aside` the
     // full height beside them. On reveal it swaps the buggy program for the fix; the host console shows both.
     if (big)
       return (
@@ -240,16 +262,17 @@ export function CardView({
             {hint && !answer && <FixHint card={f} />}
           </div>
           <div className="row-span-2 min-h-0 overflow-hidden">{aside}</div>
-          <FitCode code={answer ? f.fix : f.code} mark={answer ? fixedLines(f) : undefined} />
+          <StageCode code={answer ? f.fix : f.code} mark={answer ? fixedLines(f) : undefined} max="2.4vw" align="start" />
         </div>
       );
     return (
       <div>
-        <p className="text-lg">
+        <h3 className="text-2xl lowercase">{f.name}</h3>
+        <p className="mt-1 text-lg">
           {f.task}
           <LevelChip level={f.level} />
         </p>
-        <Code code={f.code} className="my-3" />
+        <Code code={f.code} className="my-3 max-sm:px-4 max-sm:text-[0.8125rem]" />
         {hint && !answer && <FixHint card={f} />}
         {answer && (
           <div className="mt-4 border-t-2 border-dashed border-line pt-4">
@@ -264,19 +287,46 @@ export function CardView({
   }
   if (game === "bug") {
     const b = BUGS[index];
+    const prompt = (
+      <>
+        Find the one bug in this {b.lang ?? "Python"}: pick its line, then the fix.
+        <LevelChip level={b.level} />
+      </>
+    );
+    // The TV keeps the line numbers (players pick a line) and fits the program. On reveal the bug's line lights up and
+    // why, the fix, and `aside` (the results) take a column beside it, so a long program keeps its room.
+    if (big)
+      return (
+        <div className={`grid h-full gap-x-[3vw] ${answer || aside ? "grid-cols-[minmax(0,1fr)_26vw]" : ""}`}>
+          <div className="flex min-h-0 flex-col">
+            <p className="text-[2vw] leading-snug">{prompt}</p>
+            <StageCode code={b.code} lang={b.lang} mark={answer ? b.lines : undefined} max="3.2vw" />
+          </div>
+          {(answer || aside) && (
+            <div className="min-h-0 self-center overflow-hidden">
+              {answer && (
+                <div className="text-[1.5vw] leading-snug">
+                  <p>
+                    <strong className="font-extrabold">Line {b.line}.</strong> {b.why}
+                  </p>
+                  <Code code={b.fix} numbered={false} wrap lang={b.lang} className="mt-[0.6vw] p-[0.6em_0.9em] text-[1.3vw]" />
+                </div>
+              )}
+              {aside && <div className="mt-[1.5vw]">{aside}</div>}
+            </div>
+          )}
+        </div>
+      );
     return (
       <div>
-        <p className={big ? "text-2xl" : "text-lg"}>
-          Find the one bug in this {b.lang ?? "Python"}: pick its line, then the fix.
-          <LevelChip level={b.level} />
-        </p>
-        <Code code={b.code} lang={b.lang} className={`my-3 ${codeCls}`} />
+        <p className="text-lg">{prompt}</p>
+        <Code code={b.code} lang={b.lang} className="my-3" />
         {answer && (
           <div className="mt-4 border-t-2 border-dashed border-line pt-4">
-            <p className={big ? "text-2xl" : ""}>
+            <p>
               <strong className="font-extrabold">Line {b.line}.</strong> {b.why}
             </p>
-            <Code code={b.fix} numbered={false} lang={b.lang} className={`mt-2 ${codeCls}`} />
+            <Code code={b.fix} numbered={false} lang={b.lang} className="mt-2" />
           </div>
         )}
       </div>
@@ -284,14 +334,29 @@ export function CardView({
   }
   if (game === "output") {
     const o = OUTPUTS[index];
+    const prompt = <>What does this Python print?{o.tiebreak && <LevelChip level="hard" />}</>;
+    // No line numbers: nobody picks a line here, and they read as part of the program from across the room.
+    if (big)
+      return (
+        <div className="flex h-full flex-col">
+          <p className="text-[2.4vw] leading-tight font-bold">{prompt}</p>
+          <StageCode code={o.code} numbered={false} max="4.6vw" />
+          {answer && (
+            <div className="mt-[1vw] shrink-0 border-t-2 border-dashed border-line pt-[1vw]">
+              <pre className="font-code text-[clamp(2rem,4vw,4.5rem)] leading-[1.15] font-bold">{o.answer}</pre>
+              <p className="mt-[0.6vw] text-[1.9vw] leading-snug">{o.why}</p>
+            </div>
+          )}
+        </div>
+      );
     return (
       <div>
-        <p className={big ? "text-2xl" : "text-lg"}>What does this Python print?{o.tiebreak && <LevelChip level="hard" />}</p>
-        <Code code={o.code} className={`my-3 ${codeCls}`} />
+        <p className="text-lg">{prompt}</p>
+        <Code code={o.code} numbered={false} className="my-3" />
         {answer && (
           <div className="mt-4 border-t-2 border-dashed border-line pt-4">
-            <pre className={`font-code font-bold ${big ? "text-[clamp(2rem,4vw,4.5rem)]" : "text-3xl"}`}>{o.answer}</pre>
-            <p className={big ? "text-2xl" : ""}>{o.why}</p>
+            <pre className="font-code text-3xl font-bold">{o.answer}</pre>
+            <p>{o.why}</p>
           </div>
         )}
       </div>
@@ -337,15 +402,28 @@ export function CardView({
     );
   }
   const l = LANGS[index];
+  if (big)
+    return (
+      <div className="flex h-full flex-col">
+        <p className="text-[2.4vw] leading-tight font-bold">Which language is this?</p>
+        <StageCode code={l.code} numbered={false} max="3.6vw" />
+        {answer && (
+          <div className="mt-[1vw] shrink-0 border-t-2 border-dashed border-line pt-[1vw]">
+            <p className="text-[clamp(2.4rem,4.5vw,5rem)] leading-none font-extrabold tracking-[-0.02em]">{l.lang}</p>
+            <p className="mt-[0.6vw] text-[1.9vw] leading-snug">{l.tell}</p>
+          </div>
+        )}
+      </div>
+    );
   return (
     <div>
-      <p className={big ? "text-2xl" : "text-lg"}>Which language is this?</p>
+      <p className="text-lg">Which language is this?</p>
       {/* Long lines wrap rather than scroll, so a phone shows the whole snippet. */}
-      <Code code={l.code} numbered={false} wrap className={`my-3 ${big ? codeCls : "max-sm:px-4 max-sm:text-[0.8125rem]"}`} />
+      <Code code={l.code} numbered={false} wrap className="my-3 max-sm:px-4 max-sm:text-[0.8125rem]" />
       {answer && (
         <div className="mt-4 border-t-2 border-dashed border-line pt-4">
-          <p className={`font-extrabold tracking-[-0.02em] ${big ? "text-[clamp(2.4rem,4.5vw,5rem)]" : "text-3xl"}`}>{l.lang}</p>
-          <p className={big ? "text-2xl" : ""}>{l.tell}</p>
+          <p className="text-3xl font-extrabold tracking-[-0.02em]">{l.lang}</p>
+          <p>{l.tell}</p>
         </div>
       )}
     </div>

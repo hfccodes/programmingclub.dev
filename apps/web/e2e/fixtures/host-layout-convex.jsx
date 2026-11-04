@@ -78,7 +78,18 @@ function teamUp(players, size) {
   return teams;
 }
 
-const empty = () => ({ session: null, teams: [], players: [], answers: {}, wiki: {}, drawings: [], recent: [], calls: [], rejected: [] });
+const empty = () => ({
+  session: null,
+  teams: [],
+  players: [],
+  answers: {},
+  wiki: {},
+  fixes: {},
+  drawings: [],
+  recent: [],
+  calls: [],
+  rejected: [],
+});
 
 const SCENARIOS = {
   /** No night running: the start panel. */
@@ -114,6 +125,14 @@ const SCENARIOS = {
     };
     return { ...empty(), session: s, players, teams, answers };
   },
+};
+/** A solo night with one player (Juan, on 13 points, whose join page holds the token "token-1"), between rounds. rounds.spec.ts
+ *  moves the TV and the join page from here with sessions:setScreen and sessions:timer. */
+SCENARIOS.solo = () => {
+  const players = people(1).map((p) => ({ ...p, name: "Juan" }));
+  const teams = teamUp(players, 1);
+  teams[0].score = 13;
+  return { ...empty(), session: session({ week: 4, teamSize: 1, round: 0, roundFrom: 0, screen: { mode: "lobby" } }), players, teams };
 };
 /** The active snippet after the host reveals it, scored by the app's real grading. */
 SCENARIOS.revealed = () => {
@@ -325,6 +344,15 @@ const MUTATIONS = {
     return { ...open(s), players: [...s.players, p] };
   },
   "teams:removePlayer": (s, { attendanceId }) => ({ ...s, players: s.players.filter((p) => p._id !== attendanceId) }),
+  // A join page's passing fix, as convex/fixes.ts records it (the stub trusts the page's own check).
+  "fixes:reportByToken": (s, { card }) => {
+    const c = cardOnTv(s);
+    if (c?.key !== card) throw new Error("That card isn’t on the TV anymore.");
+    const t = s.teams[0];
+    const rows = s.fixes[card] ?? [];
+    if (rows.some((r) => r.teamId === t._id)) return s;
+    return { ...s, fixes: { ...s.fixes, [card]: [...rows, { teamId: t._id, name: t.name, at: Date.now(), result: null }] } };
+  },
   "wiki:check": (s, { teamId, card, ok }) => ({
     ...s,
     wiki: { ...s.wiki, [card]: (s.wiki[card] ?? []).map((f) => (f.teamId === teamId ? { ...f, ok } : f)) },
@@ -487,7 +515,10 @@ const QUERIES = {
   },
   "fixes:board": (s) => {
     const c = cardOnTv(s);
-    return c?.game === "fix" ? { card: c.key, teams: s.teams.length, scored: s.session.scored.includes(c.key), fixed: [] } : null;
+    if (c?.game !== "fix") return null;
+    const start = s.session.card?.key === c.key ? s.session.card.at : undefined;
+    const fixed = (s.fixes[c.key] ?? []).map((r) => ({ ...r, ms: start === undefined ? null : Math.max(0, r.at - start) }));
+    return { card: c.key, teams: s.teams.length, scored: s.session.scored.includes(c.key), fixed };
   },
   "fixes:host": (s) => {
     const c = cardOnTv(s);
@@ -584,6 +615,40 @@ const QUERIES = {
     };
   },
   "drawings:inkBlocks": () => 0,
+  "players:account": () => null,
+  // The join page, for the one player whose token is "token-1".
+  "players:me": (s, args) => {
+    const p = args?.token === "token-1" ? s.players[0] : undefined;
+    if (!p || !s.session) return null;
+    const t = s.teams.find((x) => x._id === p.teamId);
+    const scores = s.teams.map((x) => x.score);
+    return {
+      name: p.name,
+      ended: false,
+      week: s.session.week,
+      practice: s.session.practice,
+      officer: false,
+      playing: false,
+      team: t && {
+        _id: t._id,
+        name: t.name,
+        key: t.key,
+        score: t.score,
+        rank: 1 + scores.filter((x) => x > t.score).length,
+        of: s.teams.length,
+        members: [p.name],
+      },
+      seasonXp: 0,
+      weeks: 0,
+      tonight: null,
+    };
+  },
+  "answers:mine": (s) => {
+    const c = cardOnTv(s);
+    if (!c || !isAnswerGame(c.game)) return null;
+    const row = s.answers[c.key]?.[s.teams[0]?._id];
+    return { card: c.key, pick: row ? { choice: row.choice, line: row.line, locked: row.lockedAt !== undefined } : null, result: null };
+  },
 };
 
 export function useQuery(reference, args) {

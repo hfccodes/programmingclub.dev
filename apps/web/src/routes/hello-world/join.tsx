@@ -489,14 +489,23 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
           {me.practice && " · practice"}
         </p>
       </div>
-      {me.team && <p className="narrow text-3xl leading-none font-extrabold">{me.team.score}</p>}
+      {/* Small labels, so a bare "13" reads as points and "2:43" as time left. */}
+      {me.team && (
+        <p className="text-right leading-none">
+          <span className="narrow text-3xl font-extrabold">{me.team.score}</span>
+          <span className="block text-xs font-semibold text-dim">{me.team.score === 1 ? "point" : "points"}</span>
+        </p>
+      )}
       {hosting && (
         <Link to="/hello-world/host" className="btn btn-sm">
           Host
         </Link>
       )}
       {timed && (
-        <p className={`narrow border-l border-line pl-3 text-3xl leading-none font-extrabold ${hot ? "text-signal" : ""}`}>{clock}</p>
+        <p role="timer" className="border-l border-line pl-3 text-right leading-none">
+          <span className={`narrow text-3xl font-extrabold ${hot ? "text-signal" : ""}`}>{clock}</span>
+          <span className="block text-xs font-semibold text-dim">left</span>
+        </p>
       )}
     </div>
   );
@@ -525,10 +534,10 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
       {!spooky && <JoinWinter game={game} />}
       {!spooky && isWinter() && <JoinShift screen={screenKey(s)} clear={clockRunning(s, live.timer, live.scored)} />}
       <Wrap
-        className={`flex min-h-dvh flex-col ${!spooky && !game ? winterTop() : "py-5"} ${wide ? "" : split || bugHunt ? "max-w-2xl lg:w-[min(80rem,100%-2.5rem)] lg:max-w-none" : "max-w-2xl"} ${drawing ? "short:max-w-none" : ""} ${spooky ? "relative isolate" : ""}`}
+        className={`flex min-h-dvh flex-col ${!spooky && !game ? winterTop() : "py-5 [--ws-top:6rem]"} ${wide ? "" : split || bugHunt ? "max-w-2xl lg:w-[min(80rem,100%-2.5rem)] lg:max-w-none" : "max-w-2xl"} ${drawing ? "short:max-w-none" : ""} ${spooky ? "relative isolate" : ""}`}
       >
         <div className={split ? `lg:grid lg:items-start lg:justify-center lg:gap-12 ${columns}` : ""}>
-          {/* On a phone on its side, a drawing takes the bar beside it instead. */}
+          {/* On a phone on its side, a drawing takes the bar beside it instead. --ws-top (above) clears it, for what sticks under it. */}
           {game && bar(`sticky top-2 z-20 flex ${slim ? "" : "lg:hidden"} ${drawing ? "short:hidden" : ""}`)}
           <div className={`${split ? "lg:sticky lg:top-5" : ""} ${slim ? "hidden" : game ? "hidden lg:block" : ""}`}>
             <p className="text-sm text-dim">

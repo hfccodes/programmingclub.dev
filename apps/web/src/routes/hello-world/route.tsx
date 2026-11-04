@@ -41,7 +41,8 @@ function Layout() {
   return (
     <>
       <Nav />
-      <main id="main">
+      {/* --ws-top: how far down the sticky header reaches, for what sticks under it (Fix it for real's workspace). */}
+      <main id="main" className="[--ws-top:6rem]">
         <Outlet />
       </main>
       <Footer />

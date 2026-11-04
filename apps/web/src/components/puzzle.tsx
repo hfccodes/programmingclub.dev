@@ -6,7 +6,7 @@ import { PUZZLES } from "#/lib/puzzles";
 import { TIMEOUT_MS } from "#/lib/python";
 import type { PyRun, Python } from "#/lib/python";
 import { teamWords } from "#/lib/words";
-import { Editor, PyState, Traceback } from "./fix";
+import { Editor, EditorHead, PyState, Traceback, errorLine } from "./fix";
 import { useConfirm, useNotify } from "./feedback";
 import { Hint, LevelChip, PuzzleExample, Rich, fmtElapsed } from "./game";
 import { Code } from "./ui";
@@ -51,7 +51,7 @@ export function PuzzleRound({ index, input, py, revealed, hint, open, stars, loc
   const p = PUZZLES[index];
   const [code, setCode] = useState(STARTER);
   const [busy, setBusy] = useState<"example" | "input" | null>(null);
-  const [run, setRun] = useState<{ on: "example" | "input"; out: PyRun } | null>(null);
+  const [run, setRun] = useState<{ on: "example" | "input"; out: PyRun; code: string } | null>(null);
   const [error, setError] = useState("");
   const done1 = stars.part1Ms !== null;
   const done2 = stars.part2Ms !== null;
@@ -96,7 +96,7 @@ export function PuzzleRound({ index, input, py, revealed, hint, open, stars, loc
     const text = on === "example" ? p.example : input;
     const out = await py.run(code, text, { "input.txt": text }).catch(() => null);
     if (!out) setError("Python isn’t ready. Reload the page and try again.");
-    else setRun({ on, out });
+    else setRun({ on, out, code });
     setBusy(null);
   };
 
@@ -127,7 +127,7 @@ export function PuzzleRound({ index, input, py, revealed, hint, open, stars, loc
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="min-w-0 space-y-3 @container">
         <Status revealed={revealed} open={open} stars={stars} result={result} />
         {!revealed && (
           <div className="space-y-2">
@@ -137,16 +137,16 @@ export function PuzzleRound({ index, input, py, revealed, hint, open, stars, loc
           </div>
         )}
         <InputBox input={input} solo={solo} />
-        <Editor value={code} onChange={edit} />
-        <div className="flex flex-wrap items-center gap-1">
+        <div>
+          <EditorHead note="Python, right here" onReset={() => void resetCode()} changed={code !== STARTER} />
+          <Editor value={code} onChange={edit} mark={run?.out.error && run.code === code ? errorLine(run.out.error) : undefined} />
+        </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <button className="btn" disabled={!can} onClick={() => void go("example")}>
             {busy === "example" ? "Running…" : "Run on the example"}
           </button>
-          <button className="btn btn-coin" disabled={!can} onClick={() => void go("input")}>
+          <button className="btn btn-primary" disabled={!can} onClick={() => void go("input")}>
             {busy === "input" ? "Running…" : "Run on my input"}
-          </button>
-          <button className="btn btn-sm ml-auto text-dim" onClick={() => void resetCode()}>
-            Reset code
           </button>
         </div>
         <PyState status={py.status} ready="Your input is in input.txt and on stdin. Try the example first: its answers are on the left." />
@@ -155,7 +155,7 @@ export function PuzzleRound({ index, input, py, revealed, hint, open, stars, loc
             {error}
           </p>
         )}
-        {run && <Output {...run} />}
+        {run && <Output on={run.on} out={run.out} stale={run.code !== code} />}
       </div>
     </div>
   );
@@ -341,15 +341,25 @@ export function InputBox({ input, solo }: { input: string; solo?: boolean }) {
   );
 }
 
-/** What the program printed, and the traceback if it crashed. */
-function Output({ on, out }: { on: "example" | "input"; out: PyRun }) {
+/** What the program printed, and the traceback if it crashed, right under the Run buttons (scrolled into view). */
+function Output({ on, out, stale }: { on: "example" | "input"; out: PyRun; stale: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const printed = out.stdout.replace(/\n+$/, "");
+  useEffect(() => {
+    ref.current?.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }, [out]);
   return (
-    <div className="card p-4">
-      <p className="font-bold">{on === "example" ? "On the example, your program printed" : "On your input, your program printed"}</p>
-      <pre className="code mt-2 max-h-80 overflow-auto text-sm">{out.stdout.replace(/\n+$/, "") || "(nothing)"}</pre>
+    <div ref={ref} className={`card scroll-mt-24 scroll-mb-4 p-4 ${stale ? "opacity-70" : ""}`}>
+      <p role="status" className="font-bold">
+        {on === "example" ? "On the example, your program" : "On your input, your program"}
+        {out.error ? (printed ? " printed this, then crashed" : " crashed before printing anything") : " printed"}
+      </p>
+      {stale && <p className="mt-1 text-sm font-semibold text-dim">You’ve changed the code since. Run it again to see the new result.</p>}
+      {/* A crash with nothing printed: the error below says it all, without an empty box over it. */}
+      {(printed || !out.error) && <pre className="code mt-2 max-h-80 overflow-auto text-sm">{printed || "(nothing)"}</pre>}
       {out.error && <Traceback text={out.error} />}
       {out.timedOut && (
-        <p className="mt-2 font-semibold text-signal">Stopped after {TIMEOUT_MS / 1000} seconds. Is there a loop that never ends?</p>
+        <p className="mt-2 font-semibold text-[#a8321f]">Stopped after {TIMEOUT_MS / 1000} seconds. Is there a loop that never ends?</p>
       )}
     </div>
   );

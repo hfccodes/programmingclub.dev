@@ -16,7 +16,9 @@ import { Lights, Pines, Snow } from "#/components/winter";
 import { WinterBoard, WinterLobby, WinterMessage, WinterShift } from "#/components/winter-stage";
 import { OfficerGate, useAction, useJoinCode } from "#/components/officer";
 import { GAME_TILE, Loading, Picto, ordinal, weekTile } from "#/components/ui";
+import type { PictoId } from "#/components/ui";
 import { BUGS, GAMES } from "#/lib/content";
+import { FIXES } from "#/lib/fixes";
 import { heldLabel, roundOf } from "#/lib/flow";
 import { cardKey, drawKey, isAnswerGame, placeOf, wikiKey } from "#/lib/grading";
 import { nextMeeting, useJustEnded, useSchedule } from "#/lib/schedule";
@@ -295,6 +297,10 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
   // A winter night's lobby, round titles, and standings are scenes too (winter-stage.tsx).
   const winter = isWinter() && !spooky;
   const scene = hunt || ((spooky || winter) && (s.mode === "lobby" || s.mode === "message" || s.mode === "scoreboard"));
+  // While a card or race is being played, its clock sits big in the top corner beside its status, not down in the ticker.
+  const playing = (s.mode === "card" && !!s.game && s.index !== undefined && !hunt) || (s.mode === "wiki" && !s.wikiReady && !!s.wikiFrom);
+  const clockShown = running || remaining !== live.timer.durationMs;
+  const stageClock = playing && clockShown && !done && <StageClock remaining={remaining} running={running} />;
 
   return (
     <>
@@ -344,32 +350,25 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
           />
         )}
         {s.mode === "card" && s.game && s.index !== undefined && !hunt && (
-          // Fix it for real fills the screen, so its code can be as big as it fits; other cards sit in the middle.
-          <div className={`mx-auto flex h-full flex-col ${isFix ? "" : "max-w-[90vw] justify-center"}`}>
-            <p className="mb-[1.2vw] flex items-center gap-[1vw] text-[1.8vw] font-bold">
-              {deckTile && (
-                <span className={`tile ${deckTile.tile} size-[3.6vw]`}>
-                  <Picto id={deckTile.picto} className="absolute inset-[10%]" />
-                </span>
-              )}
-              {DECKS[s.game].name}
-              {count && <span className="font-normal text-dim">· {count}</span>}
+          // The card's name and status across the top, with its clock where everyone is already looking, then the card:
+          // Fix it for real's code as big as fits beside who fixed it; other cards fill the rest, results beside them.
+          <div className={`mx-auto flex h-full flex-col ${isFix ? "" : "max-w-[90vw]"}`}>
+            <StageHead
+              tile={deckTile}
+              name={isFix ? `${DECKS.fix.name}: ${FIXES[s.index].name}` : DECKS[s.game].name}
+              count={count}
+              clock={stageClock}
+            >
               {board && board.locked !== null && !s.revealed && board.teams > 0 && (
-                <span className="ml-auto">
-                  <span className="narrow text-[2.6vw] font-extrabold">{board.locked}</span> of {board.teams} {w.teams} locked in
-                </span>
+                <Tally n={board.locked} of={board.teams} w={w} what="locked in" />
               )}
-              {fixBoard && !done && fixBoard.teams > 0 && (
-                <span className="ml-auto">
-                  <span className="narrow text-[2.6vw] font-extrabold">{fixBoard.fixed.length}</span> of {fixBoard.teams} {w.teams} fixed it
-                </span>
-              )}
+              {fixBoard && !done && fixBoard.teams > 0 && <Tally n={fixBoard.fixed.length} of={fixBoard.teams} w={w} what="fixed it" />}
               {puzzleBoard && !done && stars !== null && stars > 0 && (
-                <span className="ml-auto">
+                <span>
                   <span className="narrow text-[2.6vw] font-extrabold text-gold">{stars}</span> star{stars === 1 ? "" : "s"} so far
                 </span>
               )}
-            </p>
+            </StageHead>
             {isFix ? (
               <div className="min-h-0 flex-1">
                 <CardView
@@ -381,10 +380,24 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
                   aside={fixBoard && <FixList board={fixBoard} done={done} />}
                 />
               </div>
+            ) : s.game === "bug" ? (
+              <div className="min-h-0 flex-1">
+                <CardView
+                  game="bug"
+                  index={s.index}
+                  answer={done}
+                  size="xl"
+                  aside={board?.results && <Results results={board.results} bug />}
+                />
+              </div>
             ) : (
-              <div className={board?.results || puzzleBoard ? "grid grid-cols-[minmax(0,1fr)_26vw] items-start gap-[3vw]" : ""}>
-                <CardView game={s.game} index={s.index} answer={done} hint={!!s.hint} size="xl" solo={w.solo} />
-                {board?.results && <Results results={board.results} bug={s.game === "bug"} />}
+              <div
+                className={`grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)] items-center ${board?.results || puzzleBoard ? "grid-cols-[minmax(0,1fr)_26vw] gap-[3vw]" : ""}`}
+              >
+                <div className={s.game === "puzzle" ? "min-h-0" : "h-full min-h-0"}>
+                  <CardView game={s.game} index={s.index} answer={done} hint={!!s.hint} size="xl" solo={w.solo} />
+                </div>
+                {board?.results && <Results results={board.results} bug={false} />}
                 {puzzleBoard && <StarBoard board={puzzleBoard} done={done} w={w} />}
               </div>
             )}
@@ -404,28 +417,32 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
           </div>
         )}
         {s.mode === "wiki" && !s.wikiReady && s.wikiFrom && s.wikiTo && (
-          <div className={`grid h-full items-center gap-[3vw] ${wikiBoard && wikiBoard.teams > 0 ? "grid-cols-[minmax(0,1fr)_26vw]" : ""}`}>
-            <div className="flex flex-col gap-[3vw]">
-              {count && <p className="-mb-[1.5vw] text-[1.8vw] font-bold text-dim">Wiki Race · {count}</p>}
-              <div className={`grid gap-[0.3vw] ${wikiBoard && wikiBoard.teams > 0 ? "" : "grid-cols-2"}`}>
-                <div className="bg-mist p-[3vw]">
-                  <p className="text-[1.6vw] text-dim">Start here</p>
-                  <p className="mt-[0.8vw] text-[5vw] leading-[0.95] font-extrabold tracking-[-0.03em]">{s.wikiFrom}</p>
-                  <p className="mt-[1.2vw] text-[1.6vw] font-bold">
-                    {w.Computers}: {CLUB.url}/wiki
-                  </p>
+          <div className="flex h-full flex-col">
+            <StageHead tile={GAME_TILE.wiki} name={`Wiki Race${s.wikiClicks ? ": Fewest Clicks" : ""}`} count={count} clock={stageClock} />
+            <div
+              className={`grid min-h-0 flex-1 items-center gap-[3vw] ${wikiBoard && wikiBoard.teams > 0 ? "grid-cols-[minmax(0,1fr)_26vw]" : ""}`}
+            >
+              <div className="flex flex-col gap-[2vw]">
+                <div className={`grid gap-[0.3vw] ${wikiBoard && wikiBoard.teams > 0 ? "" : "grid-cols-2"}`}>
+                  <div className="bg-mist p-[2.4vw]">
+                    <p className="text-[1.6vw] text-dim">Start here</p>
+                    <p className="mt-[0.6vw] text-[5vw] leading-[0.95] font-extrabold tracking-[-0.03em]">{s.wikiFrom}</p>
+                    <p className="mt-[1vw] text-[1.6vw] font-bold">
+                      {w.Computers}: {CLUB.url}/wiki
+                    </p>
+                  </div>
+                  <div className="tile tile-sky p-[2.4vw]">
+                    <p className="text-[1.6vw]">Get to</p>
+                    <p className="mt-[0.6vw] text-[5vw] leading-[0.95] font-extrabold tracking-[-0.03em]">{s.wikiTo}</p>
+                  </div>
                 </div>
-                <div className="tile tile-sky p-[3vw]">
-                  <p className="text-[1.6vw]">Get to</p>
-                  <p className="mt-[0.8vw] text-[5vw] leading-[0.95] font-extrabold tracking-[-0.03em]">{s.wikiTo}</p>
-                </div>
+                <p className="text-[1.5vw] text-dim">
+                  {s.wikiClicks ? "Fewest clicks wins. Count every link you click. " : ""}
+                  Links inside the article only. No search bar. Back button and Ctrl+F are fine. Tap “{w.madeIt}” on a phone when you land.
+                </p>
               </div>
-              <p className="text-[1.5vw] text-dim">
-                {s.wikiClicks ? "Fewest clicks wins. Count every link you click. " : ""}
-                Links inside the article only. No search bar. Back button and Ctrl+F are fine. Tap “{w.madeIt}” on a phone when you land.
-              </p>
+              {wikiBoard && wikiBoard.teams > 0 && <RaceList board={wikiBoard} done={done || wikiBoard.scored} w={w} />}
             </div>
-            {wikiBoard && wikiBoard.teams > 0 && <RaceList board={wikiBoard} done={done || wikiBoard.scored} w={w} />}
           </div>
         )}
         {s.mode === "draw" && s.drawing !== undefined && <DrawView n={s.drawing} live={live} remaining={remaining} w={w} count={count} />}
@@ -446,7 +463,7 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         <span className="font-bold">
           Week {live.week}: {wk.title}
         </span>
-        {live.double && <span className="bg-sun px-[0.8vw] py-[0.2vw] font-bold text-[#12332b]">Last round counts double</span>}
+        {live.double && <span className="bg-sun px-[0.8vw] py-[0.2vw] font-bold text-[#12332b]">Double points</span>}
         {live.practice && <span className="bg-sky px-[0.8vw] py-[0.2vw] font-bold text-[#12332b]">Practice night</span>}
         <span className="ml-auto text-dim">
           Join at <strong className="text-ink">{origin.replace(/^https?:\/\//, "")}/join</strong>
@@ -455,7 +472,7 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         {/* A card off the TV mid-play: its clock waits for it. */}
         {s.mode !== "timer" && live.timer.parked && <span className="text-dim">paused</span>}
         {/* The haunted Bug Hunt has its own clock. */}
-        {s.mode !== "timer" && !hunt && (running || remaining !== live.timer.durationMs) && (
+        {s.mode !== "timer" && !hunt && !playing && clockShown && (
           <span
             className={`narrow min-w-[4ch] text-right text-[2.8vw] leading-none font-extrabold ${remaining <= 10_000 && running ? "text-signal" : ""}`}
           >
@@ -469,6 +486,61 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         </div>
       )}
     </>
+  );
+}
+
+/** A card's (or race's) title row: its tile and name, which one of the round it is, its status, and its clock. */
+function StageHead({
+  tile,
+  name,
+  count,
+  clock,
+  children,
+}: {
+  tile: { tile: string; picto: PictoId } | null;
+  name: string;
+  count: string | null;
+  clock: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="mb-[1.2vw] flex shrink-0 items-center gap-[1vw] text-[1.8vw] font-bold">
+      {tile && (
+        <span className={`tile ${tile.tile} size-[3.6vw] shrink-0`}>
+          <Picto id={tile.picto} className="absolute inset-[10%]" />
+        </span>
+      )}
+      <span className="min-w-0 truncate">
+        {name}
+        {count && <span className="font-normal text-dim"> · {count}</span>}
+      </span>
+      <span className="ml-auto flex shrink-0 items-center gap-[2.4vw]">
+        {children}
+        {clock}
+      </span>
+    </div>
+  );
+}
+
+/** "3 of 8 players locked in", or "0 of 1 player fixed it". */
+function Tally({ n, of, w, what }: { n: number; of: number; w: TeamWords; what: string }) {
+  return (
+    <span>
+      <span className="narrow text-[2.6vw] font-extrabold">{n}</span> of {of} {of === 1 ? w.team : w.teams} {what}
+    </span>
+  );
+}
+
+/** The clock beside the card, big enough to read from the back; red for the last ten seconds. */
+function StageClock({ remaining, running }: { remaining: number; running: boolean }) {
+  return (
+    <span
+      role="timer"
+      aria-label="Time left"
+      className={`narrow min-w-[3.2ch] text-right text-[4.4vw] leading-[0.8] font-extrabold ${remaining <= 10_000 && running ? "text-signal" : ""}`}
+    >
+      {remaining === 0 && running ? "time" : fmtClock(remaining)}
+    </span>
   );
 }
 
@@ -496,12 +568,24 @@ function useCountSound(card: string | undefined, n: number | null) {
 
 /** One row per team beside the card. Solo nights make that one per player, so past `roomy` (7) they go to one tight
  *  line each, and past 12 the rest are counted instead of listed. */
-function TeamRows<T>({ rows, row, roomy = 7 }: { rows: T[]; row: (r: T, tight: boolean) => ReactNode; roomy?: number }) {
+function TeamRows<T>({
+  rows,
+  row,
+  roomy = 7,
+  limit = 12,
+}: {
+  rows: T[];
+  row: (r: T, tight: boolean) => ReactNode;
+  roomy?: number;
+  limit?: number;
+}) {
   const tight = rows.length > roomy;
   return (
     <>
-      <ol className={`mt-[1vw] flex flex-col ${tight ? "gap-[0.3vw]" : "gap-[0.5vw]"}`}>{rows.slice(0, 12).map((r) => row(r, tight))}</ol>
-      {rows.length > 12 && <p className="mt-[0.6vw] text-[1.3vw] text-dim">+ {rows.length - 12} more</p>}
+      <ol className={`mt-[1vw] flex flex-col ${tight ? "gap-[0.3vw]" : "gap-[0.5vw]"}`}>
+        {rows.slice(0, limit).map((r) => row(r, tight))}
+      </ol>
+      {rows.length > limit && <p className="mt-[0.6vw] text-[1.3vw] text-dim">+ {rows.length - limit} more</p>}
     </>
   );
 }
@@ -727,11 +811,13 @@ function DrawRows({ rows }: { rows: { key: string; lead: string; name: string; n
   );
 }
 
-/** Who got what on the revealed card. Picks stay hidden until now. */
+/** Who got the card, with points. Under a Bug Hunt reveal's explanation there's room for fewer rows. */
 function Results({ results, bug }: { results: NonNullable<Board["results"]>; bug: boolean }) {
   return (
     <div>
       <TeamRows
+        roomy={bug ? 4 : 7}
+        limit={bug ? 5 : 12}
         rows={results}
         row={({ _id, name, result: r }, tight) => (
           <li key={_id} className={`grid grid-cols-[2.6vw_minmax(0,1fr)_auto] items-center gap-[1vw] bg-mist px-[1.2vw] ${ROW(tight)}`}>

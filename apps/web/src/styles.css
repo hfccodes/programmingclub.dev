@@ -29,6 +29,19 @@
 /* The host console as one screen: a laptop or bigger that's tall enough. Shorter screens scroll the page instead. */
 @custom-variant desk (@media (width >= 64rem) and (height >= 42.5rem));
 
+/*
+ * Fix it for real's workspace side by side, in a container wide enough for the task beside the editor, on a screen tall
+ * enough to keep the editor, the buttons, and what they found in view at once. Narrower or shorter, it stacks and scrolls.
+ * Measured on the workspace's own container (@container/fix), so it holds inside the narrower containers within.
+ */
+@custom-variant ws {
+  @container fix (width >= 56rem) {
+    @media (height >= 34rem) {
+      @slot;
+    }
+  }
+}
+
 @layer base {
   .theme-pine {
     --color-paper: #0f2b24;
@@ -259,6 +272,10 @@
     padding: 1rem 1.25rem;
     overflow-x: auto;
     tab-size: 4;
+  }
+  /* On pine itself (the TV, the slides), code would melt into the page: a lifted panel sets it apart, no border. */
+  .theme-pine .code {
+    background: #16392f;
   }
   .code .cl {
     display: block;
