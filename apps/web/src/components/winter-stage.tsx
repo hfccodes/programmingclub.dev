@@ -5,7 +5,7 @@
 // from a fixed sequence, so there's nothing to load and it's the same on every visit. Like the spooky night it moves
 // even with reduced motion on: it's a shared display.
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useFitName, useFlip } from "./graveyard";
 import { InstagramGlyph } from "./instagram";
@@ -42,7 +42,7 @@ const W = 1600;
 
 /** A torn-paper hill across a strip `h` tall: its top at `top(x)`, solid to the bottom. */
 function hill(h: number, top: (x: number) => number, k: number) {
-  const line: Pt[] = Array.from({ length: 41 }, (_, i) => [i * 40 - 20, top(i * 40 - 20)]);
+  const line: Pt[] = Array.from({ length: 43 }, (_, i) => [i * 40 - 20, top(i * 40 - 20)]);
   return shape([...tear(line, 7, 1.6, k), [W + 20, h + 2], [-20, h + 2]]);
 }
 const wave = (x: number, f: number, p: number) => Math.sin((x / W) * Math.PI * 2 * f + p);
@@ -54,7 +54,10 @@ function forest(foot: (x: number) => number, step: number, low: number, jitter: 
   const snow: string[] = [];
   for (let i = 0, x = -30; x < W + 30; i++, x += step * (0.7 + rand(i, k) * 0.6)) {
     const out = Math.min(1, Math.max(0, (Math.abs(x - W / 2) / (W / 2) - from) / (1 - from)));
-    const p = pine(x, low + rand(i, k + 1) * jitter + corner * out ** 1.3, foot(x) + 4 + rand(i, k + 2) * 6);
+    const h = low + rand(i, k + 1) * jitter + corner * out ** 1.3;
+    // A pine that would come out a sprout isn't drawn at all.
+    if (h < 18) continue;
+    const p = pine(x, h, foot(x) + 4 + rand(i, k + 2) * 6, 0.34);
     tree.push(p.tree);
     snow.push(p.snow);
   }
@@ -67,45 +70,36 @@ const FAR = { hill: hill(300, FAR_TOP, 40), ...forest(FAR_TOP, 22, 26, 26, 30, 0
 // The row of pines the signboard comes up out of, 1600 × 240.
 const ROW = forest(() => 226, 46, 70, 46, 120, 0.55, 50);
 // The snow along the front, 1600 × 120: the lobby's ground, and the foot of everything else.
-const NEAR_TOP = (x: number) => 52 + 10 * wave(x, 1.6, 1.2) + 6 * wave(x, 4.3, 0.2);
+const NEAR_TOP = (x: number) => 46 + 7 * wave(x, 1.6, 1.2) + 4 * wave(x, 4.3, 0.2);
 const NEAR = hill(120, NEAR_TOP, 60);
 // The standings' low ground, 1600 × 90: a drift, with a few pines only out in the corners.
 const LOW_TOP = (x: number) => 58 + 6 * wave(x, 2.2, 0.4);
-const LOW = { hill: hill(90, LOW_TOP, 70), ...forest(() => 66, 34, 0, 0, 74, 0.8, 71) };
+const LOW = { hill: hill(90, LOW_TOP, 70), ...forest(() => 66, 24, 0, 0, 84, 0.86, 71) };
 
 const Strip = ({ h, className, children }: { h: number; className: string; children: ReactNode }) => (
   <svg aria-hidden viewBox={`0 0 ${W} ${h}`} preserveAspectRatio="xMidYMax slice" className={`wn-strip ${className}`}>
     {children}
   </svg>
 );
-/** A torn hill: the paper's white core along the tear, under its colored face. */
-const Torn = ({ d, className }: { d: string; className: string }) => (
-  <>
-    <path d={d} className="wn-fiber" transform="translate(0 -2.2)" />
-    <path d={d} className={className} />
-  </>
-);
+/** A torn hill: its edge is torn by `hill`, and its shadow comes from the strip (winter-stage.css). */
+const Torn = ({ d, className }: { d: string; className: string }) => <path d={d} className={className} />;
 
 // Stars: across (%), down (%), size (cqw), twinkle seconds and start.
 const STARS = Array.from({ length: 46 }, (_, i) => [
   rand(i, 80) * 100,
   rand(i, 81) ** 1.5 * 62,
-  0.14 + rand(i, 82) * 0.22,
+  0.07 + rand(i, 82) ** 3 * 0.13,
   2.5 + rand(i, 83) * 4,
   -rand(i, 84) * 6,
 ]);
 
-/** The winter night behind a screen: the sky with its stars, northern lights and moon, the far hills and their pines,
+/** The winter night behind a screen: the sky with its stars and a crescent moon, the far hills and their pines,
  *  snow falling, and the club's lights across the top. `ground` picks what's along the bottom: the pines a sign comes up
  *  out of ("row"), the lobby's snowy ground ("ground"), or a low drift that leaves the standings the room ("low"). */
 function WinterNight({ ground, children }: { ground: "row" | "ground" | "low"; children?: ReactNode }) {
   const mounted = useMounted();
   return (
     <div className={`wn wn-is-${ground} absolute inset-0`}>
-      <div className="wn-aurora" aria-hidden>
-        <i />
-        <i />
-      </div>
       {mounted &&
         STARS.map(([x, y, s, t, d], i) => (
           <span
@@ -156,25 +150,21 @@ function WinterNight({ ground, children }: { ground: "row" | "ground" | "low"; c
   );
 }
 
-const MOON = shape(
-  tear(
-    Array.from({ length: 37 }, (_, i): Pt => [50 + 46 * Math.cos(i / 5.73), 50 + 46 * Math.sin(i / 5.73)]),
-    3,
-    0.9,
-    90,
-  ),
-);
-const Moon = () => (
-  <div className="wn-moon" aria-hidden>
-    <svg viewBox="0 0 100 100">
-      <path d={MOON} className="wn-fiber" />
-      <path d={MOON} transform="translate(50 50) scale(0.96) translate(-50 -50)" fill="#f2ecd6" />
-      <circle cx="36" cy="40" r="9" fill="#e2dbc0" />
-      <circle cx="62" cy="58" r="12" fill="#e5dec4" />
-      <circle cx="58" cy="30" r="5" fill="#e2dbc0" />
-    </svg>
-  </div>
-);
+/** A thin crescent moon with a soft glow around it: a disc with an offset one cut out of it. */
+function Moon() {
+  const id = useId();
+  return (
+    <div className="wn-moon" aria-hidden>
+      <svg viewBox="0 0 100 100">
+        <mask id={id}>
+          <rect width="100" height="100" fill="#fff" />
+          <circle cx="63" cy="40" r="35" fill="#000" />
+        </mask>
+        <circle cx="50" cy="50" r="40" fill="#f6efd8" mask={`url(#${id})`} />
+      </svg>
+    </div>
+  );
+}
 
 /** A round's number above the sign, its game on it, and anything else as it is: "Round 2, double points: Wiki Race". */
 function parse(message: string) {
@@ -227,23 +217,25 @@ const POSTS = [230, 770].map((x, i) =>
     ),
   ),
 );
-const CAP = shape(
-  tear(
-    [
-      [26, 124],
-      ...Array.from({ length: 21 }, (_, i): Pt => [30 + i * 47, 98 - 20 * (i % 2 ? 0.6 : 1) * (0.7 + rand(i, 104) * 0.6) - (i * 22) / 20]),
-      [976, 102],
-      // Along the face's top edge, with a drip every third.
-      ...Array.from({ length: 21 }, (_, i): Pt => [
-        976 - i * 47,
-        146 - ((976 - i * 47) / 1000) * 20 + (i % 3 === 1 ? 12 + rand(i, 105) * 16 : 0),
-      ]),
-    ],
-    8,
-    1.4,
-    106,
-  ),
-);
+// The snow on the sign: soft mounds along its top, overhanging the ends a little, and a drip here and there over the
+// face. Smooth, not torn: it's snow, not paper.
+const TOP_AT = (x: number) => 112 - (x * 22) / 1000;
+const FACE_AT = (x: number) => 146 - (x * 18) / 1000;
+const CAP = (() => {
+  let d = `M16 ${TOP_AT(16) + 12}Q14 ${TOP_AT(16) - 10} 40 ${TOP_AT(40) - 12}`;
+  for (let x = 40, i = 0; x < 960; i++) {
+    const next = Math.min(960, x + 110 + rand(i, 104) * 60);
+    d += `Q${(x + next) / 2} ${TOP_AT(x) - 30 - rand(i, 105) * 14} ${next} ${TOP_AT(next) - 12}`;
+    x = next;
+  }
+  d += `Q990 ${TOP_AT(980) - 8} 984 ${FACE_AT(984) + 2}`;
+  for (let x = 984, i = 0; x > 20; i++) {
+    const next = Math.max(20, x - 70 - rand(i, 106) * 40);
+    d += `Q${(x + next) / 2} ${FACE_AT(x) + (i % 3 === 1 ? 26 : 9)} ${next} ${FACE_AT(next)}`;
+    x = next;
+  }
+  return `${d}Z`;
+})();
 const ICICLES = Array.from({ length: 13 }, (_, i) => {
   const x = 90 + i * 66 + rand(i, 107) * 20;
   const y = 422 - (x / 1000) * 14;
@@ -274,11 +266,10 @@ export function WinterMessage({ message }: { message: string }) {
             <path key={i} d={d} fill="#6b4529" />
           ))}
           <path d={BOARD} fill="#7c5232" />
-          <path d={FACE} className="wn-fiber" transform="translate(0 -2)" />
           <path d={FACE} fill="#e3c99a" />
           <path d={ICICLES} fill="#dcebee" />
-          <path d={CAP} className="wn-fiber" transform="translate(0 -2)" />
-          <path d={CAP} fill="#f3f8f6" />
+          <path d={CAP} fill="#dfeaec" transform="translate(0 5)" />
+          <path d={CAP} fill="#f4f8f7" />
         </svg>
         <div className="wn-face">
           <h2 className="leading-[1.05] tracking-[-0.035em] text-balance lowercase" style={{ fontSize: `${size.toFixed(2)}cqw` }}>
@@ -346,7 +337,6 @@ export function WinterLobby({ address, code, joinUrl, roster }: { address: strin
       <Tree />
       <div className="wn-card">
         <svg viewBox="0 0 100 120" preserveAspectRatio="none" aria-hidden>
-          <path d={CARD} className="wn-fiber" transform="translate(0 -0.4)" />
           <path d={CARD} fill="#f6f1e4" />
         </svg>
         <Holly />
@@ -424,7 +414,10 @@ const Holly = () => (
   </svg>
 );
 
-// The lobby's tree, 400 × 600: five tiers of torn paper, snow on each, a gold star on top, and lights on its swags.
+const BULB = ["#e0472f", "#efc12c", "#5db760", "#7ec3eb", "#f49a1d"];
+
+// The lobby's tree, 400 × 600: five tiers of paper, each lit a little on its right, a garland of lights across each,
+// and a gold star on top.
 const TIERS = [
   [70, 190, 66],
   [140, 270, 100],
@@ -432,82 +425,72 @@ const TIERS = [
   [295, 455, 168],
   [380, 560, 198],
 ];
-const TREE = TIERS.map(([a, b, w], i) =>
-  shape(
-    tear(
-      [
-        [200, a],
-        [200 + w, b],
-        [200 + w * 0.5, b - 10],
-        [200, b + 6],
-        [200 - w * 0.5, b - 10],
-        [200 - w, b],
-        [200, a],
-      ],
-      9,
-      2.4,
-      120 + i,
-    ),
-  ),
-);
-const TREE_SNOW = TIERS.map(([a, b, w], i) => {
-  const at = (x: number, down: number): Pt => [200 + w * x, a + (b - a) * down];
-  return shape(
-    tear(
-      [
-        [200, a],
-        at(0.46, 0.46),
-        at(0.3, 0.34),
-        at(0.14, 0.44),
-        at(-0.04, 0.3),
-        at(-0.22, 0.42),
-        at(-0.36, 0.33),
-        at(-0.46, 0.46),
-        [200, a],
-      ],
-      7,
-      1.6,
-      130 + i,
-    ),
-  );
+const TIER = (t: number) => {
+  const [a, b, w] = TIERS[t];
+  const pts: Pt[] = [
+    [200, a],
+    [200 + w, b],
+    [200 + w * 0.5, b - 10],
+    [200, b + 6],
+    [200 - w * 0.5, b - 10],
+    [200 - w, b],
+    [200, a],
+  ];
+  // The lit half: from the top down the right side to the middle of the bottom.
+  return { tier: shape(tear(pts, 9, 1.8, 120 + t)), lit: shape(tear(pts.slice(0, 4), 9, 1.8, 120 + t)) };
+};
+// Bottom tier first, so each one above overlaps the one below it.
+const TREE = [4, 3, 2, 1, 0].map(TIER);
+// A garland across each tier's lower part, drooping in the middle, with bulbs strung along it.
+const GARLANDS = TIERS.map(([a, b, w], t) => {
+  const y = b - 46;
+  const half = w * ((y - a) / (b - a)) * 0.82;
+  const p0: Pt = [200 - half, y];
+  const c: Pt = [200, y + 40];
+  const p2: Pt = [200 + half, y - 6];
+  const n = 3 + t;
+  const bulbs = Array.from({ length: n }, (_, j) => {
+    const u = (j + 0.5) / n;
+    const at = (k: 0 | 1) => (1 - u) ** 2 * p0[k] + 2 * u * (1 - u) * c[k] + u ** 2 * p2[k];
+    return { x: at(0), y: at(1) + 6, c: BULB[(j + t * 2) % BULB.length], d: -rand(j, 140 + t) * 3 };
+  });
+  return { d: `M${p0[0]} ${p0[1]}Q${c[0]} ${c[1]} ${p2[0]} ${p2[1]}`, bulbs };
 });
-const TREE_LIGHTS = TIERS.flatMap(([a, b, w], t) =>
-  Array.from({ length: 3 + t }, (_, j) => {
-    const u = (j + 0.5) / (3 + t);
-    // On a swag that droops across the tier's lower half, inside its edges.
-    const y = b - 46 + 22 * Math.sin(Math.PI * u);
-    return { x: 200 + (u - 0.5) * 1.7 * w * ((y - a) / (b - a)), y, c: (j + t * 2) % 5, d: -rand(j, 140 + t) * 3 };
-  }),
-);
 const STAR = shape(
   Array.from({ length: 10 }, (_, i): Pt => [
     200 + Math.sin((i * Math.PI) / 5) * (i % 2 ? 16 : 40),
     62 - Math.cos((i * Math.PI) / 5) * (i % 2 ? 16 : 40),
   ]),
 );
-const BULB = ["#e0472f", "#efc12c", "#5db760", "#7ec3eb", "#f49a1d"];
 
 function Tree() {
   return (
     <div className="wn-tree" aria-hidden>
       <svg viewBox="0 0 400 600">
-        <rect x="180" y="540" width="40" height="60" fill="#5a3a22" />
-        {TREE.map((d, i) => (
-          <path key={i} d={d} fill={i % 2 ? "#173f32" : "#123528"} />
+        <rect x="182" y="540" width="36" height="60" fill="#4a2f1c" />
+        {TREE.map((t, i) => (
+          <g key={i}>
+            {/* Each tier casts a soft shadow on the one below it. */}
+            <path d={t.tier} fill="rgb(0 12 8 / 0.35)" transform="translate(0 9)" />
+            <path d={t.tier} fill="#123a2d" />
+            <path d={t.lit} fill="#1a4c3a" />
+          </g>
         ))}
-        {TREE_SNOW.map((d, i) => (
-          <path key={i} d={d} fill="#e9f3f0" />
-        ))}
-        {TREE_LIGHTS.map((l, i) => (
-          <circle
-            key={i}
-            cx={l.x}
-            cy={l.y}
-            r="7"
-            fill={BULB[l.c]}
-            className="wn-tree-bulb"
-            style={{ "--d": `${l.d}s`, "--c": BULB[l.c] } as CSSProperties}
-          />
+        {GARLANDS.map((g, i) => (
+          <g key={i}>
+            <path d={g.d} className="wn-garland" />
+            {g.bulbs.map((l, j) => (
+              <circle
+                key={j}
+                cx={l.x}
+                cy={l.y}
+                r="7.5"
+                fill={l.c}
+                className="wn-tree-bulb"
+                style={{ "--d": `${l.d}s`, "--c": l.c } as CSSProperties}
+              />
+            ))}
+          </g>
         ))}
         <path d={STAR} className="wn-star-top" />
       </svg>

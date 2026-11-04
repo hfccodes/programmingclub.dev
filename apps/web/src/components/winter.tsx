@@ -119,7 +119,8 @@ export function Lights({
 // Each pine is three tiers with snow on top of each.
 const W = 1600;
 const H = 160;
-export function pine(cx: number, h: number, base: number) {
+/** A pine `h` tall standing at (cx, base): three tiers, each with snow on its top `depth` (half, by default). */
+export function pine(cx: number, h: number, base: number, depth = 0.5) {
   const tiers = [
     [1, 0.56, 0.16],
     [0.8, 0.32, 0.23],
@@ -130,7 +131,7 @@ export function pine(cx: number, h: number, base: number) {
     `M${cx - h * 0.035} ${base - h * 0.12}h${h * 0.07}V${base}h${-h * 0.07}Z`;
   const snow = tiers
     .map(([a, b, w]) => {
-      const at = (x: number, down: number) => `${cx + w * x} ${a + (b - a) * down}`;
+      const at = (x: number, down: number) => `${cx + w * x * depth * 2} ${a + (b - a) * down * depth * 2}`;
       return `M${cx} ${a}L${at(0.5, 0.5)}Q${at(0.32, 0.36)} ${at(0.12, 0.5)}Q${at(-0.08, 0.34)} ${at(-0.26, 0.47)}Q${at(-0.4, 0.38)} ${at(-0.5, 0.5)}Z`;
     })
     .join("");
