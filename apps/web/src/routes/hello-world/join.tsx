@@ -13,6 +13,7 @@ import { PhoneDraw } from "#/components/draw";
 import { JoinNight, clockRunning, screenKey } from "#/components/spooky-stage";
 import { InstagramLink } from "#/components/instagram";
 import { Lights, Snow } from "#/components/winter";
+import { JoinGround, JoinShift } from "#/components/winter-stage";
 import { AnswerBox, InputBox } from "#/components/puzzle";
 import { Loading, Picto, Wrap, ordinal, weekTile } from "#/components/ui";
 import { WikiPair, WikiRound } from "#/components/wiki";
@@ -182,19 +183,25 @@ function Center({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** In winter, snow behind the page and lights along its top, on every screen but a game's (nothing moves behind a
- *  card). Pages that show it start below the lights (`winterTop`). */
-function JoinWinter() {
+/** In winter, pale paper hills and pines along the bottom of the window, and on every screen but a game's (nothing
+ *  moves behind a card) snow behind the page and lights along its top. Pages with the lights start below them
+ *  (`winterTop`). */
+function JoinWinter({ game = false }: { game?: boolean }) {
   if (!isWinter()) return null;
   return (
     <div aria-hidden className="[--bulb:0.6rem] [--lights-h:2.4rem] [--snow-unit:0.45rem] [--snow:#a6cbe3]">
-      <div className="fixed inset-0 -z-10">
-        <Snow count={50} />
-      </div>
-      <div className="absolute inset-x-0 top-0 -z-10">
-        <Lights swags={4} className="sm:hidden" />
-        <Lights swags={9} className="max-sm:hidden" />
-      </div>
+      <JoinGround />
+      {!game && (
+        <>
+          <div className="fixed inset-0 -z-10">
+            <Snow count={50} />
+          </div>
+          <div className="absolute inset-x-0 top-0 -z-10">
+            <Lights swags={4} className="sm:hidden" />
+            <Lights swags={9} className="max-sm:hidden" />
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -514,7 +521,9 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
     <>
       {/* The spooky night's paper and change of screen, behind and over the page; a running clock is never covered. */}
       {spooky && <JoinNight screen={screenKey(s)} clear={clockRunning(s, live.timer, live.scored)} />}
-      {!spooky && !game && <JoinWinter />}
+      {/* A winter night's ground behind the page, and its change of screen over it, as on the TV. */}
+      {!spooky && <JoinWinter game={game} />}
+      {!spooky && isWinter() && <JoinShift screen={screenKey(s)} clear={clockRunning(s, live.timer, live.scored)} />}
       <Wrap
         className={`flex min-h-dvh flex-col ${!spooky && !game ? winterTop() : "py-5"} ${wide ? "" : split || bugHunt ? "max-w-2xl lg:w-[min(80rem,100%-2.5rem)] lg:max-w-none" : "max-w-2xl"} ${drawing ? "short:max-w-none" : ""} ${spooky ? "relative isolate" : ""}`}
       >

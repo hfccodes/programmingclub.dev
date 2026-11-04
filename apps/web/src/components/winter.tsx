@@ -7,14 +7,14 @@ import "./winter.css";
 
 /** Browser-only, like the wallpaper scenes: the positions come from Math.sin, which needn't match the server's to the
  *  last digit, so rendering on the server could mismatch on hydration. */
-function useMounted() {
+export function useMounted() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return mounted;
 }
 
 /** A fixed sequence in [0, 1), so the snow and the lights are the same on every visit (and on the server). */
-const rand = (i: number, k: number) => (((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1) + 1) % 1;
+export const rand = (i: number, k: number) => (((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1) + 1) % 1;
 
 // Flakes, near ones bigger, brighter, and quicker than far ones. Sizes and sway are in --snow-unit (see winter.css).
 const FLAKES = Array.from({ length: 120 }, (_, i) => {
@@ -119,7 +119,7 @@ export function Lights({
 // Each pine is three tiers with snow on top of each.
 const W = 1600;
 const H = 160;
-function pine(cx: number, h: number, base: number) {
+export function pine(cx: number, h: number, base: number) {
   const tiers = [
     [1, 0.56, 0.16],
     [0.8, 0.32, 0.23],

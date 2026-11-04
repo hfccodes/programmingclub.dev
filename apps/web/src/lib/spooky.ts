@@ -53,8 +53,12 @@ const GRAVE_TIERS = [
 
 /** The lobby's gravestones for `players` in join order: rows, back row first (so whoever just joined is up front),
  *  each stone's width in cqw, and how many more there are than fit. */
-export function graveRows<T>(players: T[]) {
-  const tier = GRAVE_TIERS.find((t) => players.length <= t.upTo) ?? GRAVE_TIERS[GRAVE_TIERS.length - 1];
+export const graveRows = <T>(players: T[]) => tieredRows(players, GRAVE_TIERS);
+
+/** Players in rows by the first of `tiers` they fit in (the last if none): rows, back row first, each piece's width in
+ *  cqw, and how many more there are than fit. The graveyard's stones and winter's presents both lay out this way. */
+export function tieredRows<T>(players: T[], tiers: { upTo: number; rows: number; width: number }[]) {
+  const tier = tiers.find((t) => players.length <= t.upTo) ?? tiers[tiers.length - 1];
   const shown = players.slice(0, tier.upTo);
   const per = Math.max(1, Math.ceil(shown.length / tier.rows));
   const rows: T[][] = [];

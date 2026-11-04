@@ -72,6 +72,34 @@ const COVERED = 400;
  * comes while they're still rising swaps in under them. The first screen after a load gets none.
  */
 export function SpookyShift({ screen, clear }: { screen: string; clear: boolean }) {
+  const run = useShift(screen, clear);
+  if (!run) return null;
+  return (
+    <div key={run.n} className={`shift ${run.clear ? "shift-clear" : ""}`} aria-hidden>
+      {!run.clear && (
+        <div className={`absolute inset-0 ${clear ? "shift-lift" : ""}`}>
+          {FLATS.map((f) => (
+            <div key={f.name} className={`shift-flat ${f.name}`}>
+              <Art src={f.src} className={f.flip ? "-scale-x-100" : ""} />
+              <div />
+            </div>
+          ))}
+        </div>
+      )}
+      {BURST.map(([x, y, d, size, dx], i) => (
+        <div key={i} className="shift-bat" style={{ "--x": `${x}%`, "--y": `${y}%`, "--d": `${d}s`, "--dx": `${dx}cqw` } as CSSProperties}>
+          <div className="haunt-bat" style={{ "--bat": `${size}cqw`, "--flap": `${0.14 + (i % 3) * 0.03}s` } as CSSProperties}>
+            <BatFrames />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** When to run a change of screen: a new run (`n` to key it by) for each new `screen`, none for the first after a
+ *  load or in a page in the background, and gone 1.5s later. Winter's change of screen runs on it too. */
+export function useShift(screen: string, clear: boolean) {
   const last = useRef(screen);
   const [run, setRun] = useState<{ n: number; clear: boolean; at: number } | null>(null);
   useEffect(() => {
@@ -97,28 +125,7 @@ export function SpookyShift({ screen, clear }: { screen: string; clear: boolean 
     const id = setTimeout(() => setRun(null), 1500);
     return () => clearTimeout(id);
   }, [run]);
-  if (!run) return null;
-  return (
-    <div key={run.n} className={`shift ${run.clear ? "shift-clear" : ""}`} aria-hidden>
-      {!run.clear && (
-        <div className={`absolute inset-0 ${clear ? "shift-lift" : ""}`}>
-          {FLATS.map((f) => (
-            <div key={f.name} className={`shift-flat ${f.name}`}>
-              <Art src={f.src} className={f.flip ? "-scale-x-100" : ""} />
-              <div />
-            </div>
-          ))}
-        </div>
-      )}
-      {BURST.map(([x, y, d, size, dx], i) => (
-        <div key={i} className="shift-bat" style={{ "--x": `${x}%`, "--y": `${y}%`, "--d": `${d}s`, "--dx": `${dx}cqw` } as CSSProperties}>
-          <div className="haunt-bat" style={{ "--bat": `${size}cqw`, "--flap": `${0.14 + (i % 3) * 0.03}s` } as CSSProperties}>
-            <BatFrames />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  return run;
 }
 
 // Bats crossing the sky: height (cqw), seconds per crossing, start, size.

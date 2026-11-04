@@ -13,6 +13,7 @@ import { HauntedHunt, useLocks } from "#/components/haunted";
 import { SpookyBoard, SpookyMessage, SpookyShift, clockRunning, screenKey } from "#/components/spooky-stage";
 import { InstagramGlyph, InstagramQr } from "#/components/instagram";
 import { Lights, Pines, Snow } from "#/components/winter";
+import { WinterBoard, WinterLobby, WinterMessage, WinterShift } from "#/components/winter-stage";
 import { OfficerGate, useAction, useJoinCode } from "#/components/officer";
 import { GAME_TILE, Loading, Picto, ordinal, weekTile } from "#/components/ui";
 import { BUGS, GAMES } from "#/lib/content";
@@ -71,10 +72,10 @@ function TvScreen() {
   }, [live]);
   const week = live ? live.week : last ? last.week : last === undefined ? seen : null;
   const spooky = week !== null && plan[week - 1]?.theme === "spooky";
-  // In winter, every screen but the kickoff slides gets lights, pines, and snow. The rounds get less snow, so it stays
-  // quiet behind the code.
+  // In winter, every screen but the kickoff slides dresses up. The lobby, round titles, and standings are winter-night
+  // scenes of their own (winter-stage.tsx); the rest get lights, pines, and a little snow, quiet behind the code.
   const winter = isWinter() && !spooky && live?.screen.mode !== "slides";
-  const calm = !live || ["lobby", "scoreboard", "message"].includes(live.screen.mode);
+  const scene = live ? ["lobby", "scoreboard", "message"].includes(live.screen.mode) : live === null && !!last;
   return (
     // Sound is run from the host's console, so the TV shows no button for it: browsers still need one click on this page
     // before they'll play anything, and a click anywhere does it.
@@ -82,8 +83,20 @@ function TvScreen() {
       className={`theme-pine relative isolate flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
       onClick={() => !sound && unlockAudio().then(() => setSound(true))}
     >
-      {winter && <WinterTv snow={calm ? 110 : 40} />}
-      {live && code ? <LiveTv live={live} code={code} sound={sound} /> : live === null ? <AfterNight spooky={spooky} /> : <Loading />}
+      {winter && !scene && <WinterTv snow={live ? 40 : 110} />}
+      {live && code ? (
+        <LiveTv live={live} code={code} sound={sound} />
+      ) : live === null ? (
+        <AfterNight spooky={spooky} winter={winter} />
+      ) : (
+        <Loading />
+      )}
+      {winter && (
+        <WinterShift
+          screen={live ? screenKey(live.screen) : "after"}
+          clear={!!live && clockRunning(live.screen, live.timer, live.scored)}
+        />
+      )}
       {spooky && (
         <SpookyShift
           screen={live ? screenKey(live.screen) : "after"}
@@ -123,15 +136,15 @@ function CodeSquares({ code, className = "" }: { code: string; className?: strin
 }
 
 /** After End night: the season scoreboard for a while (tonight's winner up top), then the attract screen. */
-function AfterNight({ spooky }: { spooky: boolean }) {
+function AfterNight({ spooky, winter }: { spooky: boolean; winter: boolean }) {
   const last = useJustEnded();
   if (last === undefined) return <Loading />;
   if (!last) return <Attract />;
   const first = last.teams.filter((t) => t.score > 0 && t.score === last.teams[0]?.score);
   const board = <SeasonBoard winners={first.map((t) => t.name)} practice={last.practice} />;
-  return spooky ? (
+  return spooky || winter ? (
     <div className="relative flex-1 overflow-hidden">
-      <SpookyBoard>{board}</SpookyBoard>
+      {spooky ? <SpookyBoard>{board}</SpookyBoard> : <WinterBoard>{board}</WinterBoard>}
     </div>
   ) : (
     <div className="flex-1 overflow-hidden p-[3.5vw]">{board}</div>
@@ -279,7 +292,9 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
   const hunt = spooky && s.mode === "card" && s.game === "bug" && s.index !== undefined;
   const locks = useLocks(hunt && !done ? cardKey("bug", s.index!) : null);
   const graveyard = s.mode === "lobby" && spooky;
-  const scene = hunt || (spooky && (s.mode === "lobby" || s.mode === "message" || s.mode === "scoreboard"));
+  // A winter night's lobby, round titles, and standings are scenes too (winter-stage.tsx).
+  const winter = isWinter() && !spooky;
+  const scene = hunt || ((spooky || winter) && (s.mode === "lobby" || s.mode === "message" || s.mode === "scoreboard"));
 
   return (
     <>
@@ -291,6 +306,8 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         {s.mode === "slides" && <Slides screen={s} />}
         {graveyard ? (
           <Graveyard address={`${origin.replace(/^https?:\/\//, "")}/join`} code={code} roster={live.roster} />
+        ) : s.mode === "lobby" && winter ? (
+          <WinterLobby address={`${origin.replace(/^https?:\/\//, "")}/join`} code={code} joinUrl={joinUrl} roster={live.roster} />
         ) : (
           s.mode === "lobby" && <Lobby live={live} code={code} joinUrl={joinUrl} />
         )}
@@ -299,6 +316,10 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
             <SpookyBoard>
               <Scoreboard teams={live.teams} solo={live.teamSize === 1} practice={live.practice} />
             </SpookyBoard>
+          ) : winter ? (
+            <WinterBoard>
+              <Scoreboard teams={live.teams} solo={live.teamSize === 1} practice={live.practice} />
+            </WinterBoard>
           ) : (
             <Scoreboard teams={live.teams} solo={live.teamSize === 1} practice={live.practice} />
           ))}
@@ -409,7 +430,8 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         )}
         {s.mode === "draw" && s.drawing !== undefined && <DrawView n={s.drawing} live={live} remaining={remaining} w={w} count={count} />}
         {s.mode === "message" && spooky && <SpookyMessage message={s.message ?? ""} />}
-        {s.mode === "message" && !spooky && (
+        {s.mode === "message" && winter && <WinterMessage message={s.message ?? ""} />}
+        {s.mode === "message" && !spooky && !winter && (
           <div className="grid h-full place-items-center text-center">
             <p className="max-w-[18ch] text-[5.5vw] leading-[1] font-extrabold tracking-[-0.03em] text-balance">{s.message}</p>
           </div>
@@ -417,7 +439,7 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
       </div>
 
       {/* Ticker: late arrivals can always join. */}
-      <footer className={`flex items-center gap-[1.6vw] pr-[2.5vw] text-[1.4vw] ${scene ? "bg-[#262522]" : "bg-mist"}`}>
+      <footer className={`flex items-center gap-[1.6vw] pr-[2.5vw] text-[1.4vw] ${scene && spooky ? "bg-[#262522]" : "bg-mist"}`}>
         <span className={`tile ${wt.tile} size-[5vw] shrink-0`}>
           <Picto id={wt.picto} className="absolute inset-[12%]" />
         </span>

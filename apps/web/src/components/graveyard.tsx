@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, RefObject } from "react";
 import { Art, BatFrames } from "./haunted";
 import { InstagramGlyph } from "./instagram";
 import { CLUB } from "#/lib/season";
@@ -146,8 +146,40 @@ function Stone({ name, delay, back = false, empty = false }: { name: string; del
   const size = Math.max(0.1, Math.min(0.17, 0.7 / (longest * 0.52)));
   const ref = useRef<HTMLLIElement>(null);
   const face = useRef<HTMLParagraphElement>(null);
-  const last = useRef<{ x: number; y: number } | null>(null);
-  // The guess above runs wide for some letters: measure the words in the stone's own font, to the fraction of a pixel
+  useFitName(face, name, size);
+  useFlip(ref);
+  return (
+    <li
+      ref={ref}
+      className={`grave-plot ${back ? "grave-behind" : ""} ${empty ? "grave-empty" : ""}`}
+      style={{ "--at": `${at}ms` } as CSSProperties}
+    >
+      <div className="grave-dig">
+        <div className="grave-stone">
+          <Art src={SPOOKY_ART.gravestone} fallback={<div className="grave-blank" />} />
+          <p ref={face} className="grave-name" style={{ "--name": size } as CSSProperties}>
+            <span>
+              {name}
+              {/* The placeholder's ellipsis on a line of its own, under the word. */}
+              {empty && (
+                <>
+                  <br />…
+                </>
+              )}
+            </span>
+          </p>
+        </div>
+      </div>
+      <span className="grave-mound" aria-hidden />
+      {!empty && PUFFS.map((dx) => <span key={dx} className="grave-puff" style={{ "--dx": dx } as CSSProperties} aria-hidden />)}
+    </li>
+  );
+}
+
+/** Sizes a name on its piece (a gravestone, a present's tag) so each word fits on a line and the name on two: sets
+ *  --name on `face`, whose first child holds the name, as a fraction of the piece's width, `size` at most. */
+export function useFitName(face: RefObject<HTMLElement | null>, name: string, size: number) {
+  // A guess at the size runs wide for some letters: measure the words in the stone's own font, to the fraction of a pixel
   // (a box's scrollWidth rounds, so a word a hair too wide still broke), and size the type so each fits on a line and
   // the name on two, again once the font has loaded. Widths scale with the size, and it all scales together, so one fit
   // holds at any screen size.
@@ -183,6 +215,12 @@ function Stone({ name, delay, back = false, empty = false }: { name: string; del
     fit();
     void document.fonts.ready.then(fit);
   }, [name, size]);
+}
+
+/** Slides a piece in a wrapping row to its new place when the rows reflow (FLIP: it jumps there and a transform
+ *  carries it from the old one). Runs after every render. */
+export function useFlip(ref: RefObject<HTMLElement | null>) {
+  const last = useRef<{ x: number; y: number } | null>(null);
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -198,30 +236,4 @@ function Stone({ name, delay, back = false, empty = false }: { name: string; del
         easing: "cubic-bezier(0.3, 0.7, 0.3, 1)",
       });
   });
-  return (
-    <li
-      ref={ref}
-      className={`grave-plot ${back ? "grave-behind" : ""} ${empty ? "grave-empty" : ""}`}
-      style={{ "--at": `${at}ms` } as CSSProperties}
-    >
-      <div className="grave-dig">
-        <div className="grave-stone">
-          <Art src={SPOOKY_ART.gravestone} fallback={<div className="grave-blank" />} />
-          <p ref={face} className="grave-name" style={{ "--name": size } as CSSProperties}>
-            <span>
-              {name}
-              {/* The placeholder's ellipsis on a line of its own, under the word. */}
-              {empty && (
-                <>
-                  <br />…
-                </>
-              )}
-            </span>
-          </p>
-        </div>
-      </div>
-      <span className="grave-mound" aria-hidden />
-      {!empty && PUFFS.map((dx) => <span key={dx} className="grave-puff" style={{ "--dx": dx } as CSSProperties} aria-hidden />)}
-    </li>
-  );
 }
