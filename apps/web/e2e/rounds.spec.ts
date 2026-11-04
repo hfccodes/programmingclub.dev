@@ -25,13 +25,14 @@ type Screen = Record<string, unknown> & { mode: string };
 // The store's controls (host-layout.spec.ts declares the full type on window).
 type Store = {
   external: (name: string, args: Record<string, unknown>) => void;
+  fail: (name: string, message?: string) => void;
   snapshot: () => { calls: { name: string; args: Record<string, unknown> }[] };
 };
 type WithStore = { __hostLayout: Store };
 
 test.describe.configure({ timeout: 120_000 });
 
-async function mount(page: Page, which: "tv" | "join" | "test", size: Size) {
+async function mount(page: Page, which: "tv" | "join" | "test" | "wiki", size: Size) {
   const base = new URL(test.info().project.use.baseURL ?? "http://127.0.0.1:3000");
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -134,7 +135,7 @@ const TV: [string, Screen, number?][] = [
   ["fix-8-hint", { mode: "card", game: "fix", index: 8, hint: true }, 240],
   ["puzzle-0", { mode: "card", game: "puzzle", index: 0, hint: true }, 600],
   ["puzzle-0-reveal", { mode: "card", game: "puzzle", index: 0, revealed: true }],
-  ["wiki-ready", { mode: "wiki", wikiReady: true }],
+  ["wiki-ready", { mode: "wiki", wikiFrom: "Gingerbread", wikiTo: "Linux", wikiReady: true }],
   ["wiki-race", { mode: "wiki", wikiFrom: "Gingerbread", wikiTo: "Linux" }, 300],
   ["scoreboard", { mode: "scoreboard" }],
 ];
@@ -455,4 +456,259 @@ test("puzzle workspace on a laptop", async ({ page }) => {
   await expect(page.getByText("You’ve changed the code since")).toBeVisible();
   expect((await layout(page)).overflowX).toBe(false);
   expect(errors).toEqual([]);
+});
+
+// ---- Wiki Race: the club tab is home base, and Wikipedia is a tab the player opens ----------------------------------
+
+const RACE = { mode: "wiki", wikiFrom: "Gingerbread", wikiTo: "Linux" } as const;
+const NEXT = { mode: "wiki", wikiFrom: "Pizza", wikiTo: "Moon", wikiClicks: true } as const;
+const WIKIPEDIA = "https://en.wikipedia.org/wiki/";
+
+/** A night change from the host's console, by mutation name. */
+const host = (page: Page, name: string, args: Record<string, unknown>) =>
+  page.evaluate(([n, a]) => (window as unknown as WithStore).__hostLayout.external(n, a), [name, args] as const);
+const calls = async (page: Page, name: string) =>
+  (await page.evaluate(() => (window as unknown as WithStore).__hostLayout.snapshot())).calls.filter((c) => c.name === name);
+
+/** Wikipedia, as an inert page, so no test reaches the real site. Any tab or page the browser opens there lands here. */
+async function fakeWikipedia(page: Page) {
+  const seen: string[] = [];
+  const handler = (route: Parameters<Parameters<Page["route"]>[1]>[0]) => {
+    seen.push(route.request().url());
+    return route.fulfill({ contentType: "text/html", body: "<!doctype html><title>Wikipedia (stand-in)</title><h1>Stand-in article</h1>" });
+  };
+  await page.context().route(`${WIKIPEDIA}**`, handler);
+  await page.route(`${WIKIPEDIA}**`, handler);
+  return seen;
+}
+
+/** The host's "Show on TV" (get ready, clock set but stopped), then Go (the race goes up and its clock starts). */
+async function ready(page: Page, race: Screen, seconds: number) {
+  await host(page, "sessions:setScreen", { screen: { ...race, wikiReady: true } });
+  await host(page, "sessions:timer", { action: "set", seconds, relay: false });
+}
+async function go(page: Page, race: Screen, seconds: number) {
+  await host(page, "sessions:setScreen", { screen: race });
+  await host(page, "sessions:timer", { action: "set", seconds, relay: false, autostart: true });
+}
+
+/** A screenshot once the winter sweep between screens has run, so it shows the screen a player actually reads. */
+async function settledShot(page: Page, name: string) {
+  await expect(page.locator("#rounds-mount .shift")).toHaveCount(0, { timeout: 10_000 });
+  await shot(page, name);
+}
+
+/** What get ready must never show: the race itself, a link to Wikipedia, or a button to open another page. */
+async function expectNothingToOpen(page: Page, race: { wikiFrom: string; wikiTo: string }) {
+  const root = page.locator("#rounds-mount");
+  await expect(root).not.toContainText(race.wikiFrom);
+  await expect(root).not.toContainText(race.wikiTo);
+  await expect(page.locator(`#rounds-mount a[href*="wikipedia.org"], #rounds-mount a[href*="/wiki"]`)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /open the race/i })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /open the race/i })).toHaveCount(0);
+}
+
+for (const size of ["phone", "laptop"] as const)
+  test(`Wiki Race in the club tab at ${size}: get ready, Go, Wikipedia in its own tab, finish, undo, the referee, next race`, async ({
+    page,
+  }) => {
+    const errors = await mount(page, "join", size);
+    const wikipedia = await fakeWikipedia(page);
+    const tabs: string[] = [];
+    page.context().on("page", (p) => tabs.push(p.url()));
+    // Week 4's second round is its Wiki Race.
+    await host(page, "sessions:setRound", { round: 1 });
+
+    // Get ready: a calm card with the race's number, and nothing to open or tap.
+    await ready(page, RACE, 300);
+    await expect(page.getByText("Get ready", { exact: true })).toBeVisible();
+    await expect(page.getByText("Race 1 of 2", { exact: true })).toBeVisible();
+    await expect(page.getByText("The start and target show up here when the race starts.", { exact: false })).toBeVisible();
+    await expectNothingToOpen(page, RACE);
+    await expect(page.locator("#rounds-mount").getByText("5:00", { exact: true }).filter({ visible: true })).toHaveCount(0);
+    await settledShot(page, `join-${size}-wiki-ready`);
+    expect((await layout(page)).overflowX).toBe(false);
+
+    // Go: the race, its clock, and a link the player opens themselves.
+    await go(page, RACE, 300);
+    await expect(page.getByText("Gingerbread", { exact: true })).toBeVisible();
+    await expect(page.getByText("Linux", { exact: true })).toBeVisible();
+    // The clock: the slim bar's timer on a phone, the big clock beside the player card on a laptop.
+    await expect(page.locator("#rounds-mount").getByText("5:00", { exact: true }).filter({ visible: true }).first()).toBeVisible();
+    const open = page.getByRole("link", { name: "Open Gingerbread on Wikipedia ↗" });
+    await expect(open).toHaveAttribute("href", `${WIKIPEDIA}Gingerbread`);
+    await expect(open).toHaveAttribute("target", "_blank");
+    await expect(open).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(page.getByText("Opens in a new tab. Come back to this tab to finish.")).toBeVisible();
+    // Finishing never waits on the link: someone may be racing on another computer.
+    const madeIt = page.getByRole("button", { name: "I made it!" });
+    await expect(madeIt).toBeEnabled();
+    await expect(madeIt).toBeInViewport();
+    await settledShot(page, `join-${size}-wiki-go`);
+    expect((await layout(page)).overflowX).toBe(false);
+    // The page opened no tab and reached no Wikipedia on its own.
+    expect(tabs).toEqual([]);
+    expect(wikipedia).toEqual([]);
+
+    // The player's click opens Wikipedia in a new tab; the club tab stays put, finish and all.
+    const before = page.url();
+    const [tab] = await Promise.all([page.context().waitForEvent("page"), open.click()]);
+    await tab.waitForLoadState();
+    expect(tab.url()).toBe(`${WIKIPEDIA}Gingerbread`);
+    await expect(tab.getByRole("heading", { name: "Stand-in article" })).toBeVisible();
+    // rel=noopener: Wikipedia's tab can't reach back into this one.
+    expect(await tab.evaluate(() => window.opener)).toBeNull();
+    await tab.close();
+    expect(page.url()).toBe(before);
+    await page.bringToFront();
+    await expect(madeIt).toBeEnabled();
+
+    // Finish, with its check, then undo it.
+    await madeIt.click();
+    await expect(page.getByText("On the Linux article?")).toBeVisible();
+    await page.getByRole("button", { name: "Not yet" }).click();
+    await expect(madeIt).toBeVisible();
+    await madeIt.click();
+    await page.getByRole("button", { name: "Yes, I made it" }).click();
+    await expect(page.getByText("You made it!")).toBeVisible();
+    await expect(page.getByText("Raise your hand and keep the target article open")).toBeVisible();
+    await expect(open).toHaveCount(0);
+    await page.getByRole("button", { name: "Undo: I’m not there yet" }).click();
+    await expect(madeIt).toBeVisible();
+    await expect(open).toBeVisible();
+    expect((await calls(page, "wiki:undo")).length).toBe(1);
+
+    // The referee says not yet: back to racing, link and all.
+    await madeIt.click();
+    await page.getByRole("button", { name: "Yes, I made it" }).click();
+    await expect(page.getByText("You made it!")).toBeVisible();
+    await host(page, "wiki:check", { teamId: "team-1", card: "wiki:Gingerbread>Linux", ok: false });
+    await expect(page.getByText("The referee says not yet. Keep going, then tap again.")).toBeVisible();
+    await expect(open).toBeVisible();
+    await expect(madeIt).toBeEnabled();
+
+    // Then it counts: no undo once the referee has checked it.
+    await madeIt.click();
+    await page.getByRole("button", { name: "Yes, I made it" }).click();
+    await host(page, "wiki:check", { teamId: "team-1", card: "wiki:Gingerbread>Linux", ok: true });
+    await expect(page.getByText("The referee checked it. ✓")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Undo: I’m not there yet" })).toHaveCount(0);
+    await settledShot(page, `join-${size}-wiki-checked`);
+
+    // Race over and scored: the result, and no link.
+    // As the host's "End race and score" does it: the race revealed, then its clock paused.
+    await host(page, "sessions:setScreen", { screen: { ...RACE, revealed: true } });
+    await host(page, "sessions:timer", { action: "pause" });
+    await expect(page.getByText("1st place! +", { exact: false })).toBeVisible();
+    await expect(open).toHaveCount(0);
+    await settledShot(page, `join-${size}-wiki-result`);
+
+    // The next race comes to the same tab as get ready by itself, with nothing of the last race left on it.
+    await ready(page, NEXT, 360);
+    await expect(page.getByText("Get ready", { exact: true })).toBeVisible();
+    await expect(page.getByText("Race 2 of 2 · Fewest Clicks", { exact: true })).toBeVisible();
+    await expectNothingToOpen(page, NEXT);
+    await expect(page.locator("#rounds-mount")).not.toContainText("Gingerbread");
+    await settledShot(page, `join-${size}-wiki-next-ready`);
+
+    // Fewest Clicks: a fresh race with a fresh count, and only 1 to 999 sends.
+    await go(page, NEXT, 360);
+    await expect(page.getByRole("link", { name: "Open Pizza on Wikipedia ↗" })).toHaveAttribute("href", `${WIKIPEDIA}Pizza`);
+    await expect(page.getByText("You made it!")).toHaveCount(0);
+    const count = page.getByRole("spinbutton", { name: "Clicks to get there" });
+    await expect(count).toHaveValue("");
+    await expect(madeIt).toBeDisabled();
+    for (const bad of ["0", "1000", "2.5"]) {
+      await count.fill(bad);
+      await expect(madeIt, bad).toBeDisabled();
+    }
+    await count.fill("7");
+    await expect(madeIt).toBeEnabled();
+    await settledShot(page, `join-${size}-wiki-clicks`);
+
+    // A finish that doesn't reach the server says so, and leaves the finish to try again.
+    await page.evaluate(() => (window as unknown as WithStore).__hostLayout.fail("wiki:finish", "offline"));
+    await madeIt.click();
+    await page.getByRole("button", { name: "Yes, send it" }).click();
+    await expect(page.getByRole("alert")).toHaveText("That didn’t go through. Check your connection and try again.");
+    await expect(page.getByText("You made it!")).toHaveCount(0);
+    await expect(madeIt).toBeEnabled();
+    await madeIt.click();
+    await expect(page.getByText("Send 7 clicks?")).toBeVisible();
+    await page.getByRole("button", { name: "Yes, send it" }).click();
+    await expect(page.getByText("7 clicks", { exact: false })).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    expect((await calls(page, "wiki:finish")).at(-1)?.args).toMatchObject({ card: "wiki:Pizza>Moon", clicks: 7 });
+    await page.getByRole("button", { name: "Undo: I’m not there yet" }).click();
+
+    // Time's up: the race closes, and so does the link.
+    await page.clock.setFixedTime(new Date(NIGHT.getTime() + 361_000));
+    await expect(page.getByText("Time’s up. The race is closed.")).toBeVisible();
+    await expect(page.getByRole("link", { name: /on Wikipedia/ })).toHaveCount(0);
+    await expect(madeIt).toHaveCount(0);
+    await settledShot(page, `join-${size}-wiki-time-up`);
+
+    // Only the one tab the player opened, ever.
+    expect(tabs.length).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
+for (const size of ["tv", "tvSmall"] as const)
+  test(`Wiki Race on the TV at ${size}: /wiki on get ready only, then the race, its clock, and the rules`, async ({ page }) => {
+    const errors = await mount(page, "tv", size);
+    await host(page, "sessions:setRound", { round: 1 });
+    await ready(page, RACE, 300);
+    await expect(page.getByText("Get ready", { exact: true })).toBeVisible();
+    await expect(page.getByText("Wiki Race · Race 1 of 2", { exact: true })).toBeVisible();
+    await expect(page.getByText("programmingclub.dev/wiki")).toBeVisible();
+    const room = page.locator("#rounds-mount footer").locator("xpath=preceding-sibling::*[1]");
+    await expect(room).not.toContainText("Gingerbread");
+    await expect(room).not.toContainText("Linux");
+    await page.waitForTimeout(150);
+    await settledShot(page, `tv-${size}-wiki-get-ready`);
+    let m = await layout(page);
+    expect([m.overflowX, m.tall, m.clipped]).toEqual([false, false, []]);
+
+    await go(page, RACE, 300);
+    await expect(page.getByText("Gingerbread", { exact: true })).toBeVisible();
+    await expect(page.getByText("Linux", { exact: true })).toBeVisible();
+    await expect(page.getByRole("timer", { name: "Time left" })).toBeVisible();
+    await expect(page.getByText("Race 1 of 2", { exact: false }).first()).toBeVisible();
+    await expect(page.getByText("Links inside the article only.", { exact: false })).toBeVisible();
+    await expect(page.locator("#rounds-mount")).not.toContainText("/wiki");
+    await page.waitForTimeout(150);
+    await settledShot(page, `tv-${size}-wiki-race`);
+    m = await layout(page);
+    expect([m.overflowX, m.tall, m.clipped]).toEqual([false, false, []]);
+
+    // The finish order as phones tap in.
+    await host(page, "wiki:finish", { card: "wiki:Gingerbread>Linux" });
+    await expect(page.getByRole("listitem").filter({ hasText: "Juan" })).toBeVisible();
+    await page.waitForTimeout(150);
+    await settledShot(page, `tv-${size}-wiki-finished`);
+    m = await layout(page);
+    expect([m.overflowX, m.tall, m.clipped]).toEqual([false, false, []]);
+    expect(errors).toEqual([]);
+  });
+
+test("Wiki Race on a computer at /wiki: it waits through get ready, goes to the start at Go, and says to reopen it", async ({ page }) => {
+  const errors = await mount(page, "wiki", "laptop");
+  const wikipedia = await fakeWikipedia(page);
+  await host(page, "sessions:setRound", { round: 1 });
+  await expect(page.getByText("Keep this page open. It opens the start article on Wikipedia when the next race starts.")).toBeVisible();
+  await expect(page.getByText("Before the next race, open programmingclub.dev/wiki here again.", { exact: false })).toBeVisible();
+  // Nothing tells a computer to press Back to get here again: Back from the start article isn't this page.
+  await expect(page.locator("#rounds-mount")).not.toContainText(/\bBack\b/);
+
+  await ready(page, RACE, 300);
+  await expect(page.getByText("You’re ready.", { exact: false })).toBeVisible();
+  await expect(page.locator("#rounds-mount")).not.toContainText("Gingerbread");
+  await page.waitForTimeout(300);
+  expect(wikipedia).toEqual([]);
+  await settledShot(page, "wiki-laptop-ready");
+  expect(errors).toEqual([]);
+
+  // Go: the race goes up and this tab becomes the start article (the clock starting after is the host's business).
+  await Promise.all([page.waitForURL(`${WIKIPEDIA}Gingerbread`), host(page, "sessions:setScreen", { screen: RACE })]);
+  expect(wikipedia).toEqual([`${WIKIPEDIA}Gingerbread`]);
 });

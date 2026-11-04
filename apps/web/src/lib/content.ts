@@ -298,7 +298,7 @@ export const GAMES: Game[] = [
     need: "1 phone or laptop per team to race on, internet, and a phone to tap “We made it!”",
     time: "5 min per race",
     steps: [
-      "The TV shows a start and a target article. It’s on your phones too. Open programmingclub.dev/wiki on your team’s computer and it jumps to the start article.",
+      "When the race starts, the TV and your join page show the start and target articles. Open the start article from your join page in a new tab, and return to the club tab to finish. On a separate computer, open programmingclub.dev/wiki before each race.",
       "On “Go,” click only the blue links inside the article. No search bar, no typing URLs.",
       "The back button is allowed. So is Ctrl+F (find on page).",
       "When you land on the target, anyone on your team taps “We made it!” on a phone and raises a hand, keeping the target article open. A referee comes over to check it. Tapped by mistake? Undo it until the referee checks.",

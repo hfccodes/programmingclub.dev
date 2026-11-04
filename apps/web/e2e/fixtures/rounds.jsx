@@ -1,4 +1,4 @@
-// Mounts a real Hello, World Cup page (the TV, a player's join page, or the officers' test page) inside the hello-world
+// Mounts a real Hello, World Cup page (the TV, a player's join page, the officers' test page, or a computer's /wiki) inside the hello-world
 // Layout, in a memory router, on host-layout-convex.jsx's local store. rounds.spec.ts swaps their Convex and Clerk
 // imports for that store, so the pages run offline; only Pyodide's CDN is reached, for real Python.
 import { StrictMode } from "react";
@@ -11,6 +11,7 @@ const PAGES = {
   tv: () => import("../../src/routes/hello-world/tv.tsx?tsr-split=component"),
   join: () => import("../../src/routes/hello-world/join.tsx?tsr-split=component"),
   test: () => import("../../src/routes/hello-world/test.tsx?tsr-split=component"),
+  wiki: () => import("../../src/routes/hello-world/wiki.tsx?tsr-split=component"),
 };
 
 export async function mount(page, scenario) {

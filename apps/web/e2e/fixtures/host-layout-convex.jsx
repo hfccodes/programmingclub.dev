@@ -3,6 +3,7 @@
 // Nothing here talks to a network, and nothing outside the test browser can import it.
 import { forwardRef, useSyncExternalStore } from "react";
 import { getFunctionName } from "convex/server";
+import { ConvexError } from "convex/values";
 import { awardsFor, cardKey, clockLeft, isAnswerGame, settle, showCard } from "../../src/lib/grading";
 import { heldKey } from "../../src/lib/flow";
 import { OUTPUTS } from "../../src/lib/content";
@@ -352,6 +353,38 @@ const MUTATIONS = {
     const rows = s.fixes[card] ?? [];
     if (rows.some((r) => r.teamId === t._id)) return s;
     return { ...s, fixes: { ...s.fixes, [card]: [...rows, { teamId: t._id, name: t.name, at: Date.now(), result: null }] } };
+  },
+  // A phone's "We made it!" and its undo, with convex/wiki.ts's rules (this browser's player is the first team).
+  "wiki:finish": (s, { card, clicks }) => {
+    const se = s.session;
+    const sc = se.screen;
+    const key = sc.mode === "wiki" && sc.wikiFrom && sc.wikiTo ? `wiki:${sc.wikiFrom}>${sc.wikiTo}` : null;
+    if (key !== card) throw new ConvexError("That race isn’t up anymore.");
+    if (sc.revealed || se.scored.includes(key)) throw new ConvexError("This race is over.");
+    if (sc.wikiReady) throw new ConvexError("The race hasn’t started yet.");
+    if (se.timer.card === key && clockLeft(se.timer, Date.now()) <= 0) throw new ConvexError("Time’s up. The race is closed.");
+    if (sc.wikiClicks && (!Number.isInteger(clicks) || clicks < 1 || clicks > 999))
+      throw new ConvexError("Enter your click count, like 7.");
+    const t = s.teams[0];
+    const rows = s.wiki[key] ?? [];
+    const mine = rows.find((r) => r.teamId === t._id);
+    if (mine && mine.ok !== false) return s;
+    const row = {
+      teamId: t._id,
+      name: t.name,
+      by: "Juan",
+      ms: Date.now() - (se.card?.at ?? Date.now()),
+      clicks: sc.wikiClicks ? clicks : null,
+      ok: null,
+    };
+    return { ...s, wiki: { ...s.wiki, [key]: [...rows.filter((r) => r !== mine), row] } };
+  },
+  "wiki:undo": (s, { card }) => {
+    const t = s.teams[0];
+    const mine = (s.wiki[card] ?? []).find((r) => r.teamId === t._id);
+    if (!mine) return s;
+    if (mine.ok === true) throw new ConvexError("The referee already checked it, so it stays.");
+    return { ...s, wiki: { ...s.wiki, [card]: s.wiki[card].filter((r) => r !== mine) } };
   },
   "wiki:check": (s, { teamId, card, ok }) => ({
     ...s,

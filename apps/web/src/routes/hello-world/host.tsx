@@ -2159,8 +2159,8 @@ function WikiTool({ live, used, round }: { live: Live; used: string[]; round: Ro
           </div>
           {onTv && s.wikiReady && (
             <p className="mt-3 text-sm text-dim">
-              On the TV: open {CLUB.url}/wiki. Start shows the race and sends every {teamWords(live.teamSize === 1).computer} to the start
-              article at once.
+              Start shows the race on the TV and every phone at once. A {teamWords(live.teamSize === 1).computer} waiting on {CLUB.url}/wiki
+              opens the start article.
             </p>
           )}
           {onTv && !s.wikiReady && <WikiStatus live={live} />}

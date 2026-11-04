@@ -6,7 +6,9 @@ import { Picto, Wrap } from "#/components/ui";
 import { wikiUrl } from "#/lib/content";
 import { CLUB } from "#/lib/season";
 
-// A team computer opens this and lands on tonight's start article. Between races it waits for the next one.
+// A computer racing a Wiki Race opens this before the race (programmingclub.dev/wiki) and waits. When the race starts
+// it goes to the start article on Wikipedia, and from then on it's Wikipedia's page, not ours: it can't follow the
+// night anymore, so it's opened again before each race. Phones need none of this: the join page has the race.
 export const Route = createFileRoute("/hello-world/wiki")({
   head: () => ({ meta: [{ title: `Wiki Race · ${CLUB.season}` }] }),
   component: Wiki,
@@ -17,7 +19,7 @@ function Wiki() {
   const s = live?.screen;
   const from = s?.mode === "wiki" && !s.revealed && !s.wikiReady ? s.wikiFrom : undefined;
   const ready = s?.mode === "wiki" && !!s.wikiReady;
-  // replace, not assign, so the race's back button doesn't land here and bounce forward again.
+  // replace, not assign, so Back on the start article doesn't land here and bounce forward again.
   useEffect(() => {
     if (from) window.location.replace(wikiUrl(from));
   }, [from]);
@@ -41,10 +43,14 @@ function Wiki() {
           {live === undefined
             ? "Checking for a race…"
             : ready
-              ? "You’re ready. Keep this page open: it jumps to the start article the moment the race starts."
-              : "Keep this page open. It jumps to the start article as soon as the next race is on the TV."}
+              ? "You’re ready. Keep this page open: it opens the start article on Wikipedia when the race starts."
+              : "Keep this page open. It opens the start article on Wikipedia when the next race starts."}
         </p>
       )}
+      <p className="mt-6 text-sm text-dim">
+        When the race starts, this tab goes to Wikipedia and stops following the night. Before the next race, open {CLUB.url}/wiki here
+        again.
+      </p>
     </Wrap>
   );
 }

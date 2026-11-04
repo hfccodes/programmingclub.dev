@@ -626,7 +626,7 @@ export function NextPanel({
     step === "hint" && <p key="hint">Half the time is gone, so the hint is unlocked.</p>,
     step === "go" && (
       <p key="go">
-        On the TV: open {CLUB.url}/wiki. Start shows {s.wikiFrom} → {s.wikiTo} and sends every {w.computer} there at once.
+        Start shows {s.wikiFrom} → {s.wikiTo} on the TV and every phone. A {w.computer} waiting on {CLUB.url}/wiki opens the start article.
       </p>
     ),
     nextCardLine && (

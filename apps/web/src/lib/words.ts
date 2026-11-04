@@ -39,7 +39,7 @@ const TEAMS = {
   anyoneTaps: "Anyone on your team can tap it",
 
   // The TV and the kickoff deck.
-  openOn: "Team computers, open",
+  openOn: "On a team computer? Open",
   scoreboardEmpty: "Teams show up here once officers make them.",
   joinEmpty: "Teams show up here as people join.",
   makeTeams: "make teams",
@@ -96,7 +96,7 @@ const SOLO: typeof TEAMS = {
   sendFor: "",
   anyoneTaps: "Tap it",
 
-  openOn: "On your computer, open",
+  openOn: "On a computer? Open",
   scoreboardEmpty: "Players show up here as they join.",
   joinEmpty: "Players show up here as they join.",
   makeTeams: "pick Solo",

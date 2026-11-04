@@ -1,6 +1,8 @@
 // Wiki Race on phones: "We made it!" for the team (Fewest Clicks: the click count). Presentational only: the join page
 // wires it to Convex, and the officer test page drives it with local state, so both show exactly the same thing.
+// The race itself is on Wikipedia, in a tab the player opens; this page stays where it is, for the finish.
 import { useState } from "react";
+import { wikiUrl } from "#/lib/content";
 import { teamWords } from "#/lib/words";
 import { fmtElapsed } from "./game";
 import { ordinal } from "./ui";
@@ -63,6 +65,15 @@ export function WikiRound(p: RoundProps) {
   return (
     <div className="space-y-3">
       <WikiPair from={p.from} to={p.to} />
+      {/* The player opens Wikipedia themselves, in its own tab; this page never opens one. Gone once they're there. */}
+      {p.open && !p.revealed && !finished && (
+        <div>
+          <a href={wikiUrl(p.from)} target="_blank" rel="noopener noreferrer" className="btn w-full text-lg">
+            Open {p.from} on Wikipedia ↗
+          </a>
+          <p className="mt-1.5 text-center text-sm text-dim">Opens in a new tab. Come back to this tab to finish.</p>
+        </div>
+      )}
       {p.clicks && !p.revealed && <p className="font-semibold">Fewest clicks wins. Count every link you click.</p>}
       {p.revealed ? (
         <RaceBanner result={p.result} you={w.You} />

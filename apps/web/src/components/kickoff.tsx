@@ -144,7 +144,7 @@ const Big = ({ children }: { children: ReactNode }) => (
 function RaceSteps() {
   const w = useWords();
   return [
-    `On your ${w.computer}, open programmingclub.dev/wiki. It jumps to the start article.`,
+    `At “Go,” open the start article from your phone, or open programmingclub.dev/wiki on a ${w.computer} first.`,
     "On “Go,” click only links inside the article. No search bar, no typing URLs.",
     "The back button and Ctrl+F are fine.",
     `Land on the target? Tap “${w.madeIt}” on a phone and raise a hand.`,

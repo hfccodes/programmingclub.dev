@@ -403,16 +403,18 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
             )}
           </div>
         )}
+        {/* Get ready: the race's start and target stay hidden until it starts. The one place the TV gives the /wiki link. */}
         {s.mode === "wiki" && s.wikiReady && (
           <div className="grid h-full place-items-center text-center">
             <div>
               <p className="text-[2vw] font-bold text-dim">
-                Wiki Race{s.wikiClicks ? ": Fewest Clicks" : ""}
-                {count && ` · ${count}`} · get ready
+                {["Wiki Race", count, s.wikiClicks && "Fewest Clicks"].filter(Boolean).join(" · ")}
               </p>
-              <p className="mt-[1.5vw] text-[2.4vw]">{w.openOn}</p>
-              <p className="mt-[0.5vw] text-[6vw] leading-[1] font-extrabold tracking-[-0.03em]">{CLUB.url}/wiki</p>
-              <p className="mt-[2vw] text-[1.8vw] text-dim">The start and target go up when the race starts, for {w.everyone} at once.</p>
+              <p className="mt-[0.8vw] text-[8vw] leading-[1] font-extrabold tracking-[-0.03em]">Get ready</p>
+              <p className="mt-[1.6vw] text-[2.4vw]">The start and target go up here and on your phone when the race starts.</p>
+              <p className="mt-[3vw] text-[2.2vw] text-dim">
+                {w.openOn} <strong className="text-ink">{CLUB.url}/wiki</strong>
+              </p>
             </div>
           </div>
         )}
@@ -427,9 +429,6 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
                   <div className="bg-mist p-[2.4vw]">
                     <p className="text-[1.6vw] text-dim">Start here</p>
                     <p className="mt-[0.6vw] text-[5vw] leading-[0.95] font-extrabold tracking-[-0.03em]">{s.wikiFrom}</p>
-                    <p className="mt-[1vw] text-[1.6vw] font-bold">
-                      {w.Computers}: {CLUB.url}/wiki
-                    </p>
                   </div>
                   <div className="tile tile-sky p-[2.4vw]">
                     <p className="text-[1.6vw]">Get to</p>
@@ -438,7 +437,8 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
                 </div>
                 <p className="text-[1.5vw] text-dim">
                   {s.wikiClicks ? "Fewest clicks wins. Count every link you click. " : ""}
-                  Links inside the article only. No search bar. Back button and Ctrl+F are fine. Tap “{w.madeIt}” on a phone when you land.
+                  Links inside the article only. No search bar. Back button and Ctrl+F are fine. Tap “{w.madeIt}” on your phone when you
+                  land.
                 </p>
               </div>
               {wikiBoard && wikiBoard.teams > 0 && <RaceList board={wikiBoard} done={done || wikiBoard.scored} w={w} />}
@@ -703,7 +703,7 @@ function RaceList({ board, done, w }: { board: WikiBoard; done: boolean; w: Team
         </p>
       )}
       {rows.length === 0 ? (
-        <p className="mt-[1vw] text-[1.6vw] text-dim">Nobody yet. Tap “{w.madeIt}” on a phone when you land.</p>
+        <p className="mt-[1vw] text-[1.6vw] text-dim">Nobody yet. Tap “{w.madeIt}” on your phone when you land.</p>
       ) : (
         <TeamRows
           rows={rows}

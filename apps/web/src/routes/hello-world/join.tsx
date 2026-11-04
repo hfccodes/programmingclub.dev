@@ -18,6 +18,7 @@ import { AnswerBox, InputBox } from "#/components/puzzle";
 import { Loading, Picto, Wrap, ordinal, weekTile } from "#/components/ui";
 import { WikiPair, WikiRound } from "#/components/wiki";
 import { LiveFix, LivePuzzle, useLaptop, usePuzzleInput } from "#/components/workspace";
+import { heldLabel, roundOf } from "#/lib/flow";
 import { answersOpen, cardKey, drawKey, isAnswerGame, wikiKey } from "#/lib/grading";
 import { PUZZLES } from "#/lib/puzzles";
 import { usePython } from "#/lib/python";
@@ -436,6 +437,11 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
   const hot = remaining <= 10_000 && !!live.timer.startedAt;
   // The team key only matters while a team-computer game is the round being played or the card on the TV.
   const round = live.round !== null && live.round < wk.lineup.length ? wk.lineup[live.round].label : "";
+  // "Race 1 of 2", as the TV says it.
+  const raceCount =
+    s.mode === "wiki" && live.round !== null && live.round < wk.lineup.length
+      ? heldLabel(roundOf(wk.lineup[live.round], live.round), live.thisRound, s)
+      : null;
   const teamComputer = gamesIn(round).some(usesTeamComputer) || (s.mode === "card" && !!s.game && usesTeamComputer(s.game));
   const solo = live.teamSize === 1;
   const w = teamWords(solo);
@@ -663,14 +669,18 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
                 )}
               </div>
             )}
+            {/* Get ready: nothing to open or tap yet. The start and target stay off the screen until the race starts. */}
             {s.mode === "wiki" && s.wikiReady && (
-              <div className="card mt-5 p-6">
-                <p className="text-xl font-bold">Wiki Race next! Open the race here. It jumps to the start article when the race starts.</p>
-                {/* A new tab, so this page stays open for the finish. */}
-                <Link to="/hello-world/wiki" target="_blank" className="btn btn-primary mt-4 w-full text-lg">
-                  Open the race
-                </Link>
-                <p className="mt-2 text-sm text-dim">On a lab computer? Open {CLUB.url}/wiki there.</p>
+              <div className="card mt-5 p-6" role="status">
+                <p className="text-sm font-bold text-dim">
+                  {[raceCount ?? "Wiki Race", s.wikiClicks && "Fewest Clicks"].filter(Boolean).join(" · ")}
+                </p>
+                <p className="mt-1 text-4xl leading-none font-extrabold tracking-[-0.03em]">Get ready</p>
+                <p className="mt-3 text-lg">The start and target show up here when the race starts. Keep this tab open.</p>
+                <p className="mt-4 border-t border-line pt-3 text-sm text-dim">
+                  Racing on {solo ? "another computer" : `a ${w.computer}`}? Open <strong className="text-ink">{CLUB.url}/wiki</strong> on
+                  it now. It opens the start article when the race starts. Open it again before each race.
+                </p>
               </div>
             )}
             {s.mode === "wiki" && !s.wikiReady && s.wikiFrom && s.wikiTo && (
