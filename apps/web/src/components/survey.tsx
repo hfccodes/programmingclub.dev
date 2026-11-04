@@ -28,6 +28,7 @@ import {
 import type { Answers } from "#/lib/survey";
 import { CLUB } from "#/lib/season";
 import { api } from "../../convex/_generated/api";
+import { Loading } from "#/components/ui";
 
 // Answers typed before signing in, so they're still here when Clerk sends the member back.
 const DRAFT = "club.survey";
@@ -79,7 +80,7 @@ export function Survey() {
   if (!ready)
     return (
       <Page>
-        <p className="mt-10 text-dim">Loading…</p>
+        <Loading />
       </Page>
     );
 

@@ -317,6 +317,31 @@ export function PageHead({ title, children, picto }: { title: string; children?:
   );
 }
 
+// The club's six tile colors, in the order the loader's wave reaches them (corner to corner).
+const LOADER = [
+  ["tile-sky", 0],
+  ["tile-meadow", 1],
+  ["tile-sun", 2],
+  ["tile-silver", 1],
+  ["tile-pine", 2],
+  ["tile-gold", 3],
+] as const;
+
+/** Waiting on the database or sign-in: the club's tiles rippling, centered in whatever room the parent gives it (all of
+ *  a flex column, or at least `className`'s min-height). */
+export const Loading = ({ className = "min-h-[40dvh]" }: { className?: string }) => (
+  <div role="status" className={`grid w-full flex-1 place-items-center py-10 ${className}`}>
+    <div className="flex flex-col items-center gap-5">
+      <span aria-hidden className="grid grid-cols-3 gap-[3px]">
+        {LOADER.map(([tile, i]) => (
+          <span key={tile} className={`loader-tile tile ${tile} size-5`} style={{ animationDelay: `${i * 130}ms` }} />
+        ))}
+      </span>
+      <span className="loader-word text-sm font-bold tracking-[0.08em] text-dim lowercase">Loading</span>
+    </div>
+  </div>
+);
+
 export const Wrap = ({ children, className = "", id }: { children: ReactNode; className?: string; id?: string }) => (
   <section id={id} className={`mx-auto w-[min(1240px,100%-2.5rem)] ${className}`}>
     {children}

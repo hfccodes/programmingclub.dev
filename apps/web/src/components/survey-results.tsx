@@ -26,6 +26,7 @@ import {
 import type { Filters, Question, SurveyResponse } from "#/lib/survey";
 import { CLUB, fmtDate } from "#/lib/season";
 import { api } from "../../convex/_generated/api";
+import { Loading } from "#/components/ui";
 
 // School blue, the club's accent. Magnitude is this one hue from light to dark.
 const BLUE = "#0b4fa3";
@@ -56,7 +57,7 @@ function Results() {
   const data = useQuery(api.survey.results);
   const [example, setExample] = useState(false);
   const sample = useMemo(() => exampleResponses(), []);
-  if (!data) return <p className="font-bold text-dim">Loading…</p>;
+  if (!data) return <Loading />;
   const rows = example ? sample : data.responses;
   const waiting = example ? [] : data.waiting;
   return (

@@ -14,7 +14,7 @@ import { JoinNight, clockRunning, screenKey } from "#/components/spooky-stage";
 import { InstagramLink } from "#/components/instagram";
 import { Lights, Snow } from "#/components/winter";
 import { AnswerBox, InputBox } from "#/components/puzzle";
-import { Picto, Wrap, ordinal, weekTile } from "#/components/ui";
+import { Loading, Picto, Wrap, ordinal, weekTile } from "#/components/ui";
 import { WikiPair, WikiRound } from "#/components/wiki";
 import { LiveFix, LivePuzzle, useLaptop, usePuzzleInput } from "#/components/workspace";
 import { answersOpen, cardKey, drawKey, isAnswerGame, wikiKey } from "#/lib/grading";
@@ -70,7 +70,7 @@ function Join() {
   if (live === undefined || (live === null && (last === undefined || (token && me === undefined))))
     return (
       <Center>
-        <p className="text-dim">Loading…</p>
+        <Loading />
       </Center>
     );
   if (live === null && me?.ended) return <NightOver me={me} />;
@@ -264,7 +264,7 @@ function JoinForm({ initialCode, sessionId, onJoined }: { initialCode: string; s
   if ((isLoading && !waited) || (isAuthenticated && account === undefined))
     return (
       <Center>
-        <p className="text-dim">Loading…</p>
+        <Loading />
       </Center>
     );
   const letters = code.padEnd(4, " ").slice(0, 4).split("");

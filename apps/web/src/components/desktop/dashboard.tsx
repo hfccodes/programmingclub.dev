@@ -9,6 +9,7 @@ import { ideasText } from "#/lib/ideas";
 import { likelyWeek, useSchedule } from "#/lib/schedule";
 import { CLUB, fmtDate, roomFor } from "#/lib/season";
 import { api } from "../../../convex/_generated/api";
+import { Loading } from "#/components/ui";
 
 export function Dashboard() {
   return (
@@ -31,7 +32,7 @@ const Section = ({ title, action, children }: { title: string; action?: ReactNod
 function Overview() {
   const data = useQuery(api.dashboard.overview);
   const plan = useSchedule();
-  if (!data) return <p className="font-bold text-dim">Loading…</p>;
+  if (!data) return <Loading />;
   const { live, nights, totals } = data;
   const upcoming = likelyWeek(plan);
 

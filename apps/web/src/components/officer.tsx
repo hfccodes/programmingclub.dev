@@ -7,6 +7,7 @@ import type { Id } from "../../convex/_generated/dataModel";
 import { useSchedule } from "#/lib/schedule";
 import { CLUB } from "#/lib/season";
 import { useNotify } from "./feedback";
+import { Loading } from "#/components/ui";
 
 /** Reports failures without letting operations from a previous mount update the current UI. */
 export function useAction(): (operation: Promise<unknown>) => Promise<boolean> {
@@ -80,7 +81,7 @@ export function OfficerGate({ children, redirect, purpose }: { children: ReactNo
 function Check({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const me = useQuery(api.officers.me, isAuthenticated ? {} : "skip");
-  if (isLoading || (isAuthenticated && me === undefined)) return <p className="font-bold text-dim">Loading…</p>;
+  if (isLoading || (isAuthenticated && me === undefined)) return <Loading />;
   if (!isAuthenticated)
     return (
       <p className="card p-6">

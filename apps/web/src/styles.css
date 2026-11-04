@@ -319,6 +319,50 @@
   }
 }
 
+/* The loader (components/ui.tsx, Loading): its tiles dip and rise in a wave, and its word's dots count up. */
+@keyframes loader-wave {
+  0%,
+  60%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+  30% {
+    transform: scale(0.45);
+    opacity: 0.35;
+  }
+}
+.loader-tile {
+  animation: loader-wave 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes loader-dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+}
+.loader-word::after {
+  content: "…";
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: loader-dots 1.3s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-tile,
+  .loader-word::after {
+    animation: none;
+  }
+}
+
 /* The one page-load moment: the pictogram wall fills in, tile by tile. */
 @keyframes tile-in {
   from {

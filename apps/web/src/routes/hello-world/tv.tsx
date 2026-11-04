@@ -14,7 +14,7 @@ import { SpookyBoard, SpookyMessage, SpookyShift, clockRunning, screenKey } from
 import { InstagramGlyph, InstagramQr } from "#/components/instagram";
 import { Lights, Pines, Snow } from "#/components/winter";
 import { OfficerGate, useAction, useJoinCode } from "#/components/officer";
-import { GAME_TILE, Picto, ordinal, weekTile } from "#/components/ui";
+import { GAME_TILE, Loading, Picto, ordinal, weekTile } from "#/components/ui";
 import { BUGS, GAMES } from "#/lib/content";
 import { heldLabel, roundOf } from "#/lib/flow";
 import { cardKey, drawKey, isAnswerGame, placeOf, wikiKey } from "#/lib/grading";
@@ -48,9 +48,12 @@ function useOrigin() {
 
 function Tv() {
   return (
-    <OfficerGate redirect="/hello-world/tv" purpose="put the game on the TV">
-      <TvScreen />
-    </OfficerGate>
+    // On the TV's own pine from the first frame, so signing in and loading never flash a white page.
+    <div className="theme-pine flex min-h-dvh flex-col [&>.card]:my-auto">
+      <OfficerGate redirect="/hello-world/tv" purpose="put the game on the TV">
+        <TvScreen />
+      </OfficerGate>
+    </div>
   );
 }
 
@@ -68,9 +71,10 @@ function TvScreen() {
   }, [live]);
   const week = live ? live.week : last ? last.week : last === undefined ? seen : null;
   const spooky = week !== null && plan[week - 1]?.theme === "spooky";
-  // In winter, the screens between games (the lobby, standings, messages, and the attract screen) get snow, lights, and
-  // pines. The games themselves stay plain, so nothing moves behind the code or the drawing.
-  const winter = isWinter() && !spooky && (!live || ["lobby", "scoreboard", "message"].includes(live.screen.mode));
+  // In winter, every screen but the kickoff slides gets lights, pines, and snow. The rounds get less snow, so it stays
+  // quiet behind the code.
+  const winter = isWinter() && !spooky && live?.screen.mode !== "slides";
+  const calm = !live || ["lobby", "scoreboard", "message"].includes(live.screen.mode);
   return (
     // Sound is run from the host's console, so the TV shows no button for it: browsers still need one click on this page
     // before they'll play anything, and a click anywhere does it.
@@ -78,8 +82,8 @@ function TvScreen() {
       className={`theme-pine relative isolate flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
       onClick={() => !sound && unlockAudio().then(() => setSound(true))}
     >
-      {winter && <WinterTv />}
-      {live && code ? <LiveTv live={live} code={code} sound={sound} /> : live === null ? <AfterNight spooky={spooky} /> : null}
+      {winter && <WinterTv snow={calm ? 110 : 40} />}
+      {live && code ? <LiveTv live={live} code={code} sound={sound} /> : live === null ? <AfterNight spooky={spooky} /> : <Loading />}
       {spooky && (
         <SpookyShift
           screen={live ? screenKey(live.screen) : "after"}
@@ -90,12 +94,16 @@ function TvScreen() {
   );
 }
 
-/** Winter behind the TV's screens between games. It keeps moving with reduced motion, like the spooky night's TV. */
-function WinterTv() {
+/** Winter behind the TV's screens, standing on the night's bottom bar (--shift-under) once there is one. It keeps
+ *  moving with reduced motion, like the spooky night's TV. */
+function WinterTv({ snow }: { snow: number }) {
   return (
-    <div aria-hidden className="absolute inset-0 -z-10 [--bulb:0.85vw] [--lights-h:3.4vw] [--snow-unit:0.5vw] [--wire:#06140f]">
+    <div
+      aria-hidden
+      className="absolute inset-x-0 top-0 bottom-[var(--shift-under,0px)] -z-10 [--bulb:0.85vw] [--lights-h:3.4vw] [--snow-unit:0.5vw] [--wire:#06140f]"
+    >
       <Pines />
-      <Snow count={110} always />
+      <Snow count={snow} always />
       <Lights swags={7} per={5} always />
     </div>
   );
@@ -117,7 +125,7 @@ function CodeSquares({ code, className = "" }: { code: string; className?: strin
 /** After End night: the season scoreboard for a while (tonight's winner up top), then the attract screen. */
 function AfterNight({ spooky }: { spooky: boolean }) {
   const last = useJustEnded();
-  if (last === undefined) return null;
+  if (last === undefined) return <Loading />;
   if (!last) return <Attract />;
   const first = last.teams.filter((t) => t.score > 0 && t.score === last.teams[0]?.score);
   const board = <SeasonBoard winners={first.map((t) => t.name)} practice={last.practice} />;

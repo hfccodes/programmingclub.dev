@@ -114,10 +114,11 @@ export function Lights({
   );
 }
 
-// The TV's treeline, in a 1600 × 240 box: a far row and a near row of pines, tallest out at the edges so the middle,
-// where the words are, stays low. Each pine is three tiers with snow on top of each.
+// The TV's treeline, in a 1600 × 160 box (10vw tall on the TV): a far row and a near row of pines. Across the middle
+// they stay inside the screen's bottom padding (3.5vw), clear of the words; only out in the corners do a few grow tall.
+// Each pine is three tiers with snow on top of each.
 const W = 1600;
-const H = 240;
+const H = 160;
 function pine(cx: number, h: number, base: number) {
   const tiers = [
     [1, 0.56, 0.16],
@@ -135,20 +136,22 @@ function pine(cx: number, h: number, base: number) {
     .join("");
   return { tree, snow };
 }
-function treeline(step: number, low: number, high: number, k: number) {
+/** Pines every `step` or so, `low` to `low + jitter` tall, and up to `corner` taller in the outer 12% of each side. */
+function treeline(step: number, low: number, jitter: number, corner: number, k: number) {
   const trees = [];
   for (let i = 0, x = -30; x < W + 30; i++, x += step * (0.75 + rand(i, k) * 0.5)) {
     const edge = Math.abs(x - W / 2) / (W / 2);
-    trees.push(pine(x, low + (high - low) * edge ** 2.4 + rand(i, k + 1) * 26, H - 8 - rand(i, k + 2) * 10));
+    const out = Math.min(1, Math.max(0, (edge - 0.88) / 0.12));
+    trees.push(pine(x, low + rand(i, k + 1) * jitter + corner * out ** 1.4, H - 6 - rand(i, k + 2) * 8));
   }
   return { tree: trees.map((t) => t.tree).join(""), snow: trees.map((t) => t.snow).join("") };
 }
-const FAR = treeline(34, 40, 105, 10);
-const NEAR = treeline(64, 26, 140, 20);
+const FAR = treeline(30, 34, 22, 66, 10);
+const NEAR = treeline(52, 22, 22, 90, 20);
 // Snow on the ground: a soft drift across the bottom.
-const DRIFT = `M0 ${H - 18}${Array.from({ length: 8 }, (_, i) => {
+const DRIFT = `M0 ${H - 12}${Array.from({ length: 8 }, (_, i) => {
   const x = (i + 1) * (W / 8);
-  return `Q${x - W / 16} ${H - 30 - rand(i, 30) * 16} ${x} ${H - 16 - rand(i, 31) * 8}`;
+  return `Q${x - W / 16} ${H - 22 - rand(i, 30) * 10} ${x} ${H - 10 - rand(i, 31) * 6}`;
 }).join("")}V${H}H0Z`;
 
 /** Snowy pines along the bottom of the parent, its full width. */

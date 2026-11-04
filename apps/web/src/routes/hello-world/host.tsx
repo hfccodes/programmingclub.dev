@@ -34,7 +34,7 @@ import {
 import { ExportButton, OfficerGate, useAction, useJoinCode } from "#/components/officer";
 import { useConfirm } from "#/components/feedback";
 import { SearchPicker } from "#/components/search-picker";
-import { GAME_TILE, Picto, Wrap, ordinal } from "#/components/ui";
+import { GAME_TILE, Loading, Picto, Wrap, ordinal } from "#/components/ui";
 import { GAMES, WIKI_RACES, wikiUrl } from "#/lib/content";
 import { deckFor, filtersFor, heldKey, nextCard, nounFor, puzzleTitle, revealable, roundOf, roundTitle } from "#/lib/flow";
 import type { Filter, Round } from "#/lib/flow";
@@ -77,7 +77,8 @@ const Brand = () => (
 // whole screen. The sign-in prompts and the start screen are plain pages under a small bar.
 function Host() {
   return (
-    <div className="[&>:not([data-host-shell])]:mx-4 [&>:not([data-host-shell])]:my-16">
+    // Loading fills the screen there, so its tiles sit in the middle of it.
+    <div className="[&>:not([data-host-shell])]:mx-4 [&>:not([data-host-shell])]:my-16 [&>[role=status]]:min-h-[calc(100dvh-8rem)]">
       <OfficerGate redirect="/hello-world/host" purpose="run tonight’s game">
         <Console />
       </OfficerGate>
@@ -88,7 +89,7 @@ function Host() {
 function Console() {
   const data = useQuery(api.sessions.host);
   const live = useQuery(api.sessions.live);
-  if (!data || live === undefined) return <p className="font-bold text-dim">Loading…</p>;
+  if (!data || live === undefined) return <Loading />;
   if (!data.session || !live)
     return (
       <div data-host-shell>
