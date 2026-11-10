@@ -17,10 +17,11 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as DesktopIndexRouteImport } from './routes/_desktop/index'
 import { Route as DesktopAboutRouteImport } from './routes/_desktop/about'
-import { Route as DesktopAiBusinessConferenceRouteImport } from './routes/_desktop/ai-business-conference'
+import { Route as DesktopBuilderWarsRouteImport } from './routes/_desktop/builder-wars'
 import { Route as DesktopDashboardRouteImport } from './routes/_desktop/dashboard'
 import { Route as DesktopHackTheNestRouteImport } from './routes/_desktop/hack-the-nest'
 import { Route as DesktopHowToJoinRouteImport } from './routes/_desktop/how-to-join'
+import { Route as DesktopLearnToCodeRouteImport } from './routes/_desktop/learn-to-code'
 import { Route as DesktopMeetingsRouteImport } from './routes/_desktop/meetings'
 import { Route as DesktopOfficersRouteImport } from './routes/_desktop/officers'
 import { Route as DesktopSiteRouteImport } from './routes/_desktop/site'
@@ -84,12 +85,11 @@ const DesktopAboutRoute = DesktopAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => DesktopRoute,
 } as any)
-const DesktopAiBusinessConferenceRoute =
-  DesktopAiBusinessConferenceRouteImport.update({
-    id: '/ai-business-conference',
-    path: '/ai-business-conference',
-    getParentRoute: () => DesktopRoute,
-  } as any)
+const DesktopBuilderWarsRoute = DesktopBuilderWarsRouteImport.update({
+  id: '/builder-wars',
+  path: '/builder-wars',
+  getParentRoute: () => DesktopRoute,
+} as any)
 const DesktopDashboardRoute = DesktopDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -103,6 +103,11 @@ const DesktopHackTheNestRoute = DesktopHackTheNestRouteImport.update({
 const DesktopHowToJoinRoute = DesktopHowToJoinRouteImport.update({
   id: '/how-to-join',
   path: '/how-to-join',
+  getParentRoute: () => DesktopRoute,
+} as any)
+const DesktopLearnToCodeRoute = DesktopLearnToCodeRouteImport.update({
+  id: '/learn-to-code',
+  path: '/learn-to-code',
   getParentRoute: () => DesktopRoute,
 } as any)
 const DesktopMeetingsRoute = DesktopMeetingsRouteImport.update({
@@ -229,10 +234,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
-  '/ai-business-conference': typeof DesktopAiBusinessConferenceRoute
+  '/builder-wars': typeof DesktopBuilderWarsRoute
   '/dashboard': typeof DesktopDashboardRoute
   '/hack-the-nest': typeof DesktopHackTheNestRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
+  '/learn-to-code': typeof DesktopLearnToCodeRoute
   '/meetings': typeof DesktopMeetingsRoute
   '/officers': typeof DesktopOfficersRoute
   '/site': typeof DesktopSiteRoute
@@ -263,10 +269,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
-  '/ai-business-conference': typeof DesktopAiBusinessConferenceRoute
+  '/builder-wars': typeof DesktopBuilderWarsRoute
   '/dashboard': typeof DesktopDashboardRoute
   '/hack-the-nest': typeof DesktopHackTheNestRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
+  '/learn-to-code': typeof DesktopLearnToCodeRoute
   '/meetings': typeof DesktopMeetingsRoute
   '/officers': typeof DesktopOfficersRoute
   '/site': typeof DesktopSiteRoute
@@ -301,10 +308,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/_desktop/about': typeof DesktopAboutRoute
-  '/_desktop/ai-business-conference': typeof DesktopAiBusinessConferenceRoute
+  '/_desktop/builder-wars': typeof DesktopBuilderWarsRoute
   '/_desktop/dashboard': typeof DesktopDashboardRoute
   '/_desktop/hack-the-nest': typeof DesktopHackTheNestRoute
   '/_desktop/how-to-join': typeof DesktopHowToJoinRoute
+  '/_desktop/learn-to-code': typeof DesktopLearnToCodeRoute
   '/_desktop/meetings': typeof DesktopMeetingsRoute
   '/_desktop/officers': typeof DesktopOfficersRoute
   '/_desktop/site': typeof DesktopSiteRoute
@@ -340,10 +348,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
-    | '/ai-business-conference'
+    | '/builder-wars'
     | '/dashboard'
     | '/hack-the-nest'
     | '/how-to-join'
+    | '/learn-to-code'
     | '/meetings'
     | '/officers'
     | '/site'
@@ -374,10 +383,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
-    | '/ai-business-conference'
+    | '/builder-wars'
     | '/dashboard'
     | '/hack-the-nest'
     | '/how-to-join'
+    | '/learn-to-code'
     | '/meetings'
     | '/officers'
     | '/site'
@@ -411,10 +421,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/_desktop/about'
-    | '/_desktop/ai-business-conference'
+    | '/_desktop/builder-wars'
     | '/_desktop/dashboard'
     | '/_desktop/hack-the-nest'
     | '/_desktop/how-to-join'
+    | '/_desktop/learn-to-code'
     | '/_desktop/meetings'
     | '/_desktop/officers'
     | '/_desktop/site'
@@ -511,11 +522,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesktopAboutRouteImport
       parentRoute: typeof DesktopRoute
     }
-    '/_desktop/ai-business-conference': {
-      id: '/_desktop/ai-business-conference'
-      path: '/ai-business-conference'
-      fullPath: '/ai-business-conference'
-      preLoaderRoute: typeof DesktopAiBusinessConferenceRouteImport
+    '/_desktop/builder-wars': {
+      id: '/_desktop/builder-wars'
+      path: '/builder-wars'
+      fullPath: '/builder-wars'
+      preLoaderRoute: typeof DesktopBuilderWarsRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/dashboard': {
@@ -537,6 +548,13 @@ declare module '@tanstack/react-router' {
       path: '/how-to-join'
       fullPath: '/how-to-join'
       preLoaderRoute: typeof DesktopHowToJoinRouteImport
+      parentRoute: typeof DesktopRoute
+    }
+    '/_desktop/learn-to-code': {
+      id: '/_desktop/learn-to-code'
+      path: '/learn-to-code'
+      fullPath: '/learn-to-code'
+      preLoaderRoute: typeof DesktopLearnToCodeRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/meetings': {
@@ -747,10 +765,11 @@ const HelloWorldRouteRouteWithChildren = HelloWorldRouteRoute._addFileChildren(
 
 interface DesktopRouteChildren {
   DesktopAboutRoute: typeof DesktopAboutRoute
-  DesktopAiBusinessConferenceRoute: typeof DesktopAiBusinessConferenceRoute
+  DesktopBuilderWarsRoute: typeof DesktopBuilderWarsRoute
   DesktopDashboardRoute: typeof DesktopDashboardRoute
   DesktopHackTheNestRoute: typeof DesktopHackTheNestRoute
   DesktopHowToJoinRoute: typeof DesktopHowToJoinRoute
+  DesktopLearnToCodeRoute: typeof DesktopLearnToCodeRoute
   DesktopMeetingsRoute: typeof DesktopMeetingsRoute
   DesktopOfficersRoute: typeof DesktopOfficersRoute
   DesktopSiteRoute: typeof DesktopSiteRoute
@@ -760,10 +779,11 @@ interface DesktopRouteChildren {
 
 const DesktopRouteChildren: DesktopRouteChildren = {
   DesktopAboutRoute: DesktopAboutRoute,
-  DesktopAiBusinessConferenceRoute: DesktopAiBusinessConferenceRoute,
+  DesktopBuilderWarsRoute: DesktopBuilderWarsRoute,
   DesktopDashboardRoute: DesktopDashboardRoute,
   DesktopHackTheNestRoute: DesktopHackTheNestRoute,
   DesktopHowToJoinRoute: DesktopHowToJoinRoute,
+  DesktopLearnToCodeRoute: DesktopLearnToCodeRoute,
   DesktopMeetingsRoute: DesktopMeetingsRoute,
   DesktopOfficersRoute: DesktopOfficersRoute,
   DesktopSiteRoute: DesktopSiteRoute,

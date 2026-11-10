@@ -175,8 +175,8 @@ function Overview() {
       <Section title="Events">
         <div className="space-y-2">
           {[
-            ["AI Business Conference", "Oct 23 · U-M Ross", data.conferenceInterest],
             ["Hack The Nest", "Nov 14–15 · EMU", data.hackInterest],
+            ["BuilderWars", "Nov 14–15 · Newlab Detroit", data.builderWarsInterest],
           ].map(([name, when, n]) => (
             <div key={name} className="flex items-center justify-between gap-3 rounded-[8px] bg-mist p-3">
               <div>

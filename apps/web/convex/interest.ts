@@ -2,8 +2,8 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { QueryCtx } from "./_generated/server";
 
-// Events that take hearts. Add an id here when a new event app goes on the home page.
-const EVENTS = new Set(["hack-the-nest-2026", "ai-business-conference-2026"]);
+// Events that take hearts. Add an id here when a new event app goes on the home page, and drop it once the app comes off.
+const EVENTS = new Set(["hack-the-nest-2026", "builder-wars-2026"]);
 
 const check = (event: string, voter: string) => {
   if (!EVENTS.has(event)) throw new ConvexError("Unknown event.");

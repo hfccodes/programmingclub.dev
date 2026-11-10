@@ -13,12 +13,12 @@ export const overview = query({
         .query("interest")
         .withIndex("by_event_voter", (q) => q.eq("event", event))
         .collect();
-    const [allSessions, allAttendance, live, hackInterest, conferenceInterest] = await Promise.all([
+    const [allSessions, allAttendance, live, hackInterest, builderWarsInterest] = await Promise.all([
       ctx.db.query("sessions").collect(),
       ctx.db.query("attendance").collect(),
       openSession(ctx),
       interestIn("hack-the-nest-2026"),
-      interestIn("ai-business-conference-2026"),
+      interestIn("builder-wars-2026"),
     ]);
 
     const sessions = allSessions.filter((s) => !s.practice);
@@ -58,7 +58,7 @@ export const overview = query({
         average: ended.length ? Math.round(ended.reduce((n, x) => n + x.headcount, 0) / ended.length) : 0,
       },
       hackInterest: hackInterest.length,
-      conferenceInterest: conferenceInterest.length,
+      builderWarsInterest: builderWarsInterest.length,
     };
   },
 });

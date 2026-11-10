@@ -1,4 +1,5 @@
 // The club desktop's apps: what each window shows. Content comes from lib/season.ts and the live schedule.
+import { Tabs } from "@base-ui/react/tabs";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
@@ -7,12 +8,15 @@ import { InstagramLink } from "#/components/instagram";
 import { Disclaimer } from "#/components/site";
 import { GAME_TILE, Picto, weekTile } from "#/components/ui";
 import { GAMES } from "#/lib/content";
+import { STAGES } from "#/lib/learn";
+import type { Price, Stage } from "#/lib/learn";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
 import { CALENDAR, CLUB, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
 import { api } from "../../../convex/_generated/api";
 import { Dashboard } from "./dashboard";
 
-export type AppId = "about" | "meetings" | "world-cup" | "hackathon" | "conference" | "officers" | "join" | "site" | "dashboard";
+export type AppId =
+  "about" | "meetings" | "world-cup" | "learn" | "hackathon" | "builder-wars" | "officers" | "join" | "site" | "dashboard";
 
 export interface App {
   id: AppId;
@@ -343,55 +347,54 @@ function Hackathon() {
         ))}
       </dl>
       <Interest event={HACK.id} />
+      <SameWeekend other="builder-wars" />
       <p className="text-sm text-dim">Hosted by GDG on Campus at EMU, not by our club. Register and find the schedule on their site.</p>
     </div>
   );
 }
 
-/* ---------- conference: Michigan AI Business Conference ---------- */
+/* ---------- builder-wars: BuilderWars at Newlab Detroit ---------- */
 
-const CONF = {
-  id: "ai-business-conference-2026",
-  url: "https://abgumich.org/conference",
-  flyer: "/events/ai-business-conference-2026.pdf",
-};
+const BW = { id: "builder-wars-2026", url: "https://builderwars.dev/", discord: "https://discord.com/invite/mrYkakzvUj" };
 
-function Conference() {
+function BuilderWars() {
   return (
     <div className="space-y-5">
-      <div className="rounded-[10px] bg-[#0b2a55] p-5 text-white">
-        <p className="text-sm font-semibold text-[#f5c400]">Fri, Oct 23, 2026 · 10:30 a.m.–5 p.m.</p>
-        <p className="mt-1 text-2xl leading-tight font-extrabold tracking-[-0.02em]">AI Business Conference</p>
-        <p className="mt-1 text-white/75">Ross School of Business, University of Michigan, Ann Arbor</p>
+      <div className="rounded-[10px] bg-[#111418] p-5 text-white shadow-[inset_0_0_0_1px_#2a3039]">
+        <p className="text-sm font-semibold text-[#a78bfa]">Sat–Sun, Nov 14–15, 2026 · 24 hours</p>
+        <p className="mt-1 text-2xl leading-tight font-extrabold tracking-[-0.02em]">BuilderWars</p>
+        <p className="mt-1 text-white/75">Newlab Detroit, 1st floor</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href={CONF.url}
+            href={BW.url}
             target="_blank"
             rel="noreferrer"
-            className="press inline-flex h-9 items-center rounded-full bg-[#f5c400] px-4 text-sm font-semibold text-[#0b2a55] hover:bg-[#ffd633]"
+            className="press inline-flex h-9 items-center rounded-full bg-[#a78bfa] px-4 text-sm font-semibold text-[#111418] hover:bg-[#c4b5fd]"
           >
-            Get a ticket ↗
+            Register at builderwars.dev ↗
           </a>
           <a
-            href={CONF.flyer}
+            href={BW.discord}
             target="_blank"
             rel="noreferrer"
             className="press inline-flex h-9 items-center rounded-full bg-white/10 px-4 text-sm font-semibold text-white hover:bg-white/20"
           >
-            View the flyer (PDF)
+            Their Discord ↗
           </a>
         </div>
       </div>
       <p className="text-lg leading-relaxed">
-        A full day on how AI is changing finance and venture capital: keynotes, expert panels, coffee chats, and networking with industry
-        leaders. Speakers come from Microsoft, J.P. Morgan, Bank of America, BTIG, and more.
+        A free, in-person, 24-hour hackathon for college and university students, run by the AWS Student Builder Group at Wayne State. Build
+        anything: a web or mobile app, hardware, an AI tool. Bring a team of up to four, or come solo and find one at Team Matchmaking.
       </p>
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 text-[0.95rem]">
         {[
-          ["Cost", "$17 general admission"],
-          ["Tickets", "On sale until Thu, Oct 22, 8 a.m. ET"],
-          ["Tracks", "Finance & quant, venture capital"],
-          ["Included", "Lunch, workshops, closing reception"],
+          ["Cost", "Free, with meals and snacks"],
+          ["Teams", "1–4, solo welcome"],
+          ["Who", "Any college student, any major"],
+          ["Prizes", "Top 3 overall, plus company tracks"],
+          ["Check-in", "Sat, 10 a.m., with breakfast"],
+          ["Awards", "Sun, 2:30 p.m."],
         ].map(([k, v]) => (
           <div key={k}>
             <dt className="text-dim">{k}</dt>
@@ -399,10 +402,110 @@ function Conference() {
           </div>
         ))}
       </dl>
-      <Interest event={CONF.id} />
+      <Interest event={BW.id} />
+      <SameWeekend other="hackathon" />
       <p className="text-sm text-dim">
-        Hosted by the University of Michigan’s AI Business Group (ABG), not by our club. Times are from their flyer; check their site for
-        the full agenda, since it may start earlier.
+        Hosted by the AWS Student Builder Group at Wayne State, not by our club. The building closes to new arrivals from 10 p.m. Saturday
+        to 7 a.m. Sunday; if you’re inside you can stay the night, so bring a laptop, a charger, and maybe a sleeping bag.
+      </p>
+    </div>
+  );
+}
+
+/** Hack The Nest and BuilderWars share a weekend: each window points to the other. */
+function SameWeekend({ other }: { other: "hackathon" | "builder-wars" }) {
+  const app = APPS.find((a) => a.id === other)!;
+  return (
+    <p className="flex items-center gap-3 rounded-[10px] border border-dashed border-line p-3 text-sm">
+      <span className="size-5 shrink-0 text-dim">{app.glyph}</span>
+      <span>
+        Same weekend as{" "}
+        <Link to={app.path} className="link font-semibold">
+          {app.title}
+        </Link>
+        {other === "hackathon" ? " in Ypsilanti." : " in Detroit."} You’ll have to pick one.
+      </span>
+    </p>
+  );
+}
+
+/* ---------- learn: where to learn to code, and how to get hired ---------- */
+
+const PRICE_CHIP: Record<Price, string> = {
+  Free: "bg-[#dff5e3] text-[#14532d]",
+  "Free tier": "bg-[#e3edff] text-[#0b4fa3]",
+  Paid: "bg-[#fdebd3] text-[#9a3412]",
+  "Free for students": "bg-[#efe6ff] text-[#5b21b6]",
+};
+
+function Learn() {
+  const [stage, setStage] = useState<Stage["id"]>("start");
+  return (
+    <div>
+      <p className="text-lg leading-relaxed">
+        Where to learn to code, and what helps you land the job, in the order you’d use them. Most are free.
+      </p>
+      <Tabs.Root value={stage} onValueChange={(v) => setStage(v as Stage["id"])} className="mt-4">
+        <Tabs.List className="relative grid grid-cols-4 gap-1 rounded-[10px] bg-mist p-1" aria-label="Where you are">
+          {STAGES.map((s, i) => (
+            <Tabs.Tab
+              key={s.id}
+              value={s.id}
+              className="press relative z-10 flex h-12 flex-col items-center justify-center rounded-[8px] px-1 text-center leading-tight outline-none focus-visible:ring-2 focus-visible:ring-[#1f63d6] data-[active]:text-ink"
+            >
+              <span className="text-[0.7rem] font-bold text-dim">{i + 1}</span>
+              <span className="text-sm font-semibold">{s.title}</span>
+            </Tabs.Tab>
+          ))}
+          <Tabs.Indicator className="learn-indicator absolute top-1 left-0 z-0 h-12 rounded-[8px] bg-white shadow-[0_1px_3px_rgb(6_24_56/0.18)]" />
+        </Tabs.List>
+        {STAGES.map((s) => (
+          <Tabs.Panel key={s.id} value={s.id} className="learn-panel outline-none">
+            <p className="mt-4 text-[0.95rem] text-dim">{s.goal}</p>
+            <ul className="mt-3 space-y-2">
+              {[...s.items]
+                .sort((a, b) => Number(!!b.pick) - Number(!!a.pick))
+                .map((r) => (
+                  <li key={r.name}>
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group flex items-start gap-3 rounded-[10px] p-3 shadow-[0_0_0_1px_var(--color-line)] transition-shadow hover:shadow-[0_0_0_1px_#1f63d6,0_6px_16px_-10px_rgb(6_24_56/0.5)]"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="font-bold group-hover:underline">{r.name}</span>
+                          <span className={`chip ${PRICE_CHIP[r.price]}`}>{r.price}</span>
+                          {r.pick && <span className="chip bg-gold text-ink">Top pick</span>}
+                        </span>
+                        <span className="mt-0.5 block text-[0.95rem] leading-snug text-dim">{r.blurb}</span>
+                      </span>
+                      <span className="mt-0.5 text-dim group-hover:text-[#1f63d6]" aria-hidden>
+                        ↗
+                      </span>
+                    </a>
+                  </li>
+                ))}
+            </ul>
+            {s.id === "hired" && (
+              <p className="mt-3 text-sm">
+                Two hackathons this month:{" "}
+                <Link to="/hack-the-nest" className="link">
+                  Hack The Nest
+                </Link>{" "}
+                and{" "}
+                <Link to="/builder-wars" className="link">
+                  BuilderWars
+                </Link>
+                .
+              </p>
+            )}
+          </Tabs.Panel>
+        ))}
+      </Tabs.Root>
+      <p className="mt-5 border-t border-line pt-4 text-sm text-dim">
+        Stuck on a lesson? Bring it to a meeting ({CLUB.day}, {CLUB.time}). Officers help with any course, in any language.
       </p>
     </div>
   );
@@ -413,7 +516,13 @@ function Interest({ event }: { event: string }) {
   const [voter, setVoter] = useState<string | null>(null);
   useEffect(() => {
     let id = localStorage.getItem("pc.voter");
-    if (!id) localStorage.setItem("pc.voter", (id = crypto.randomUUID()));
+    // randomUUID only exists on secure pages (HTTPS or localhost); a dev server opened by IP gets random hex instead.
+    if (!id) {
+      id = isSecureContext
+        ? crypto.randomUUID()
+        : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
+      localStorage.setItem("pc.voter", id);
+    }
     setVoter(id);
   }, []);
   const data = useQuery(api.interest.get, voter ? { event, voter } : "skip");
@@ -496,6 +605,21 @@ export const APPS: App[] = [
     Content: WorldCup,
   },
   {
+    id: "learn",
+    path: "/learn-to-code",
+    title: "Learn to code",
+    label: "Learn to Code",
+    glyph: (
+      <svg viewBox="0 0 24 24" {...G}>
+        <path d="M3 6.5C5.5 5 8.5 5 12 7c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5Z" />
+        <path d="M12 7v12.5M7.5 11L6 12.5 7.5 14M16.5 11l1.5 1.5-1.5 1.5" />
+      </svg>
+    ),
+    at: { left: 38, top: 6 },
+    width: "32rem",
+    Content: Learn,
+  },
+  {
     id: "hackathon",
     path: "/hack-the-nest",
     title: "Hack The Nest",
@@ -511,19 +635,20 @@ export const APPS: App[] = [
     Content: Hackathon,
   },
   {
-    id: "conference",
-    path: "/ai-business-conference",
-    title: "AI Business Conference",
-    label: "AI Business Conference",
+    id: "builder-wars",
+    path: "/builder-wars",
+    title: "BuilderWars",
+    label: "BuilderWars",
     glyph: (
       <svg viewBox="0 0 24 24" {...G}>
-        <rect x="3.5" y="4" width="17" height="10" rx="1.5" />
-        <path d="M12 14v3M8 21l4-4 4 4M7.5 11l3-3 2 2 3.5-3.5" />
+        <path d="M4 20l9-9M13 11l2.5-2.5M15.5 8.5L20 4M17 4h3v3" />
+        <path d="M20 20l-9-9M8.5 8.5L4 4M7 4H4v3" />
+        <path d="M6 15.5l2.5 2.5M18 15.5L15.5 18" />
       </svg>
     ),
     at: { left: 44, top: 12 },
     width: "27rem",
-    Content: Conference,
+    Content: BuilderWars,
   },
   {
     id: "officers",

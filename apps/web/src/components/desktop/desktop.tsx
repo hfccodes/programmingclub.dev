@@ -11,7 +11,9 @@ import { useLikelyOfficer } from "#/components/officer";
 import { ClubLogo } from "#/components/site";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
 import { CLUB, INSTAGRAM_URL, isHalloweenMonth, isWinter } from "#/lib/season";
+import { Ambient } from "./ambient";
 import { APPS, appFor, countdown } from "./apps";
+import { Launcher, SearchButton } from "./launcher";
 import { Scene } from "./scene";
 import { SpookyScene } from "./spooky-scene";
 import { Lights, Snow } from "#/components/winter";
@@ -24,7 +26,22 @@ type Phase = "opening" | "closing" | "minimizing" | "restoring" | "zooming";
  * Array order is stacking order; `n` is opening order, which the taskbar keeps. `delay` holds the first windows until startup finishes.
  * `tile` places the two startup windows side by side (0 left, 1 right) instead of at their usual spots, where they'd overlap.
  */
-type Win = { id: AppId; n: number; pos?: Pt; min?: boolean; max?: boolean; phase?: Phase; fly?: Pt; delay?: number; tile?: 0 | 1 };
+type Win = {
+  id: AppId;
+  n: number;
+  pos?: Pt;
+  min?: boolean;
+  max?: boolean;
+  phase?: Phase;
+  fly?: Pt;
+  delay?: number;
+  tile?: 0 | 1;
+  /** Docked to half the screen by dragging it to a side edge. */
+  snap?: Snap;
+  /** Set once the window has been resized by an edge or corner, in pixels. */
+  size?: { w: number; h: number };
+};
+type Snap = "left" | "right";
 let opened = 0;
 /** The startup animation plays on the first load only, not when coming back from another page. Set in an effect, so never on the server. */
 let booted = false;
@@ -85,6 +102,7 @@ export function Desktop() {
       setWins((ws) => ws.map((w) => (w.tile === 1 ? { ...w, min: true, phase: undefined } : w)));
   }, []);
   const [startOpen, setStartOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const iconApps = useIconApps();
   const october = isHalloweenMonth();
@@ -129,9 +147,11 @@ export function Desktop() {
     patch(id, fly ? { phase: "minimizing", fly } : { min: true, phase: undefined });
     leave(id);
   };
+  // A window docked to a side restores to where it was; otherwise this toggles full screen.
   const maximize = (id: AppId) => {
     const w = wins.find((x) => x.id === id);
-    patch(id, { max: !w?.max, phase: still() ? undefined : "zooming" });
+    const phase = still() ? undefined : ("zooming" as const);
+    patch(id, w?.snap ? { snap: undefined, phase } : { max: !w?.max, phase });
   };
   const settle = (id: AppId) =>
     setWins((ws) =>
@@ -142,11 +162,18 @@ export function Desktop() {
         return [{ ...w, phase: undefined }];
       }),
     );
-  const move = (id: AppId, pos: Pt) => patch(id, { pos });
 
+  // Ctrl+K (⌘K on a Mac), or / outside a text field, opens search.
   // Escape closes the window on top, unless something else (like the Start menu) already handled it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as HTMLElement).closest("input, textarea, select, [contenteditable]");
+      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey)) {
+        e.preventDefault();
+        setStartOpen(false);
+        setSearchOpen(true);
+        return;
+      }
       if (e.key !== "Escape" || e.defaultPrevented) return;
       const top = [...wins].reverse().find((w) => !w.min && w.phase !== "closing");
       if (top && !(e.target as HTMLElement).closest("input, textarea")) close(top.id);
@@ -163,6 +190,7 @@ export function Desktop() {
       <div aria-hidden className={`absolute inset-0 ${boot ? "boot-wallpaper" : ""}`}>
         <div className="desk-aerial" />
         {october ? <SpookyScene /> : <Scene />}
+        <Ambient root={root} parallax={!october} />
         {/* Winter: snow over the shore and lights along the top. Reduced motion stills both. */}
         {winter && (
           <div className="absolute inset-0 [--bulb:0.65rem] [--lights-h:2.6rem] [--snow-unit:0.5vmax] [--wire:#081833]">
@@ -174,7 +202,7 @@ export function Desktop() {
       </div>
 
       {/* Desktop (tablets and up) */}
-      <div className="absolute inset-0 bottom-12 max-md:hidden">
+      <div data-windows className="absolute inset-0 bottom-12 max-md:hidden">
         {/* Icons fill a column, then wrap into the next one on short screens. */}
         <nav aria-label="Desktop" className="absolute top-6 left-4 flex h-[calc(100%-7.5rem)] flex-col flex-wrap content-start gap-1">
           {iconApps.map((app, i) => (
@@ -208,24 +236,28 @@ export function Desktop() {
           </span>
         </a>
 
-        {visible.map((w, n) => {
-          const app = APPS.find((a) => a.id === w.id)!;
-          return (
-            <Window
-              key={w.id}
-              app={app}
-              win={w}
-              z={10 + n}
-              active={w.id === topId}
-              onFocus={() => focus(w.id)}
-              onClose={() => close(w.id)}
-              onMinimize={() => minimize(w.id)}
-              onMaximize={() => maximize(w.id)}
-              onMove={(p) => move(w.id, p)}
-              onSettle={() => settle(w.id)}
-            />
-          );
-        })}
+        {/* Rendered in opening order, stacked by z-index: moving a window's element to the end of the list to raise it
+            would drop the pointer capture of a drag that starts on a window behind another. */}
+        {[...visible]
+          .sort((a, b) => a.n - b.n)
+          .map((w) => {
+            const app = APPS.find((a) => a.id === w.id)!;
+            return (
+              <Window
+                key={w.id}
+                app={app}
+                win={w}
+                z={10 + visible.indexOf(w)}
+                active={w.id === topId}
+                onFocus={() => focus(w.id)}
+                onClose={() => close(w.id)}
+                onMinimize={() => minimize(w.id)}
+                onMaximize={() => maximize(w.id)}
+                onPatch={(p) => patch(w.id, p)}
+                onSettle={() => settle(w.id)}
+              />
+            );
+          })}
       </div>
 
       {/* Phone home screen, or the open app full screen */}
@@ -242,7 +274,9 @@ export function Desktop() {
         inApp={!!routeApp}
         boot={boot}
         menuRoot={root}
+        onSearch={() => setSearchOpen(true)}
       />
+      <Launcher open={searchOpen} onOpenChange={setSearchOpen} onOpen={open} container={root} />
     </div>
   );
 }
@@ -258,6 +292,22 @@ const tiled = (i: 0 | 1): CSSProperties => ({
   maxHeight: "calc(100% - 2.5rem)",
 });
 
+/** A CSS length in rem (like an app's width) in pixels. */
+const remPx = (len: string) => parseFloat(len) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+/** Docked windows float this far off the edges and each other, like a tiling window manager's gaps. */
+const GAP = 10;
+/** How close to the desktop's edge the pointer has to be to dock a window there. */
+const EDGE = 6;
+/** How far the pointer moves before a docked window tears off, so a double-click still restores it. */
+const TEAR = 6;
+
+/** `loose` once the window moves freely; `torn` for the one move that tears a docked window off. */
+type Drag = { dx: number; dy: number; x0: number; y0: number; origin: Pt; loose: boolean; torn?: boolean };
+/** Which edges a resize handle moves: e(ast), w(est), s(outh). */
+type Edges = "e" | "w" | "s" | "se" | "sw";
+type Resize = { x0: number; y0: number; w0: number; h0: number; left: number; top: number; edges: Edges };
+
 function Window({
   app,
   win,
@@ -267,7 +317,7 @@ function Window({
   onClose,
   onMinimize,
   onMaximize,
-  onMove,
+  onPatch,
   onSettle,
 }: {
   app: App;
@@ -278,86 +328,210 @@ function Window({
   onClose: () => void;
   onMinimize: () => void;
   onMaximize: () => void;
-  onMove: (p: Pt) => void;
+  onPatch: (p: Partial<Win>) => void;
   onSettle: () => void;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const drag = useRef<Drag | null>(null);
+  const resize = useRef<Resize | null>(null);
+  // Where the window would dock if it were let go now, previewed under it.
+  const [hint, setHint] = useState<Snap | "max" | null>(null);
+  const docked = !!(win.max || win.snap);
 
   const onDown = (e: ReactPointerEvent) => {
-    if ((e.target as HTMLElement).closest("button") || win.max) return;
+    if ((e.target as HTMLElement).closest("button")) return;
     const el = ref.current!;
-    drag.current = { dx: e.clientX - el.offsetLeft, dy: e.clientY - el.offsetTop };
+    drag.current = {
+      dx: e.clientX - el.offsetLeft,
+      dy: e.clientY - el.offsetTop,
+      x0: e.clientX,
+      y0: e.clientY,
+      origin: { x: el.offsetLeft, y: el.offsetTop },
+      loose: !docked,
+    };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     onFocus();
   };
   const onDrag = (e: ReactPointerEvent) => {
-    if (!drag.current) return;
+    const d = drag.current;
+    if (!d) return;
     const el = ref.current!;
     const parent = el.offsetParent as HTMLElement;
+    let width = el.offsetWidth;
+    if (!d.loose) {
+      if (Math.hypot(e.clientX - d.x0, e.clientY - d.y0) < TEAR) return;
+      // Tear a docked window off: back to its own size, with the same spot of the title bar under the pointer.
+      const rect = el.getBoundingClientRect();
+      width = Math.min(win.size?.w ?? remPx(app.width), parent.clientWidth - 32);
+      d.dx = ((d.x0 - rect.left) / rect.width) * width;
+      d.dy = d.y0 - rect.top;
+      d.loose = d.torn = true;
+    }
     // Keep the title bar on screen.
-    const x = Math.min(Math.max(e.clientX - drag.current.dx, -el.offsetWidth + 120), parent.clientWidth - 120);
-    const y = Math.min(Math.max(e.clientY - drag.current.dy, 0), parent.clientHeight - 44);
-    onMove({ x, y });
+    const x = Math.min(Math.max(e.clientX - d.dx, -width + 120), parent.clientWidth - 120);
+    const y = Math.min(Math.max(e.clientY - d.dy, 0), parent.clientHeight - 44);
+    if (d.torn) {
+      d.origin = { x, y };
+      d.torn = false;
+    }
+    onPatch({ pos: { x, y }, ...(docked ? { max: false, snap: undefined } : {}) });
+    const next = e.clientY <= EDGE ? "max" : e.clientX <= EDGE ? "left" : e.clientX >= parent.clientWidth - EDGE ? "right" : null;
+    if (next !== hint) setHint(next);
   };
-  const onUp = () => (drag.current = null);
+  const onUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (!hint) return;
+    setHint(null);
+    if (!d?.loose) return;
+    // Docked windows keep where they were picked up from, to go back to when restored.
+    const phase = still() ? undefined : ("zooming" as const);
+    onPatch(hint === "max" ? { max: true, pos: d.origin, phase } : { snap: hint, pos: d.origin, phase });
+  };
 
-  const place = win.max
-    ? { left: 0, top: 0, width: "100%", height: "100%" }
-    : win.pos
-      ? { left: win.pos.x, top: win.pos.y, width: app.width, maxHeight: `calc(100% - ${win.pos.y}px - 1rem)` }
-      : win.tile !== undefined
-        ? tiled(win.tile)
-        : // Clear the icon columns (two once officers see the Dashboard) so a fresh window never covers them.
-          { left: `max(16rem, ${app.at.left}%)`, top: `${app.at.top}%`, width: app.width, maxHeight: `calc(${100 - app.at.top}% - 1rem)` };
+  const onResizeDown = (edges: Edges) => (e: ReactPointerEvent) => {
+    e.stopPropagation();
+    const el = ref.current!;
+    resize.current = {
+      x0: e.clientX,
+      y0: e.clientY,
+      w0: el.offsetWidth,
+      h0: el.offsetHeight,
+      left: el.offsetLeft,
+      top: el.offsetTop,
+      edges,
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    onFocus();
+  };
+  const onResize = (e: ReactPointerEvent) => {
+    const r = resize.current;
+    if (!r) return;
+    const parent = ref.current!.offsetParent as HTMLElement;
+    const minW = remPx("18rem");
+    const minH = remPx("12rem");
+    const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
+    let { w0: w, h0: h, left: x } = r;
+    if (r.edges.includes("e")) w = clamp(r.w0 + e.clientX - r.x0, minW, parent.clientWidth - r.left);
+    if (r.edges.includes("w")) {
+      w = clamp(r.w0 - (e.clientX - r.x0), minW, r.left + r.w0);
+      x = r.left + r.w0 - w;
+    }
+    if (r.edges.includes("s")) h = clamp(r.h0 + e.clientY - r.y0, minH, parent.clientHeight - r.top);
+    onPatch({ pos: { x, y: r.top }, size: { w, h } });
+  };
+  const resizeHandle = (edges: Edges, className: string) => (
+    <span
+      aria-hidden
+      onPointerDown={onResizeDown(edges)}
+      onPointerMove={onResize}
+      onPointerUp={() => (resize.current = null)}
+      onPointerCancel={() => (resize.current = null)}
+      className={`absolute z-10 touch-none ${className}`}
+    />
+  );
+
+  const place: CSSProperties = win.max
+    ? { left: GAP, top: GAP, width: `calc(100% - ${2 * GAP}px)`, height: `calc(100% - ${2 * GAP}px)` }
+    : win.snap
+      ? {
+          left: win.snap === "left" ? GAP : `calc(50% + ${GAP / 2}px)`,
+          top: GAP,
+          width: `calc(50% - ${GAP * 1.5}px)`,
+          height: `calc(100% - ${2 * GAP}px)`,
+        }
+      : win.pos
+        ? {
+            left: win.pos.x,
+            top: win.pos.y,
+            width: win.size ? win.size.w : app.width,
+            height: win.size?.h,
+            maxHeight: win.size ? `calc(100% - ${win.pos.y}px)` : `calc(100% - ${win.pos.y}px - 1rem)`,
+          }
+        : win.tile !== undefined
+          ? tiled(win.tile)
+          : // Clear the icon columns (two once officers see the Dashboard) so a fresh window never covers them.
+            {
+              left: `max(16rem, ${app.at.left}%)`,
+              top: `${app.at.top}%`,
+              width: app.width,
+              maxHeight: `calc(${100 - app.at.top}% - 1rem)`,
+            };
   const fly = win.fly ? { "--fx": `${win.fly.x}px`, "--fy": `${win.fly.y}px` } : {};
 
   return (
-    <section
-      ref={ref}
-      role="dialog"
-      aria-label={app.title}
-      data-win={app.id}
-      onPointerDown={onFocus}
-      onAnimationEnd={(e) => e.target === e.currentTarget && win.phase && onSettle()}
-      className={`win absolute flex flex-col ${win.max ? "win-max" : "max-w-[calc(100%-2rem)]"} ${active ? "win-active" : ""} ${win.phase ? `win-${win.phase}` : ""}`}
-      style={{ ...place, ...fly, zIndex: z, animationDelay: win.phase === "opening" && win.delay ? `${win.delay}ms` : undefined }}
-    >
-      <header
-        onPointerDown={onDown}
-        onPointerMove={onDrag}
-        onPointerUp={onUp}
-        onDoubleClick={(e) => !(e.target as HTMLElement).closest("button") && onMaximize()}
-        className={`win-bar flex h-11 shrink-0 touch-none items-center gap-2.5 pr-2 pl-4 select-none ${win.max ? "" : "cursor-grab active:cursor-grabbing"}`}
+    <>
+      {hint && (
+        <div
+          aria-hidden
+          className="snap-hint pointer-events-none absolute"
+          style={{
+            zIndex: z - 1,
+            inset: GAP,
+            left: hint === "right" ? `calc(50% + ${GAP / 2}px)` : GAP,
+            right: hint === "left" ? `calc(50% + ${GAP / 2}px)` : GAP,
+          }}
+        />
+      )}
+      <section
+        ref={ref}
+        role="dialog"
+        aria-label={app.title}
+        data-win={app.id}
+        data-snap={win.snap}
+        onPointerDown={onFocus}
+        onAnimationEnd={(e) => e.target === e.currentTarget && win.phase && onSettle()}
+        className={`win absolute flex flex-col ${docked ? "" : "max-w-[calc(100%-2rem)]"} ${active ? "win-active" : ""} ${win.phase ? `win-${win.phase}` : ""}`}
+        style={{ ...place, ...fly, zIndex: z, animationDelay: win.phase === "opening" && win.delay ? `${win.delay}ms` : undefined }}
       >
-        <span className="size-4 shrink-0">{app.glyph}</span>
-        <span className="min-w-0 flex-1 truncate text-[0.9rem] font-semibold">{app.title}</span>
-        <button onClick={onMinimize} className="win-btn press" aria-label={`Minimize ${app.title}`}>
-          <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
-            <path d="M2.5 6h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-        </button>
-        <button onClick={onMaximize} className="win-btn press" aria-label={`${win.max ? "Restore" : "Maximize"} ${app.title}`}>
-          <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-            {win.max ? (
-              <path d="M2.5 4.5h5v5h-5zM4.5 4.5v-2h5v5h-2" strokeLinejoin="round" />
-            ) : (
-              <rect x="2.5" y="2.5" width="7" height="7" rx="1.2" />
-            )}
-          </svg>
-        </button>
-        <button onClick={onClose} className="win-btn win-btn-close press" aria-label={`Close ${app.title}`}>
-          <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
-            <path d="M3 3l6 6M9 3L3 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-        </button>
-      </header>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-6">
-        <div className={win.max ? "mx-auto max-w-3xl py-4" : undefined}>
-          <app.Content />
+        <header
+          onPointerDown={onDown}
+          onPointerMove={onDrag}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          onDoubleClick={(e) => !(e.target as HTMLElement).closest("button") && onMaximize()}
+          title="Drag to a side or the top to dock it"
+          className="win-bar flex h-11 shrink-0 cursor-grab touch-none items-center gap-2.5 pr-2 pl-4 select-none active:cursor-grabbing"
+        >
+          <span className="size-4 shrink-0">{app.glyph}</span>
+          <span className="min-w-0 flex-1 truncate text-[0.9rem] font-semibold">{app.title}</span>
+          <button onClick={onMinimize} className="win-btn press" aria-label={`Minimize ${app.title}`}>
+            <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
+              <path d="M2.5 6h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+          <button onClick={onMaximize} className="win-btn press" aria-label={`${docked ? "Restore" : "Maximize"} ${app.title}`}>
+            <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              {docked ? (
+                <path d="M2.5 4.5h5v5h-5zM4.5 4.5v-2h5v5h-2" strokeLinejoin="round" />
+              ) : (
+                <rect x="2.5" y="2.5" width="7" height="7" rx="1.2" />
+              )}
+            </svg>
+          </button>
+          <button onClick={onClose} className="win-btn win-btn-close press" aria-label={`Close ${app.title}`}>
+            <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
+              <path d="M3 3l6 6M9 3L3 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-6">
+          <div className={docked ? "mx-auto max-w-3xl py-4" : undefined}>
+            <app.Content />
+          </div>
         </div>
-      </div>
-    </section>
+        {/* Edges and corners resize a floating window; the right edge stays thin so it doesn't steal the scrollbar. */}
+        {!docked && (
+          <>
+            {resizeHandle("w", "top-11 bottom-3 left-0 w-1.5 cursor-ew-resize")}
+            {resizeHandle("e", "top-11 right-0 bottom-3 w-[3px] cursor-ew-resize")}
+            {resizeHandle("s", "right-4 bottom-0 left-4 h-1.5 cursor-ns-resize")}
+            {resizeHandle("sw", "bottom-0 left-0 size-4 cursor-nesw-resize")}
+            {resizeHandle("se", "right-0 bottom-0 size-4 cursor-nwse-resize")}
+          </>
+        )}
+      </section>
+    </>
   );
 }
 
@@ -372,6 +546,7 @@ function Taskbar({
   inApp,
   boot,
   menuRoot,
+  onSearch,
 }: {
   wins: Win[];
   topId?: AppId;
@@ -385,6 +560,7 @@ function Taskbar({
   boot: boolean;
   /** The Start menu renders in the desktop root so it keeps the club theme. */
   menuRoot: RefObject<HTMLDivElement | null>;
+  onSearch: () => void;
 }) {
   return (
     <Menu.Root open={startOpen} onOpenChange={setStartOpen} modal={false}>
@@ -470,6 +646,7 @@ function Taskbar({
           <ClubLogo className="size-6" />
           <span className="max-sm:hidden">Programming Club</span>
         </Menu.Trigger>
+        <SearchButton onClick={onSearch} />
         <span className="mx-1 h-6 w-px bg-white/15 max-md:hidden" aria-hidden />
         <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto max-md:hidden">
           {wins.map((w) => {
@@ -513,7 +690,7 @@ function NextChip({ onOpen }: { onOpen: (a: App) => void }) {
   return (
     <button
       onClick={() => onOpen(APPS.find((a) => a.id === "meetings")!)}
-      className="press ml-auto flex h-9 items-center gap-2 rounded-[8px] px-3 text-sm font-semibold hover:bg-white/10 max-md:flex-1"
+      className="press ml-auto flex h-9 min-w-0 items-center gap-2 rounded-[8px] px-3 text-sm font-semibold hover:bg-white/10 max-md:flex-1"
     >
       <span className="relative flex size-2" aria-hidden>
         <span className="absolute inset-0 animate-ping rounded-full bg-[#ffb547] opacity-60 motion-reduce:hidden" />
