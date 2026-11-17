@@ -21,3 +21,12 @@ On the owner's machine (Juan's), these CLIs are installed and authenticated. Use
 ## Screenshots in PR descriptions
 
 Put them on the `pr-assets` branch, never on a branch of their own: it's an orphan branch (no shared history with `main`) with a folder per PR (`pr-12/`), and a ruleset blocks deleting or force-pushing it. Add a commit with a `pr-<n>/` folder on top of the branch tip (`git hash-object`/`mktree`/`commit-tree` works without touching the checkout), push it, and link images by that commit's SHA so later pushes never change an old PR: `https://raw.githubusercontent.com/the-programming-club-at-hfc/The-Programming-Club/<sha>/pr-<n>/<file>.png`.
+
+## Refreshing the Hackathons window
+
+The desktop's Hackathons window (`/hackathons`) reads everything from `apps/web/src/lib/hackathons.ts`; there's nothing to change anywhere else, and Convex accepts interest hearts for every id listed there.
+
+- Scope: in-person student hackathons within about a two-hour drive of HFC (Dearborn) that start in the next one to three months. Windsor counts, but say it needs a passport.
+- Sources: the MLH season page (`mlh.com/seasons/<year>/events`), Devpost, and the nearby schools' own sites (SpartaHack/MSU, RocketHacks/Toledo, WinHacks/Windsor, GrizzHacks/Oakland, MHacks/UMich, Hack The Nest/EMU, BuilderWars/Wayne State). Confirm every date on the organizer's own page; aggregators are often stale.
+- Each event drops out of "Coming up" on its own the day after it ends. Move ended ones to `PAST` (with how members did, if anyone went), move a `NOT_ANNOUNCED` regular into `HACKATHONS` once its dates are out, and never rename an id that already has hearts.
+- Convex imports the list, so a change ships with the next deploy (Vercel runs `convex deploy`). Run `bun run typecheck` and the desktop e2e test after editing.

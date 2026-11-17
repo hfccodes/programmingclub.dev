@@ -3,11 +3,13 @@ import { Tabs } from "@base-ui/react/tabs";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { InstagramLink } from "#/components/instagram";
 import { Disclaimer } from "#/components/site";
 import { GAME_TILE, Picto, weekTile } from "#/components/ui";
 import { GAMES } from "#/lib/content";
+import { NOT_ANNOUNCED, PACK, PAST, TIPS, WEEKEND, dateParts, shortWhen, upcoming } from "#/lib/hackathons";
+import type { Hackathon } from "#/lib/hackathons";
 import { STAGES } from "#/lib/learn";
 import type { Price, Stage } from "#/lib/learn";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
@@ -15,8 +17,7 @@ import { CALENDAR, CLUB, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/
 import { api } from "../../../convex/_generated/api";
 import { Dashboard } from "./dashboard";
 
-export type AppId =
-  "about" | "meetings" | "world-cup" | "learn" | "hackathon" | "builder-wars" | "officers" | "join" | "site" | "dashboard";
+export type AppId = "about" | "meetings" | "world-cup" | "learn" | "hackathons" | "officers" | "join" | "site" | "dashboard";
 
 export interface App {
   id: AppId;
@@ -309,123 +310,206 @@ function Site() {
 
 /* ---------- registry ---------- */
 
-/* ---------- hackathon: Hack The Nest ---------- */
+/* ---------- hackathons: student hackathons near campus (lib/hackathons.ts) ---------- */
 
-const HACK = { id: "hack-the-nest-2026", url: "https://hackthenest.tech/" };
+// The window is a file folder: each hackathon is a tab in its own color, and the poster under it is the same color field.
+const TAB =
+  "press relative flex min-w-0 flex-col rounded-t-[10px] bg-mist px-2.5 pt-2 pb-2.5 text-left leading-tight text-dim outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[#1f63d6] data-[active]:bg-(--c) data-[active]:text-ink";
 
-function Hackathon() {
+function Hackathons() {
+  const now = useNow() ?? Date.now();
+  const next = upcoming(now);
+  const ids = [...next.map((h) => h.id), "guide"];
+  const [picked, setPicked] = useState<string | null>(null);
+  const tab = picked && ids.includes(picked) ? picked : (ids.at(0) ?? null);
   return (
-    <div className="space-y-5">
-      <div className="rounded-[10px] bg-[#0a2147] p-5 text-white">
-        <p className="text-sm font-semibold text-[#9fd3ff]">Sat–Sun, Nov 14–15, 2026 · 24 hours</p>
-        <p className="mt-1 text-2xl leading-tight font-extrabold tracking-[-0.02em]">Hack The Nest</p>
-        <p className="mt-1 text-white/75">Eastern Michigan University, Ypsilanti</p>
-        <a
-          href={HACK.url}
-          target="_blank"
-          rel="noreferrer"
-          className="press mt-4 inline-flex h-9 items-center rounded-full bg-white px-4 text-sm font-semibold text-[#0a2147] hover:bg-[#e8f1ff]"
+    <div>
+      <Tabs.Root value={tab} onValueChange={(v) => setPicked(v as string)}>
+        <Tabs.List
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${ids.length}, minmax(0, 1fr))` }}
+          aria-label="Hackathons near campus"
         >
-          Visit hackthenest.tech ↗
-        </a>
-      </div>
-      <p className="text-lg leading-relaxed">
-        A free, in-person, 24-hour hackathon run by Google Developer Group on Campus at EMU. Build anything with a team of up to four, or
-        come solo and get matched with a team at the start. Any major, any experience level.
-      </p>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 text-[0.95rem]">
-        {[
-          ["Cost", "Free, with meals and swag"],
-          ["Teams", "Up to 4, solo welcome"],
-          ["Who", "College and high school students"],
-          ["Prizes", "Four tracks, announced soon"],
-        ].map(([k, v]) => (
-          <div key={k}>
-            <dt className="text-dim">{k}</dt>
-            <dd className="font-semibold">{v}</dd>
-          </div>
+          {next.map((h) => (
+            <Tabs.Tab key={h.id} value={h.id} className={TAB} style={{ "--c": h.color } as CSSProperties}>
+              <span className="narrow text-[0.8rem] font-bold tracking-[0.08em] uppercase">{shortWhen(h)}</span>
+              <span className="narrow truncate text-[1.05rem] font-extrabold">{h.name.replace(/ \d{4}$/, "")}</span>
+            </Tabs.Tab>
+          ))}
+          <Tabs.Tab value="guide" className={TAB} style={{ "--c": "var(--color-meadow)" } as CSSProperties}>
+            <span className="narrow text-[0.8rem] font-bold tracking-[0.08em] uppercase">First time?</span>
+            <span className="narrow truncate text-[1.05rem] font-extrabold">How it works</span>
+          </Tabs.Tab>
+        </Tabs.List>
+        {next.map((h) => (
+          <Tabs.Panel key={h.id} value={h.id} className="learn-panel outline-none">
+            <Poster h={h} now={now} />
+          </Tabs.Panel>
         ))}
-      </dl>
-      <Interest event={HACK.id} />
-      <SameWeekend other="builder-wars" />
-      <p className="text-sm text-dim">Hosted by GDG on Campus at EMU, not by our club. Register and find the schedule on their site.</p>
+        <Tabs.Panel value="guide" className="learn-panel outline-none">
+          <HowItWorks />
+        </Tabs.Panel>
+      </Tabs.Root>
+      {next.length === 0 && <p className="mt-4 font-semibold">Nothing nearby is announced yet. Check back soon.</p>}
+      <div className="mt-5 space-y-1.5 border-t border-line pt-4 text-sm text-dim">
+        {NOT_ANNOUNCED.map((h) => (
+          <p key={h.name}>
+            <a href={h.url} target="_blank" rel="noreferrer" className="link text-ink">
+              {h.name}
+            </a>{" "}
+            ({h.place}, usually {h.usually}) hasn’t posted dates yet.
+          </p>
+        ))}
+        <p>Student hackathons within two hours of campus. Hosted by other schools, not by our club.</p>
+      </div>
     </div>
   );
 }
 
-/* ---------- builder-wars: BuilderWars at Newlab Detroit ---------- */
-
-const BW = { id: "builder-wars-2026", url: "https://builderwars.dev/", discord: "https://discord.com/invite/mrYkakzvUj" };
-
-function BuilderWars() {
+function Poster({ h, now }: { h: Hackathon; now: number }) {
+  const d = dateParts(h, now);
+  const due = h.deadline && new Date(h.deadline.at).getTime() > now ? h.deadline : null;
+  const length = h.when.split(" · ").at(1);
   return (
-    <div className="space-y-5">
-      <div className="rounded-[10px] bg-[#111418] p-5 text-white shadow-[inset_0_0_0_1px_#2a3039]">
-        <p className="text-sm font-semibold text-[#a78bfa]">Sat–Sun, Nov 14–15, 2026 · 24 hours</p>
-        <p className="mt-1 text-2xl leading-tight font-extrabold tracking-[-0.02em]">BuilderWars</p>
-        <p className="mt-1 text-white/75">Newlab Detroit, 1st floor</p>
+    <>
+      <div className="rounded-b-[10px] p-5 pt-4 text-ink" style={{ background: h.color }}>
+        <div className="flex items-start justify-between gap-4">
+          <p className="narrow text-sm font-bold tracking-[0.08em] uppercase">
+            {d.weekdays} · {d.month}
+          </p>
+          <p className="narrow text-sm font-bold tracking-[0.08em] uppercase">
+            {d.daysAway === 0 ? "This weekend" : `${d.daysAway} day${d.daysAway === 1 ? "" : "s"} away`}
+          </p>
+        </div>
+        <p className="narrow mt-1 text-[5.5rem] leading-[0.85] font-extrabold tracking-[-0.04em]" aria-hidden>
+          {d.days}
+        </p>
+        <h3 className="mt-3 text-[2rem] lowercase">{h.name}</h3>
+        <p className="mt-1.5 font-semibold">
+          {h.host}
+          {length && ` · ${length}`}
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href={BW.url}
+            href={h.url}
             target="_blank"
             rel="noreferrer"
-            className="press inline-flex h-9 items-center rounded-full bg-[#a78bfa] px-4 text-sm font-semibold text-[#111418] hover:bg-[#c4b5fd]"
+            className="press inline-flex h-10 items-center rounded-full bg-ink px-4 text-sm font-semibold text-white hover:bg-[#1f3a6e]"
           >
-            Register at builderwars.dev ↗
+            {h.cta} ↗
           </a>
-          <a
-            href={BW.discord}
-            target="_blank"
-            rel="noreferrer"
-            className="press inline-flex h-9 items-center rounded-full bg-white/10 px-4 text-sm font-semibold text-white hover:bg-white/20"
-          >
-            Their Discord ↗
-          </a>
+          {h.discord && (
+            <a
+              href={h.discord}
+              target="_blank"
+              rel="noreferrer"
+              className="press inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold shadow-[inset_0_0_0_2px_var(--color-ink)] hover:bg-ink/10"
+            >
+              Their Discord ↗
+            </a>
+          )}
         </div>
       </div>
-      <p className="text-lg leading-relaxed">
-        A free, in-person, 24-hour hackathon for college and university students, run by the AWS Student Builder Group at Wayne State. Build
-        anything: a web or mobile app, hardware, an AI tool. Bring a team of up to four, or come solo and find one at Team Matchmaking.
-      </p>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 text-[0.95rem]">
-        {[
-          ["Cost", "Free, with meals and snacks"],
-          ["Teams", "1–4, solo welcome"],
-          ["Who", "Any college student, any major"],
-          ["Prizes", "Top 3 overall, plus company tracks"],
-          ["Check-in", "Sat, 10 a.m., with breakfast"],
-          ["Awards", "Sun, 2:30 p.m."],
-        ].map(([k, v]) => (
-          <div key={k}>
-            <dt className="text-dim">{k}</dt>
+
+      {/* The drive, drawn as a road from campus. */}
+      <div className="mt-4 flex items-center gap-2 text-sm font-bold">
+        <span>HFC</span>
+        <span className="size-2 shrink-0 rounded-full bg-ink" />
+        <span className="h-0 min-w-3 flex-1 border-t-2 border-dashed border-line" />
+        <span className="narrow rounded-full px-2.5 py-0.5 text-ink" style={{ background: h.color }}>
+          about {h.drive} drive
+        </span>
+        <span className="h-0 min-w-3 flex-1 border-t-2 border-dashed border-line" />
+        <span className="size-2 shrink-0 rounded-full bg-ink" />
+        <span className="text-right">{h.city}</span>
+      </div>
+
+      {due && (
+        <p className="mt-4 flex items-baseline gap-2 text-[0.95rem] font-semibold">
+          <span className="chip bg-signal text-white">Deadline</span>
+          {due.label}
+        </p>
+      )}
+      <p className="mt-4 leading-relaxed">{h.blurb}</p>
+      <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] bg-line text-[0.95rem] shadow-[0_0_0_1px_var(--color-line)]">
+        {[...h.facts, ["Where", h.place] as [string, string]].map(([k, v]) => (
+          <div key={k} className="bg-white px-3 py-2 last:odd:col-span-2">
+            <dt className="text-sm text-dim">{k}</dt>
             <dd className="font-semibold">{v}</dd>
           </div>
         ))}
       </dl>
-      <Interest event={BW.id} />
-      <SameWeekend other="hackathon" />
-      <p className="text-sm text-dim">
-        Hosted by the AWS Student Builder Group at Wayne State, not by our club. The building closes to new arrivals from 10 p.m. Saturday
-        to 7 a.m. Sunday; if you’re inside you can stay the night, so bring a laptop, a charger, and maybe a sleeping bag.
-      </p>
-    </div>
+      <div className="mt-4">
+        <Interest event={h.id} />
+      </div>
+    </>
   );
 }
 
-/** Hack The Nest and BuilderWars share a weekend: each window points to the other. */
-function SameWeekend({ other }: { other: "hackathon" | "builder-wars" }) {
-  const app = APPS.find((a) => a.id === other)!;
+/** What a first hackathon is like: the weekend, what to pack, and tips. */
+function HowItWorks() {
+  const win = PAST.find((p) => p.result);
   return (
-    <p className="flex items-center gap-3 rounded-[10px] border border-dashed border-line p-3 text-sm">
-      <span className="size-5 shrink-0 text-dim">{app.glyph}</span>
-      <span>
-        Same weekend as{" "}
-        <Link to={app.path} className="link font-semibold">
-          {app.title}
-        </Link>
-        {other === "hackathon" ? " in Ypsilanti." : " in Detroit."} You’ll have to pick one.
-      </span>
-    </p>
+    <>
+      <div className="rounded-b-[10px] bg-meadow p-5 pt-4 text-ink">
+        <p className="narrow text-sm font-bold tracking-[0.08em] uppercase">Usually free · beginners welcome</p>
+        <h3 className="mt-2 text-[2.5rem] lowercase">how a hackathon works</h3>
+        <p className="mt-1.5 font-semibold">
+          Usually a weekend of building something with a small team: an app, a game, hardware, an AI tool. Most college hackathons are free
+          and feed you, and most give prizes at the end.
+        </p>
+      </div>
+
+      <h3 className="mt-6 text-sm font-bold text-dim">The weekend</h3>
+      <ol className="mt-2">
+        {WEEKEND.map((step, i) => (
+          <li key={step.title} className="relative flex gap-3 pb-4 last:pb-0">
+            {/* The line that strings the steps together. */}
+            {i < WEEKEND.length - 1 && <span className="absolute top-7 bottom-0 left-[0.8rem] w-0.5 bg-line" aria-hidden />}
+            <span className="narrow relative grid size-[1.65rem] shrink-0 place-items-center rounded-full bg-ink text-sm font-bold text-white">
+              {i + 1}
+            </span>
+            <div className="min-w-0">
+              <p className="leading-snug font-extrabold">{step.title}</p>
+              <p className="mt-0.5 text-[0.95rem] leading-snug text-dim">{step.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <h3 className="mt-6 text-sm font-bold text-dim">Pack</h3>
+      <ul className="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] bg-line text-[0.95rem] shadow-[0_0_0_1px_var(--color-line)]">
+        {PACK.map(([thing, why]) => (
+          <li key={thing} className="bg-white px-3 py-2">
+            <span className="block font-semibold">{thing}</span>
+            <span className="text-sm text-dim">{why}</span>
+          </li>
+        ))}
+      </ul>
+
+      <h3 className="mt-6 text-sm font-bold text-dim">Tips</h3>
+      <ul className="mt-2 divide-y divide-line">
+        {TIPS.map((t) => (
+          <li key={t.title} className="py-2.5">
+            <p className="font-bold">{t.title}</p>
+            <p className="mt-0.5 text-[0.95rem] leading-snug text-dim">{t.body}</p>
+          </li>
+        ))}
+      </ul>
+
+      {win?.result && (
+        <p className="mt-4 flex gap-3 rounded-[10px] bg-gold/30 p-3 text-[0.95rem]">
+          <svg viewBox="0 0 24 24" {...G} className="mt-0.5 size-5 shrink-0 text-[#a16207]" aria-hidden>
+            <path d="M8 4h8v5a4 4 0 0 1-8 0Z" />
+            <path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4" />
+          </svg>
+          <span>
+            <span className="font-bold">From our club:</span> {win.result.who}, took {win.result.rank} place in the {win.result.of} at{" "}
+            {win.name} this fall.
+          </span>
+        </p>
+      )}
+    </>
   );
 }
 
@@ -488,19 +572,7 @@ function Learn() {
                   </li>
                 ))}
             </ul>
-            {s.id === "hired" && (
-              <p className="mt-3 text-sm">
-                Two hackathons this month:{" "}
-                <Link to="/hack-the-nest" className="link">
-                  Hack The Nest
-                </Link>{" "}
-                and{" "}
-                <Link to="/builder-wars" className="link">
-                  BuilderWars
-                </Link>
-                .
-              </p>
-            )}
+            {s.id === "hired" && <NextHackathon />}
           </Tabs.Panel>
         ))}
       </Tabs.Root>
@@ -508,6 +580,20 @@ function Learn() {
         Stuck on a lesson? Bring it to a meeting ({CLUB.day}, {CLUB.time}). Officers help with any course, in any language.
       </p>
     </div>
+  );
+}
+
+/** A pointer from Learn to Code's "Get hired" stage to the Hackathons window. */
+function NextHackathon() {
+  const next = upcoming(useNow() ?? Date.now()).at(0);
+  return (
+    <p className="mt-3 text-sm">
+      {next ? `Next hackathon nearby: ${next.name}, ${shortWhen(next)}. ` : ""}
+      <Link to="/hackathons" className="link">
+        See hackathons near campus
+      </Link>
+      .
+    </p>
   );
 }
 
@@ -620,35 +706,19 @@ export const APPS: App[] = [
     Content: Learn,
   },
   {
-    id: "hackathon",
-    path: "/hack-the-nest",
-    title: "Hack The Nest",
-    label: "Hack The Nest",
+    id: "hackathons",
+    path: "/hackathons",
+    title: "Hackathons",
+    label: "Hackathons",
     glyph: (
       <svg viewBox="0 0 24 24" {...G}>
         <rect x="4" y="5" width="16" height="11" rx="1.5" />
         <path d="M2.5 19.5h19M12.8 7.8l-2.3 3.4h3l-2.3 3.4" />
       </svg>
     ),
-    at: { left: 34, top: 10 },
-    width: "27rem",
-    Content: Hackathon,
-  },
-  {
-    id: "builder-wars",
-    path: "/builder-wars",
-    title: "BuilderWars",
-    label: "BuilderWars",
-    glyph: (
-      <svg viewBox="0 0 24 24" {...G}>
-        <path d="M4 20l9-9M13 11l2.5-2.5M15.5 8.5L20 4M17 4h3v3" />
-        <path d="M20 20l-9-9M8.5 8.5L4 4M7 4H4v3" />
-        <path d="M6 15.5l2.5 2.5M18 15.5L15.5 18" />
-      </svg>
-    ),
-    at: { left: 44, top: 12 },
-    width: "27rem",
-    Content: BuilderWars,
+    at: { left: 34, top: 8 },
+    width: "28rem",
+    Content: Hackathons,
   },
   {
     id: "officers",

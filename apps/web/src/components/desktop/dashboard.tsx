@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { ExportButton, OfficerGate } from "#/components/officer";
+import { PAST, upcoming as upcomingHackathons } from "#/lib/hackathons";
 import { ideasText } from "#/lib/ideas";
 import { likelyWeek, useSchedule } from "#/lib/schedule";
 import { CLUB, fmtDate, roomFor } from "#/lib/season";
@@ -172,19 +173,26 @@ function Overview() {
         </ol>
       </Section>
 
-      <Section title="Events">
+      <Section
+        title="Hackathons"
+        action={
+          <Link to="/hackathons" className="link text-sm">
+            Open
+          </Link>
+        }
+      >
         <div className="space-y-2">
           {[
-            ["Hack The Nest", "Nov 14–15 · EMU", data.hackInterest],
-            ["BuilderWars", "Nov 14–15 · Newlab Detroit", data.builderWarsInterest],
-          ].map(([name, when, n]) => (
-            <div key={name} className="flex items-center justify-between gap-3 rounded-[8px] bg-mist p-3">
+            ...upcomingHackathons(Date.now()).map((h) => ({ id: h.id, name: h.name, when: h.when.split(" · ")[0], past: false })),
+            ...PAST.map((p) => ({ id: p.id, name: p.name, when: `${p.when} · ended`, past: true })),
+          ].map(({ id, name, when, past }) => (
+            <div key={id} className={`flex items-center justify-between gap-3 rounded-[8px] bg-mist p-3 ${past ? "opacity-55" : ""}`}>
               <div>
                 <p className="font-bold">{name}</p>
                 <p className="text-sm text-dim">{when}</p>
               </div>
               <p className="text-right text-sm">
-                <span className="narrow block text-3xl font-extrabold">{n}</span>
+                <span className="narrow block text-3xl font-extrabold">{data.interest[id] ?? 0}</span>
                 interested
               </p>
             </div>
