@@ -17,9 +17,8 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as DesktopIndexRouteImport } from './routes/_desktop/index'
 import { Route as DesktopAboutRouteImport } from './routes/_desktop/about'
-import { Route as DesktopBuilderWarsRouteImport } from './routes/_desktop/builder-wars'
 import { Route as DesktopDashboardRouteImport } from './routes/_desktop/dashboard'
-import { Route as DesktopHackTheNestRouteImport } from './routes/_desktop/hack-the-nest'
+import { Route as DesktopHackathonsRouteImport } from './routes/_desktop/hackathons'
 import { Route as DesktopHowToJoinRouteImport } from './routes/_desktop/how-to-join'
 import { Route as DesktopLearnToCodeRouteImport } from './routes/_desktop/learn-to-code'
 import { Route as DesktopMeetingsRouteImport } from './routes/_desktop/meetings'
@@ -85,19 +84,14 @@ const DesktopAboutRoute = DesktopAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => DesktopRoute,
 } as any)
-const DesktopBuilderWarsRoute = DesktopBuilderWarsRouteImport.update({
-  id: '/builder-wars',
-  path: '/builder-wars',
-  getParentRoute: () => DesktopRoute,
-} as any)
 const DesktopDashboardRoute = DesktopDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => DesktopRoute,
 } as any)
-const DesktopHackTheNestRoute = DesktopHackTheNestRouteImport.update({
-  id: '/hack-the-nest',
-  path: '/hack-the-nest',
+const DesktopHackathonsRoute = DesktopHackathonsRouteImport.update({
+  id: '/hackathons',
+  path: '/hackathons',
   getParentRoute: () => DesktopRoute,
 } as any)
 const DesktopHowToJoinRoute = DesktopHowToJoinRouteImport.update({
@@ -234,9 +228,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
-  '/builder-wars': typeof DesktopBuilderWarsRoute
   '/dashboard': typeof DesktopDashboardRoute
-  '/hack-the-nest': typeof DesktopHackTheNestRoute
+  '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
   '/meetings': typeof DesktopMeetingsRoute
@@ -269,9 +262,8 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
-  '/builder-wars': typeof DesktopBuilderWarsRoute
   '/dashboard': typeof DesktopDashboardRoute
-  '/hack-the-nest': typeof DesktopHackTheNestRoute
+  '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
   '/meetings': typeof DesktopMeetingsRoute
@@ -308,9 +300,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/_desktop/about': typeof DesktopAboutRoute
-  '/_desktop/builder-wars': typeof DesktopBuilderWarsRoute
   '/_desktop/dashboard': typeof DesktopDashboardRoute
-  '/_desktop/hack-the-nest': typeof DesktopHackTheNestRoute
+  '/_desktop/hackathons': typeof DesktopHackathonsRoute
   '/_desktop/how-to-join': typeof DesktopHowToJoinRoute
   '/_desktop/learn-to-code': typeof DesktopLearnToCodeRoute
   '/_desktop/meetings': typeof DesktopMeetingsRoute
@@ -348,9 +339,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
-    | '/builder-wars'
     | '/dashboard'
-    | '/hack-the-nest'
+    | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
     | '/meetings'
@@ -383,9 +373,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
-    | '/builder-wars'
     | '/dashboard'
-    | '/hack-the-nest'
+    | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
     | '/meetings'
@@ -421,9 +410,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/_desktop/about'
-    | '/_desktop/builder-wars'
     | '/_desktop/dashboard'
-    | '/_desktop/hack-the-nest'
+    | '/_desktop/hackathons'
     | '/_desktop/how-to-join'
     | '/_desktop/learn-to-code'
     | '/_desktop/meetings'
@@ -522,13 +510,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesktopAboutRouteImport
       parentRoute: typeof DesktopRoute
     }
-    '/_desktop/builder-wars': {
-      id: '/_desktop/builder-wars'
-      path: '/builder-wars'
-      fullPath: '/builder-wars'
-      preLoaderRoute: typeof DesktopBuilderWarsRouteImport
-      parentRoute: typeof DesktopRoute
-    }
     '/_desktop/dashboard': {
       id: '/_desktop/dashboard'
       path: '/dashboard'
@@ -536,11 +517,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesktopDashboardRouteImport
       parentRoute: typeof DesktopRoute
     }
-    '/_desktop/hack-the-nest': {
-      id: '/_desktop/hack-the-nest'
-      path: '/hack-the-nest'
-      fullPath: '/hack-the-nest'
-      preLoaderRoute: typeof DesktopHackTheNestRouteImport
+    '/_desktop/hackathons': {
+      id: '/_desktop/hackathons'
+      path: '/hackathons'
+      fullPath: '/hackathons'
+      preLoaderRoute: typeof DesktopHackathonsRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/how-to-join': {
@@ -765,9 +746,8 @@ const HelloWorldRouteRouteWithChildren = HelloWorldRouteRoute._addFileChildren(
 
 interface DesktopRouteChildren {
   DesktopAboutRoute: typeof DesktopAboutRoute
-  DesktopBuilderWarsRoute: typeof DesktopBuilderWarsRoute
   DesktopDashboardRoute: typeof DesktopDashboardRoute
-  DesktopHackTheNestRoute: typeof DesktopHackTheNestRoute
+  DesktopHackathonsRoute: typeof DesktopHackathonsRoute
   DesktopHowToJoinRoute: typeof DesktopHowToJoinRoute
   DesktopLearnToCodeRoute: typeof DesktopLearnToCodeRoute
   DesktopMeetingsRoute: typeof DesktopMeetingsRoute
@@ -779,9 +759,8 @@ interface DesktopRouteChildren {
 
 const DesktopRouteChildren: DesktopRouteChildren = {
   DesktopAboutRoute: DesktopAboutRoute,
-  DesktopBuilderWarsRoute: DesktopBuilderWarsRoute,
   DesktopDashboardRoute: DesktopDashboardRoute,
-  DesktopHackTheNestRoute: DesktopHackTheNestRoute,
+  DesktopHackathonsRoute: DesktopHackathonsRoute,
   DesktopHowToJoinRoute: DesktopHowToJoinRoute,
   DesktopLearnToCodeRoute: DesktopLearnToCodeRoute,
   DesktopMeetingsRoute: DesktopMeetingsRoute,

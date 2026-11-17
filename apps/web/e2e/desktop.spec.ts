@@ -32,20 +32,26 @@ test("Learn to Code walks through its four stages", async ({ page }, testInfo) =
   await page.keyboard.press("Enter");
   await expect(learn.getByRole("link", { name: /GitHub Student Developer Pack/ })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("learn.png") });
-  // The hackathon links open their windows.
-  await learn.getByRole("link", { name: "BuilderWars", exact: true }).click();
-  await expect(page).toHaveURL(/\/builder-wars$/);
-  await expect(win(page, "BuilderWars")).toBeVisible();
+  // Get hired points at the hackathons near campus.
+  await learn.getByRole("link", { name: "See hackathons near campus" }).click();
+  await expect(page).toHaveURL(/\/hackathons$/);
+  await expect(win(page, "Hackathons")).toBeVisible();
 });
 
-test("The two hackathon windows point at each other, and the conference is gone", async ({ page }) => {
-  await page.goto("/builder-wars", { waitUntil: "networkidle" });
-  const bw = win(page, "BuilderWars");
-  await expect(bw.getByRole("link", { name: /Register at builderwars\.dev/ })).toHaveAttribute("href", "https://builderwars.dev/");
-  await bw.getByRole("link", { name: "Hack The Nest", exact: true }).click();
-  await expect(page).toHaveURL(/\/hack-the-nest$/);
-  await expect(win(page, "Hack The Nest").getByText("Same weekend as")).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Desktop" }).getByText("AI Business Conference")).toHaveCount(0);
+test("Hackathons lists what's coming up and how a hackathon works", async ({ page }, testInfo) => {
+  await page.goto("/hackathons", { waitUntil: "networkidle" });
+  const hack = win(page, "Hackathons");
+  await expect(hack.getByRole("heading", { name: "SpartaHack 12" })).toBeVisible();
+  await expect(hack.getByRole("link", { name: /Apply at spartahack\.com/ })).toHaveAttribute("href", "https://www.spartahack.com/");
+  await page.screenshot({ path: testInfo.outputPath("hackathons.png") });
+  // One tab per hackathon, then past results and regulars without dates.
+  await hack.getByRole("tab", { name: /RocketHacks/ }).click();
+  await expect(hack.getByRole("heading", { name: "RocketHacks 2027" })).toBeVisible();
+  await expect(hack.getByRole("heading", { name: "SpartaHack 12" })).toBeHidden();
+  await hack.getByRole("tab", { name: /How it works/ }).click();
+  await expect(hack.getByRole("heading", { name: "how a hackathon works" })).toBeVisible();
+  await expect(hack.getByText(/1st place in the Mind & Machine track/)).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Desktop" }).getByText("BuilderWars")).toHaveCount(0);
 });
 
 test("Search opens apps with the keyboard and finds places to learn", async ({ page }, testInfo) => {
@@ -55,17 +61,17 @@ test("Search opens apps with the keyboard and finds places to learn", async ({ p
   await expect(search).toBeFocused();
   await search.fill("leet");
   await expect(page.getByRole("option").first()).toContainText("LeetCode");
-  await search.fill("builder");
+  await search.fill("hack");
   await page.screenshot({ path: testInfo.outputPath("search.png") });
   await page.keyboard.press("Enter");
   await expect(search).toBeHidden();
-  await expect(page).toHaveURL(/\/builder-wars$/);
+  await expect(page).toHaveURL(/\/hackathons$/);
   // Escape in search closes search, not the window behind it.
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(search).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(search).toBeHidden();
-  await expect(win(page, "BuilderWars")).toBeVisible();
+  await expect(win(page, "Hackathons")).toBeVisible();
 });
 
 test("Windows dock to a side or the top, tear back off, and resize", async ({ page }, testInfo) => {

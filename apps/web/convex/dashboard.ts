@@ -1,3 +1,4 @@
+import { INTEREST_IDS } from "../src/lib/hackathons";
 import { query } from "./_generated/server";
 import { openSession } from "./lib";
 import { requireOfficer } from "./officers";
@@ -8,17 +9,21 @@ export const overview = query({
   args: {},
   handler: async (ctx) => {
     await requireOfficer(ctx);
-    const interestIn = (event: string) =>
-      ctx.db
-        .query("interest")
-        .withIndex("by_event_voter", (q) => q.eq("event", event))
-        .collect();
-    const [allSessions, allAttendance, live, hackInterest, builderWarsInterest] = await Promise.all([
+    const interestIn = async (event: string) =>
+      [
+        event,
+        (
+          await ctx.db
+            .query("interest")
+            .withIndex("by_event_voter", (q) => q.eq("event", event))
+            .collect()
+        ).length,
+      ] as const;
+    const [allSessions, allAttendance, live, interest] = await Promise.all([
       ctx.db.query("sessions").collect(),
       ctx.db.query("attendance").collect(),
       openSession(ctx),
-      interestIn("hack-the-nest-2026"),
-      interestIn("builder-wars-2026"),
+      Promise.all(INTEREST_IDS.map(interestIn)),
     ]);
 
     const sessions = allSessions.filter((s) => !s.practice);
@@ -57,8 +62,8 @@ export const overview = query({
         checkIns: attendance.length,
         average: ended.length ? Math.round(ended.reduce((n, x) => n + x.headcount, 0) / ended.length) : 0,
       },
-      hackInterest: hackInterest.length,
-      builderWarsInterest: builderWarsInterest.length,
+      /** Hearts per hackathon id. */
+      interest: Object.fromEntries(interest),
     };
   },
 });
