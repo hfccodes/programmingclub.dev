@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { InstagramLink } from "#/components/instagram";
 import { Disclaimer } from "#/components/site";
-import { GAME_TILE, Picto, weekTile } from "#/components/ui";
+import { GAME_TILE, Loading, Picto, weekTile } from "#/components/ui";
 import { GAMES } from "#/lib/content";
 import { NOT_ANNOUNCED, PACK, PAST, TIPS, WEEKEND, dateParts, shortWhen, upcoming } from "#/lib/hackathons";
 import type { Hackathon } from "#/lib/hackathons";
@@ -317,10 +317,13 @@ const TAB =
   "press relative flex min-w-0 flex-col rounded-t-[10px] bg-mist px-2.5 pt-2 pb-2.5 text-left leading-tight text-dim outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[#1f63d6] data-[active]:bg-(--c) data-[active]:text-ink";
 
 function Hackathons() {
-  const now = useNow() ?? Date.now();
+  // Which events show depends on today's date, so render once the client knows it; a server-rendered guess could
+  // disagree with the browser's (a deadline or an event ending in between) and break hydration.
+  const now = useNow();
+  const [picked, setPicked] = useState<string | null>(null);
+  if (now === null) return <Loading className="min-h-64" />;
   const next = upcoming(now);
   const ids = [...next.map((h) => h.id), "guide"];
-  const [picked, setPicked] = useState<string | null>(null);
   const tab = picked && ids.includes(picked) ? picked : (ids.at(0) ?? null);
   return (
     <div>
@@ -357,7 +360,7 @@ function Hackathons() {
             <a href={h.url} target="_blank" rel="noreferrer" className="link text-ink">
               {h.name}
             </a>{" "}
-            ({h.place}, usually {h.usually}) hasn’t posted dates yet.
+            ({h.place}, usually in {h.usually}) hasn’t posted dates yet. {h.drive}.
           </p>
         ))}
         <p>Student hackathons within two hours of campus. Hosted by other schools, not by our club.</p>
@@ -585,7 +588,8 @@ function Learn() {
 
 /** A pointer from Learn to Code's "Get hired" stage to the Hackathons window. */
 function NextHackathon() {
-  const next = upcoming(useNow() ?? Date.now()).at(0);
+  const now = useNow();
+  const next = now === null ? undefined : upcoming(now).at(0);
   return (
     <p className="mt-3 text-sm">
       {next ? `Next hackathon nearby: ${next.name}, ${shortWhen(next)}. ` : ""}

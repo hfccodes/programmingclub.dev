@@ -112,8 +112,9 @@ export const PAST: {
 export const INTEREST_IDS = [...HACKATHONS.map((h) => h.id), ...PAST.map((p) => p.id)];
 
 /** Hackathons that haven't ended yet (one ends at midnight after its last day, Detroit time), soonest first. */
-export const upcoming = (now: number) =>
-  HACKATHONS.filter((h) => new Date(`${h.end}T23:59:59-05:00`).getTime() >= now).sort((a, b) => a.start.localeCompare(b.start));
+export const hasEnded = (h: Hackathon, now: number) => new Date(`${h.end}T23:59:59-05:00`).getTime() < now;
+
+export const upcoming = (now: number) => HACKATHONS.filter((h) => !hasEnded(h, now)).sort((a, b) => a.start.localeCompare(b.start));
 
 /** "Sat–Sun, Feb 6–7, 2027 · 24 hours" → "Feb 6–7". */
 export const shortWhen = (h: Hackathon) =>
@@ -156,7 +157,7 @@ export const WEEKEND: { title: string; body: string }[] = [
   },
   {
     title: "Build",
-    body: "Your project is built during the event. Most in-person hackathons feed you, and many have workshops, sponsor tables, and mentors you can ask for help.",
+    body: "Many events require projects to be built during the event, so check the rules on existing work. Most in-person hackathons feed you, and many have workshops, sponsor tables, and mentors you can ask for help.",
   },
   {
     title: "Submit",
@@ -168,7 +169,7 @@ export const WEEKEND: { title: string; body: string }[] = [
   },
   {
     title: "Awards",
-    body: "Winners are announced at the closing ceremony. Prizes vary: overall places, tracks, and sponsor challenges, with cash, gift cards, or gear.",
+    body: "Winners are usually announced at a closing ceremony; check the event’s schedule. Prizes vary: overall places, tracks, and sponsor challenges, with cash, gift cards, or gear.",
   },
 ];
 
