@@ -2,6 +2,7 @@
 import { Tabs } from "@base-ui/react/tabs";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
+import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { InstagramLink } from "#/components/instagram";
@@ -13,11 +14,11 @@ import type { Hackathon } from "#/lib/hackathons";
 import { STAGES } from "#/lib/learn";
 import type { Price, Stage } from "#/lib/learn";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
-import { CALENDAR, CLUB, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
+import { CALENDAR, CLUB, DISCORD_URL, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
 import { api } from "../../../convex/_generated/api";
 import { Dashboard } from "./dashboard";
 
-export type AppId = "about" | "meetings" | "world-cup" | "learn" | "hackathons" | "officers" | "join" | "site" | "dashboard";
+export type AppId = "about" | "meetings" | "world-cup" | "learn" | "hackathons" | "officers" | "join" | "discord" | "site" | "dashboard";
 
 export interface App {
   id: AppId;
@@ -275,6 +276,47 @@ function Join() {
             Email the advisor
           </a>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- discord: the club server ---------- */
+
+const CHANNELS = ["help", "projects", "ai", "gamedev", "cybersecurity", "opportunities"];
+
+function Discord() {
+  return (
+    <div className="space-y-5">
+      <div className="flex items-start gap-5">
+        <div className="min-w-0 flex-1 space-y-3">
+          <h3 className="text-2xl">Keep coding between meetings</h3>
+          <p className="leading-relaxed">
+            Ask questions, show what you’re building, and find teammates. Meetings show up as events, so you get a reminder before
+            Wednesday.
+          </p>
+        </div>
+        {/* Desktop visitors are usually on a laptop: scan to join on the phone, where Discord lives. */}
+        <QRCodeSVG
+          value={DISCORD_URL}
+          title="Scan to join the club Discord"
+          size={512}
+          marginSize={2}
+          className="h-auto w-28 shrink-0 rounded-[6px] max-md:hidden"
+        />
+      </div>
+      <ul className="flex flex-wrap gap-1.5" aria-label="Some of the channels">
+        {CHANNELS.map((c) => (
+          <li key={c} className="chip font-mono">
+            #{c}
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-4">
+        <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
+          Join the Discord
+        </a>
+        <p className="text-sm text-dim">Pick your interests when you join to get pinged about what you care about.</p>
       </div>
     </div>
   );
@@ -754,6 +796,22 @@ export const APPS: App[] = [
     at: { left: 22, top: 26 },
     width: "26rem",
     Content: Join,
+  },
+  {
+    id: "discord",
+    path: "/discord",
+    title: "Discord",
+    label: "Discord",
+    glyph: (
+      <svg viewBox="0 0 24 24" {...G}>
+        <path d="M4 5.5h11a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5H9l-3.5 3v-3H4A1.5 1.5 0 0 1 2.5 13V7A1.5 1.5 0 0 1 4 5.5Z" />
+        <path d="M16.5 9.5H20a1.5 1.5 0 0 1 1.5 1.5v5.5A1.5 1.5 0 0 1 20 18h-1v2.5L16 18h-3.5a1.5 1.5 0 0 1-1.5-1.5v-2" />
+        <path d="M7 10h.01M9.5 10h.01M12 10h.01" />
+      </svg>
+    ),
+    at: { left: 48, top: 20 },
+    width: "28rem",
+    Content: Discord,
   },
   {
     id: "site",

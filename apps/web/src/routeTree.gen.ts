@@ -18,6 +18,7 @@ import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as DesktopIndexRouteImport } from './routes/_desktop/index'
 import { Route as DesktopAboutRouteImport } from './routes/_desktop/about'
 import { Route as DesktopDashboardRouteImport } from './routes/_desktop/dashboard'
+import { Route as DesktopDiscordRouteImport } from './routes/_desktop/discord'
 import { Route as DesktopHackathonsRouteImport } from './routes/_desktop/hackathons'
 import { Route as DesktopHowToJoinRouteImport } from './routes/_desktop/how-to-join'
 import { Route as DesktopLearnToCodeRouteImport } from './routes/_desktop/learn-to-code'
@@ -87,6 +88,11 @@ const DesktopAboutRoute = DesktopAboutRouteImport.update({
 const DesktopDashboardRoute = DesktopDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => DesktopRoute,
+} as any)
+const DesktopDiscordRoute = DesktopDiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
   getParentRoute: () => DesktopRoute,
 } as any)
 const DesktopHackathonsRoute = DesktopHackathonsRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
   '/dashboard': typeof DesktopDashboardRoute
+  '/discord': typeof DesktopDiscordRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
   '/dashboard': typeof DesktopDashboardRoute
+  '/discord': typeof DesktopDiscordRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/wiki': typeof WikiRoute
   '/_desktop/about': typeof DesktopAboutRoute
   '/_desktop/dashboard': typeof DesktopDashboardRoute
+  '/_desktop/discord': typeof DesktopDiscordRoute
   '/_desktop/hackathons': typeof DesktopHackathonsRoute
   '/_desktop/how-to-join': typeof DesktopHowToJoinRoute
   '/_desktop/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/about'
     | '/dashboard'
+    | '/discord'
     | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/about'
     | '/dashboard'
+    | '/discord'
     | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
@@ -411,6 +422,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/_desktop/about'
     | '/_desktop/dashboard'
+    | '/_desktop/discord'
     | '/_desktop/hackathons'
     | '/_desktop/how-to-join'
     | '/_desktop/learn-to-code'
@@ -515,6 +527,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DesktopDashboardRouteImport
+      parentRoute: typeof DesktopRoute
+    }
+    '/_desktop/discord': {
+      id: '/_desktop/discord'
+      path: '/discord'
+      fullPath: '/discord'
+      preLoaderRoute: typeof DesktopDiscordRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/hackathons': {
@@ -747,6 +766,7 @@ const HelloWorldRouteRouteWithChildren = HelloWorldRouteRoute._addFileChildren(
 interface DesktopRouteChildren {
   DesktopAboutRoute: typeof DesktopAboutRoute
   DesktopDashboardRoute: typeof DesktopDashboardRoute
+  DesktopDiscordRoute: typeof DesktopDiscordRoute
   DesktopHackathonsRoute: typeof DesktopHackathonsRoute
   DesktopHowToJoinRoute: typeof DesktopHowToJoinRoute
   DesktopLearnToCodeRoute: typeof DesktopLearnToCodeRoute
@@ -760,6 +780,7 @@ interface DesktopRouteChildren {
 const DesktopRouteChildren: DesktopRouteChildren = {
   DesktopAboutRoute: DesktopAboutRoute,
   DesktopDashboardRoute: DesktopDashboardRoute,
+  DesktopDiscordRoute: DesktopDiscordRoute,
   DesktopHackathonsRoute: DesktopHackathonsRoute,
   DesktopHowToJoinRoute: DesktopHowToJoinRoute,
   DesktopLearnToCodeRoute: DesktopLearnToCodeRoute,

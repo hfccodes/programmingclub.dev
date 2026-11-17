@@ -27,6 +27,9 @@ export const CALENDAR = {
 
 export const INSTAGRAM_URL = `https://www.instagram.com/${CLUB.instagram}/`;
 
+/** The club Discord: a permanent invite (never expires, no use limit). */
+export const DISCORD_URL = "https://discord.gg/vqw3vVQg9Q";
+
 /** HFC student (@hawkmail.hfcc.edu) and staff (@hfcc.edu) emails: the only ones members join with, since the club is HFC-only. */
 export const isHfcEmail = (email: string) => /@(hawkmail\.)?hfcc\.edu$/i.test(email.trim());
 
