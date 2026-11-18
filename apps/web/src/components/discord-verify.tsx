@@ -1,4 +1,4 @@
-// Discord verification (/discord/verify): sign in with HawkMail, pick what to get pinged about, and connect Discord.
+// Discord verification (/discord): sign in with HawkMail, pick what to get pinged about, and connect Discord.
 // The club's bot then adds them to the server with their roles (convex/discord.ts).
 import { SignInButton, SignOutButton } from "@clerk/tanstack-react-start";
 import { Link } from "@tanstack/react-router";
@@ -41,7 +41,7 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
             <a href={server} className="btn btn-primary">
               Open Discord
             </a>
-            <Link to="/discord/verify" search={{}} className="btn">
+            <Link to="/discord" search={{}} className="btn">
               Change my pings
             </Link>
           </div>
@@ -80,7 +80,7 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
         <Question n={1} title="Sign in with your HawkMail">
           {!mine ? (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <SignInButton mode="modal" withSignUp forceRedirectUrl="/discord/verify">
+              <SignInButton mode="modal" withSignUp forceRedirectUrl="/discord">
                 <button className="btn btn-primary">Sign in with HawkMail</button>
               </SignInButton>
               <p className="text-sm text-dim">We’ll email you a code. Faculty and staff can use their @hfcc.edu email.</p>
@@ -90,14 +90,14 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
               <p className="min-w-0 flex-1">
                 You’re signed in as <strong className="[overflow-wrap:anywhere]">{mine.email}</strong>, which isn’t a HawkMail.
               </p>
-              <SignOutButton redirectUrl="/discord/verify">
+              <SignOutButton redirectUrl="/discord">
                 <button className="btn btn-primary">Switch to HawkMail</button>
               </SignOutButton>
             </div>
           ) : (
             <p>
               <span aria-hidden>✓ </span>Signed in as <strong className="[overflow-wrap:anywhere]">{mine.email}</strong>.{" "}
-              <SignOutButton redirectUrl="/discord/verify">
+              <SignOutButton redirectUrl="/discord">
                 <button className="link text-sm">Not you?</button>
               </SignOutButton>
             </p>

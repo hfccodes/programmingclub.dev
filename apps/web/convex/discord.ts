@@ -196,7 +196,7 @@ export const callback = httpAction(async (ctx, req) => {
   const back = (q: string) =>
     new Response(null, {
       status: 302,
-      headers: { Location: `${process.env.SITE_URL ?? "https://programmingclub.dev"}/discord/verify?${q}` },
+      headers: { Location: `${process.env.SITE_URL ?? "https://programmingclub.dev"}/discord?${q}` },
     });
   const state = url.searchParams.get("state");
   const pending = state ? await ctx.runMutation(internal.discord.take, { state }) : null;

@@ -1,4 +1,4 @@
-// Discord verification (/discord/verify): the club server is for HFC students, so members sign in with HawkMail and
+// Discord verification (/discord): the club server is for HFC students, so members sign in with HawkMail and
 // connect Discord here, and the club's bot gives them their roles. Role names match the server's roles; the bot looks
 // up their ids, so renaming a role in Discord means renaming it here too.
 

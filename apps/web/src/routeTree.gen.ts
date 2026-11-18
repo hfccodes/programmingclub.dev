@@ -17,8 +17,8 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as DesktopIndexRouteImport } from './routes/_desktop/index'
 import { Route as DesktopAboutRouteImport } from './routes/_desktop/about'
+import { Route as DesktopClubDiscordRouteImport } from './routes/_desktop/club-discord'
 import { Route as DesktopDashboardRouteImport } from './routes/_desktop/dashboard'
-import { Route as DesktopDiscordRouteImport } from './routes/_desktop/discord'
 import { Route as DesktopHackathonsRouteImport } from './routes/_desktop/hackathons'
 import { Route as DesktopHowToJoinRouteImport } from './routes/_desktop/how-to-join'
 import { Route as DesktopLearnToCodeRouteImport } from './routes/_desktop/learn-to-code'
@@ -26,6 +26,7 @@ import { Route as DesktopMeetingsRouteImport } from './routes/_desktop/meetings'
 import { Route as DesktopOfficersRouteImport } from './routes/_desktop/officers'
 import { Route as DesktopSiteRouteImport } from './routes/_desktop/site'
 import { Route as DesktopWorldCupRouteImport } from './routes/_desktop/world-cup'
+import { Route as DiscordIndexRouteImport } from './routes/discord/index'
 import { Route as DiscordVerifyRouteImport } from './routes/discord/verify'
 import { Route as HelloWorldIndexRouteImport } from './routes/hello-world/index'
 import { Route as HelloWorldCupRouteImport } from './routes/hello-world/cup'
@@ -86,14 +87,14 @@ const DesktopAboutRoute = DesktopAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => DesktopRoute,
 } as any)
+const DesktopClubDiscordRoute = DesktopClubDiscordRouteImport.update({
+  id: '/club-discord',
+  path: '/club-discord',
+  getParentRoute: () => DesktopRoute,
+} as any)
 const DesktopDashboardRoute = DesktopDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => DesktopRoute,
-} as any)
-const DesktopDiscordRoute = DesktopDiscordRouteImport.update({
-  id: '/discord',
-  path: '/discord',
   getParentRoute: () => DesktopRoute,
 } as any)
 const DesktopHackathonsRoute = DesktopHackathonsRouteImport.update({
@@ -130,6 +131,11 @@ const DesktopWorldCupRoute = DesktopWorldCupRouteImport.update({
   id: '/world-cup',
   path: '/world-cup',
   getParentRoute: () => DesktopRoute,
+} as any)
+const DiscordIndexRoute = DiscordIndexRouteImport.update({
+  id: '/discord/',
+  path: '/discord/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DiscordVerifyRoute = DiscordVerifyRouteImport.update({
   id: '/discord/verify',
@@ -240,8 +246,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
+  '/club-discord': typeof DesktopClubDiscordRoute
   '/dashboard': typeof DesktopDashboardRoute
-  '/discord': typeof DesktopDiscordRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/hello-world/wiki': typeof HelloWorldWikiRoute
   '/sign-in/$': typeof SignInSplatRoute
   '/survey/results': typeof SurveyResultsRoute
+  '/discord/': typeof DiscordIndexRoute
   '/hello-world/': typeof HelloWorldIndexRoute
   '/survey/': typeof SurveyIndexRoute
 }
@@ -276,8 +283,8 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
+  '/club-discord': typeof DesktopClubDiscordRoute
   '/dashboard': typeof DesktopDashboardRoute
-  '/discord': typeof DesktopDiscordRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
   '/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/sign-in/$': typeof SignInSplatRoute
   '/survey/results': typeof SurveyResultsRoute
   '/': typeof DesktopIndexRoute
+  '/discord': typeof DiscordIndexRoute
   '/hello-world': typeof HelloWorldIndexRoute
   '/survey': typeof SurveyIndexRoute
 }
@@ -316,8 +324,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wiki': typeof WikiRoute
   '/_desktop/about': typeof DesktopAboutRoute
+  '/_desktop/club-discord': typeof DesktopClubDiscordRoute
   '/_desktop/dashboard': typeof DesktopDashboardRoute
-  '/_desktop/discord': typeof DesktopDiscordRoute
   '/_desktop/hackathons': typeof DesktopHackathonsRoute
   '/_desktop/how-to-join': typeof DesktopHowToJoinRoute
   '/_desktop/learn-to-code': typeof DesktopLearnToCodeRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/sign-in/$': typeof SignInSplatRoute
   '/survey/results': typeof SurveyResultsRoute
   '/_desktop/': typeof DesktopIndexRoute
+  '/discord/': typeof DiscordIndexRoute
   '/hello-world/': typeof HelloWorldIndexRoute
   '/survey/': typeof SurveyIndexRoute
 }
@@ -357,8 +366,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
+    | '/club-discord'
     | '/dashboard'
-    | '/discord'
     | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/hello-world/wiki'
     | '/sign-in/$'
     | '/survey/results'
+    | '/discord/'
     | '/hello-world/'
     | '/survey/'
   fileRoutesByTo: FileRoutesByTo
@@ -393,8 +403,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/about'
+    | '/club-discord'
     | '/dashboard'
-    | '/discord'
     | '/hackathons'
     | '/how-to-join'
     | '/learn-to-code'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/survey/results'
     | '/'
+    | '/discord'
     | '/hello-world'
     | '/survey'
   id:
@@ -432,8 +443,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wiki'
     | '/_desktop/about'
+    | '/_desktop/club-discord'
     | '/_desktop/dashboard'
-    | '/_desktop/discord'
     | '/_desktop/hackathons'
     | '/_desktop/how-to-join'
     | '/_desktop/learn-to-code'
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/survey/results'
     | '/_desktop/'
+    | '/discord/'
     | '/hello-world/'
     | '/survey/'
   fileRoutesById: FileRoutesById
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   DiscordVerifyRoute: typeof DiscordVerifyRoute
   SignInSplatRoute: typeof SignInSplatRoute
   SurveyResultsRoute: typeof SurveyResultsRoute
+  DiscordIndexRoute: typeof DiscordIndexRoute
   SurveyIndexRoute: typeof SurveyIndexRoute
 }
 
@@ -535,18 +548,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesktopAboutRouteImport
       parentRoute: typeof DesktopRoute
     }
+    '/_desktop/club-discord': {
+      id: '/_desktop/club-discord'
+      path: '/club-discord'
+      fullPath: '/club-discord'
+      preLoaderRoute: typeof DesktopClubDiscordRouteImport
+      parentRoute: typeof DesktopRoute
+    }
     '/_desktop/dashboard': {
       id: '/_desktop/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DesktopDashboardRouteImport
-      parentRoute: typeof DesktopRoute
-    }
-    '/_desktop/discord': {
-      id: '/_desktop/discord'
-      path: '/discord'
-      fullPath: '/discord'
-      preLoaderRoute: typeof DesktopDiscordRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/hackathons': {
@@ -597,6 +610,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/world-cup'
       preLoaderRoute: typeof DesktopWorldCupRouteImport
       parentRoute: typeof DesktopRoute
+    }
+    '/discord/': {
+      id: '/discord/'
+      path: '/discord'
+      fullPath: '/discord/'
+      preLoaderRoute: typeof DiscordIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/discord/verify': {
       id: '/discord/verify'
@@ -785,8 +805,8 @@ const HelloWorldRouteRouteWithChildren = HelloWorldRouteRoute._addFileChildren(
 
 interface DesktopRouteChildren {
   DesktopAboutRoute: typeof DesktopAboutRoute
+  DesktopClubDiscordRoute: typeof DesktopClubDiscordRoute
   DesktopDashboardRoute: typeof DesktopDashboardRoute
-  DesktopDiscordRoute: typeof DesktopDiscordRoute
   DesktopHackathonsRoute: typeof DesktopHackathonsRoute
   DesktopHowToJoinRoute: typeof DesktopHowToJoinRoute
   DesktopLearnToCodeRoute: typeof DesktopLearnToCodeRoute
@@ -799,8 +819,8 @@ interface DesktopRouteChildren {
 
 const DesktopRouteChildren: DesktopRouteChildren = {
   DesktopAboutRoute: DesktopAboutRoute,
+  DesktopClubDiscordRoute: DesktopClubDiscordRoute,
   DesktopDashboardRoute: DesktopDashboardRoute,
-  DesktopDiscordRoute: DesktopDiscordRoute,
   DesktopHackathonsRoute: DesktopHackathonsRoute,
   DesktopHowToJoinRoute: DesktopHowToJoinRoute,
   DesktopLearnToCodeRoute: DesktopLearnToCodeRoute,
@@ -824,6 +844,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscordVerifyRoute: DiscordVerifyRoute,
   SignInSplatRoute: SignInSplatRoute,
   SurveyResultsRoute: SurveyResultsRoute,
+  DiscordIndexRoute: DiscordIndexRoute,
   SurveyIndexRoute: SurveyIndexRoute,
 }
 export const routeTree = rootRouteImport

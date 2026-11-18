@@ -46,7 +46,7 @@ const id = (name: string) => ROLES.find((r) => r.name === name)!.id;
 /** A fake Discord: who's signed in on the OAuth token, and each member's roles on the server. */
 function fakeDiscord(user: { id: string; username: string }, members: Map<string, string[]>) {
   const real = globalThis.fetch;
-  globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? "GET";
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
@@ -68,7 +68,7 @@ function fakeDiscord(user: { id: string; username: string }, members: Map<string
       return json({ roles: members.get(m[1]) });
     }
     throw new Error(`Unexpected fetch ${method} ${url}`);
-  });
+  };
   return () => (globalThis.fetch = real);
 }
 let restore = () => {};
@@ -114,7 +114,7 @@ test("verifying joins the server with roles, verifying again swaps them, and a n
   restore = fakeDiscord({ id: "u1", username: "sam" }, members);
 
   const done = await verify(t, SAM, ["ai", "nope"]);
-  expect(done.origin + done.pathname).toBe("https://site.test/discord/verify");
+  expect(done.origin + done.pathname).toBe("https://site.test/discord");
   expect(done.searchParams.get("done")).toBe("sam");
   expect(members.get("u1")).toEqual([id("Member"), id("AI")]);
 

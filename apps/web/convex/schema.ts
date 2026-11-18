@@ -302,7 +302,7 @@ export default defineSchema({
     .index("by_team_card", ["teamId", "card"])
     .index("by_attendance_card", ["attendanceId", "card"]),
 
-  // Discord verification (/discord/verify): the Discord account each verified HawkMail linked, so verifying again moves
+  // Discord verification (/discord): the Discord account each verified HawkMail linked, so verifying again moves
   // the roles instead of piling them up. One row per email, and one email per Discord account.
   discord: defineTable({
     email: v.string(),

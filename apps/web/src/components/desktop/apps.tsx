@@ -298,7 +298,7 @@ function Discord() {
         </div>
         {/* Desktop visitors are usually on a laptop: scan to join on the phone, where Discord lives. */}
         <QRCodeSVG
-          value={`https://${CLUB.url}/discord/verify`}
+          value={`https://${CLUB.url}/discord`}
           title="Scan to join the club Discord"
           size={512}
           marginSize={2}
@@ -313,7 +313,7 @@ function Discord() {
         ))}
       </ul>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-4">
-        <Link to="/discord/verify" className="btn btn-primary btn-sm">
+        <Link to="/discord" className="btn btn-primary btn-sm">
           Join with HawkMail
         </Link>
         <p className="text-sm text-dim">For HFC students: sign in with your HawkMail, connect Discord, and you’re in.</p>
@@ -799,7 +799,7 @@ export const APPS: App[] = [
   },
   {
     id: "discord",
-    path: "/discord",
+    path: "/club-discord",
     title: "Discord",
     label: "Discord",
     glyph: (
