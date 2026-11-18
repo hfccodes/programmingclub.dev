@@ -88,7 +88,7 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
           ) : !mine.eligible ? (
             <div className="flex flex-wrap items-center gap-3">
               <p className="min-w-0 flex-1">
-                You’re signed in as <strong>{mine.email}</strong>, which isn’t a HawkMail.
+                You’re signed in as <strong className="[overflow-wrap:anywhere]">{mine.email}</strong>, which isn’t a HawkMail.
               </p>
               <SignOutButton redirectUrl="/discord/verify">
                 <button className="btn btn-primary">Switch to HawkMail</button>
@@ -96,7 +96,7 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
             </div>
           ) : (
             <p>
-              <span aria-hidden>✓ </span>Signed in as <strong>{mine.email}</strong>.{" "}
+              <span aria-hidden>✓ </span>Signed in as <strong className="[overflow-wrap:anywhere]">{mine.email}</strong>.{" "}
               <SignOutButton redirectUrl="/discord/verify">
                 <button className="link text-sm">Not you?</button>
               </SignOutButton>
