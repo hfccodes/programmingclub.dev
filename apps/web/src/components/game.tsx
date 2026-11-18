@@ -81,9 +81,9 @@ export function useChimes(t: Timer | undefined, remaining: number) {
 export const isSwapMoment = (t: Timer | undefined, remaining: number) =>
   !!t?.startedAt && t.relay && remaining > 1000 && (t.durationMs - remaining) % 120_000 < 5000 && t.durationMs - remaining > 5000;
 
-const LEVEL_STYLE = { easy: "bg-meadow text-[#12332b]", medium: "bg-sun text-[#12332b]", hard: "bg-signal text-white" } as const;
+const LEVEL_STYLE = { easy: "bg-meadow text-[#0f1f3d]", medium: "bg-sun text-[#0f1f3d]", hard: "bg-signal text-white" } as const;
 export const Hint = ({ text, big = false }: { text: string; big?: boolean }) => (
-  <p className={`rounded-[6px] bg-sun px-4 py-3 font-semibold text-[#12332b] ${big ? "text-[clamp(1.3rem,2vw,2.2rem)]" : ""}`}>
+  <p className={`rounded-[6px] bg-sun px-4 py-3 font-semibold text-[#0f1f3d] ${big ? "text-[clamp(1.3rem,2vw,2.2rem)]" : ""}`}>
     Hint: {text}
   </p>
 );

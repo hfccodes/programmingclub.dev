@@ -64,7 +64,7 @@ function TeamKeyForm({ live, wrong, onKey }: { live: Live; wrong: boolean; onKey
   const w = teamWords(live.teamSize === 1);
   return (
     <Wrap className="max-w-xl py-12">
-      <p className="font-bold text-pine">{w.Computer}</p>
+      <p className="font-bold text-school">{w.Computer}</p>
       <h1 className="text-[clamp(2.4rem,7vw,3.6rem)] lowercase">{w.whichTeam}</h1>
       {live.teams.length === 0 ? (
         <p className="mt-4 text-lg text-dim">

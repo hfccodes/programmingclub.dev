@@ -62,7 +62,7 @@ const Panel = ({ title, children, className = "" }: { title: string; children: R
   </section>
 );
 
-const STRIP = ["tile-sky", "tile-meadow", "tile-sun", "tile-silver", "tile-pine", "tile-gold"];
+const STRIP = ["tile-sky", "tile-meadow", "tile-sun", "tile-silver", "tile-school", "tile-gold"];
 const Brand = () => (
   <Link to="/hello-world" className="flex shrink-0 items-center" aria-label="hello, world cup home">
     <span className="grid grid-cols-3 gap-[2px]" aria-hidden>
@@ -384,11 +384,11 @@ function HostBar({ live }: { live: Live }) {
           <Brand />
         </span>
         <div className="min-w-0 flex-1 leading-tight lg:flex-initial">
-          <p className="truncate text-xs font-bold text-pine">
+          <p className="truncate text-xs font-bold text-school">
             Week {live.week}
             {isCupWeek(live.week) ? " · Cup night" : ""}
             {live.practice && (
-              <span className="chip ml-2 bg-sky text-[#12332b]">
+              <span className="chip ml-2 bg-sky text-[#0f1f3d]">
                 Practice<span className="max-lg:hidden">: doesn’t count</span>
               </span>
             )}
@@ -403,7 +403,7 @@ function HostBar({ live }: { live: Live }) {
           className="flex min-w-0 items-center gap-2 rounded-[6px] bg-mist px-3 py-1.5 text-sm font-semibold max-lg:hidden"
           title="What the TV shows"
         >
-          <span className="size-2 shrink-0 rounded-full bg-pine" aria-hidden />
+          <span className="size-2 shrink-0 rounded-full bg-school" aria-hidden />
           <span className="max-w-[24rem] truncate">TV: {tv}</span>
         </p>
         <a href="/hello-world/tv" target="_blank" rel="noreferrer" className="btn btn-sm max-lg:hidden">
@@ -570,7 +570,7 @@ function RoundStrip({
                   <Menu.RadioItem
                     value="round"
                     closeOnClick
-                    className="btn btn-sm justify-start data-checked:bg-pine data-checked:text-white data-highlighted:outline-2"
+                    className="btn btn-sm justify-start data-checked:bg-school data-checked:text-white data-highlighted:outline-2"
                   >
                     {playing === null ? "Back to getting ready" : "Back to this round’s game"}
                   </Menu.RadioItem>
@@ -580,7 +580,7 @@ function RoundStrip({
                       key={t}
                       value={t}
                       closeOnClick
-                      className="btn btn-sm justify-start data-checked:bg-pine data-checked:text-white data-highlighted:outline-2"
+                      className="btn btn-sm justify-start data-checked:bg-school data-checked:text-white data-highlighted:outline-2"
                     >
                       {label}
                     </Menu.RadioItem>
@@ -771,7 +771,7 @@ function SetupSteps({
           >
             <div className="flex min-w-0 flex-1 items-start gap-2.5 [overflow-wrap:anywhere]">
               <span
-                className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-sm font-extrabold ${s.ok ? "bg-pine text-white" : "bg-paper shadow-[inset_0_0_0_2px_var(--color-signal)]"}`}
+                className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-sm font-extrabold ${s.ok ? "bg-school text-white" : "bg-paper shadow-[inset_0_0_0_2px_var(--color-signal)]"}`}
               >
                 <span aria-hidden>{s.ok ? "✓" : ""}</span>
                 <span className="sr-only">{s.ok ? "Done: " : "To do: "}</span>
@@ -1693,7 +1693,7 @@ function CardTool({
       {/* The card and, beside it when there's room, what the phones and team computers are doing. */}
       <div className={`mt-3 grid items-start gap-3 ${status ? "@2xl:grid-cols-[minmax(0,1fr)_minmax(15rem,20rem)]" : ""}`}>
         <div
-          className={`min-w-0 rounded-[8px] p-4 ${onTv ? "bg-mist shadow-[inset_0_0_0_3px_var(--color-pine)]" : "border-2 border-dashed border-line"}`}
+          className={`min-w-0 rounded-[8px] p-4 ${onTv ? "bg-mist shadow-[inset_0_0_0_3px_var(--color-school)]" : "border-2 border-dashed border-line"}`}
         >
           <p className="mb-2 text-xs font-extrabold tracking-wide text-dim uppercase">
             {onTv
@@ -1717,7 +1717,7 @@ const StageTag = ({ state }: { state: "live" | "held" | "preview" }) => (
   <span
     className={`shrink-0 rounded-[4px] px-2 py-0.5 text-xs font-extrabold tracking-wide uppercase ${
       state === "live"
-        ? "bg-pine text-white"
+        ? "bg-school text-white"
         : state === "held"
           ? "bg-sun/40 text-ink"
           : "text-dim shadow-[inset_0_0_0_1.5px_var(--color-dim)]"
@@ -1759,13 +1759,13 @@ function AnswerStatus({ live }: { live: Live }) {
             return (
               <li key={t._id} className="flex flex-wrap items-center gap-2 py-1.5">
                 <span className="font-bold">{t.name}</span>
-                <span className={`chip ${status === "Locked" ? "bg-pine text-white" : status === "No answer" ? "" : "bg-sun/40"}`}>
+                <span className={`chip ${status === "Locked" ? "bg-school text-white" : status === "No answer" ? "" : "bg-sun/40"}`}>
                   {status}
                 </span>
                 {t.lockMs !== null && <span className="text-xs text-dim">at {(Math.max(0, t.lockMs) / 1000).toFixed(1)}s</span>}
                 {/* Bug Hunt: the team gave up its early bonus for the beetle's hint. */}
                 {p?.hint && <span className="chip bg-sun/40">Asked the beetle</span>}
-                {firstRight === t._id && <span className="chip bg-gold text-[#12332b]">First right</span>}
+                {firstRight === t._id && <span className="chip bg-gold text-[#0f1f3d]">First right</span>}
                 {data.scored && (
                   <>
                     <span className="min-w-0 truncate font-code text-sm text-dim">
@@ -1829,10 +1829,10 @@ function FixStatus({ live }: { live: Live }) {
             <li key={t._id} className="py-1.5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-bold">{t.name}</span>
-                <span className={`chip ${t.fixed ? "bg-pine text-white" : ""}`}>
+                <span className={`chip ${t.fixed ? "bg-school text-white" : ""}`}>
                   {t.fixed ? `Fixed${t.ms === null ? "" : ` at ${fmtElapsed(t.ms)}`}` : "Not fixed yet"}
                 </span>
-                {t.first && <span className="chip bg-gold text-[#12332b]">First</span>}
+                {t.first && <span className="chip bg-gold text-[#0f1f3d]">First</span>}
                 {data.scored && <span className="narrow ml-auto text-xl font-extrabold">+{t.result?.points ?? 0}</span>}
               </div>
               {t.code !== null && (
@@ -1877,7 +1877,7 @@ function PuzzleStatus({ live, index }: { live: Live; index: number }) {
   const halfway = live.timer.card === key && remaining <= live.timer.durationMs / 2;
   const count = (part: "part1Ms" | "part2Ms") => board.teams.filter((t) => t[part] !== null).length;
   const star = (ms: number | null, first: boolean) => (
-    <span className={`chip ${ms === null ? "" : "bg-gold text-[#12332b]"}`}>
+    <span className={`chip ${ms === null ? "" : "bg-gold text-[#0f1f3d]"}`}>
       {ms === null ? "☆" : `★ ${fmtElapsed(ms)}${first ? " · first" : ""}`}
     </span>
   );
@@ -2355,7 +2355,7 @@ function PlayersPanel({ live, rows, sessionId }: { live: Live; rows: Row[]; sess
               <div className="min-w-40 flex-1">
                 <p className="font-bold">
                   {r.name}
-                  {r.firstTime && <span className="chip ml-2 text-pine">New</span>}
+                  {r.firstTime && <span className="chip ml-2 text-school">New</span>}
                   {r.officer && <span className="chip ml-2">{r.teamId ? "Officer, playing" : "Officer"}</span>}
                 </p>
                 <p className="text-xs text-dim">

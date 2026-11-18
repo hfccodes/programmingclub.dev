@@ -52,7 +52,7 @@ function useOrigin() {
 function Tv() {
   return (
     // On the TV's own pine from the first frame, so signing in and loading never flash a white page.
-    <div className="theme-pine flex min-h-dvh flex-col [&>.card]:my-auto">
+    <div className="theme-night flex min-h-dvh flex-col [&>.card]:my-auto">
       <OfficerGate redirect="/hello-world/tv" purpose="put the game on the TV">
         <TvScreen />
       </OfficerGate>
@@ -82,7 +82,7 @@ function TvScreen() {
     // Sound is run from the host's console, so the TV shows no button for it: browsers still need one click on this page
     // before they'll play anything, and a click anywhere does it.
     <div
-      className={`theme-pine relative isolate flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
+      className={`theme-night relative isolate flex h-screen flex-col overflow-hidden ${live ? "[--shift-under:5vw]" : ""}`}
       onClick={() => !sound && unlockAudio().then(() => setSound(true))}
     >
       {winter && !scene && <WinterTv snow={live ? 40 : 110} />}
@@ -129,7 +129,7 @@ function CodeSquares({ code, className = "" }: { code: string; className?: strin
   return (
     <span className={`flex gap-[0.08em] ${className}`} aria-label={`Code ${code.split("").join(" ")}`}>
       {code.split("").map((c, i) => (
-        <span key={i} className="narrow grid h-[1.3em] w-[1.05em] place-items-center bg-white leading-none font-extrabold text-[#12332b]">
+        <span key={i} className="narrow grid h-[1.3em] w-[1.05em] place-items-center bg-white leading-none font-extrabold text-[#0f1f3d]">
           {c}
         </span>
       ))}
@@ -463,8 +463,8 @@ function LiveTv({ live, code, sound }: { live: Live; code: string; sound: boolea
         <span className="font-bold">
           Week {live.week}: {wk.title}
         </span>
-        {live.double && <span className="bg-sun px-[0.8vw] py-[0.2vw] font-bold text-[#12332b]">Double points</span>}
-        {live.practice && <span className="bg-sky px-[0.8vw] py-[0.2vw] font-bold text-[#12332b]">Practice night</span>}
+        {live.double && <span className="bg-sun px-[0.8vw] py-[0.2vw] font-bold text-[#0f1f3d]">Double points</span>}
+        {live.practice && <span className="bg-sky px-[0.8vw] py-[0.2vw] font-bold text-[#0f1f3d]">Practice night</span>}
         <span className="ml-auto text-dim">
           Join at <strong className="text-ink">{origin.replace(/^https?:\/\//, "")}/join</strong>
         </span>

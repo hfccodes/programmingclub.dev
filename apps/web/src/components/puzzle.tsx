@@ -167,7 +167,7 @@ function Part({ n, text, done }: { n: 1 | 2; text: string; done: boolean }) {
       <p className="font-extrabold">
         Part {n}
         {done && (
-          <span className="ml-2 text-pine">
+          <span className="ml-2 text-school">
             <span className="text-sun">★</span> solved
           </span>
         )}
@@ -184,7 +184,7 @@ function Status({ revealed, open, stars, result }: Pick<Props, "revealed" | "ope
   const times = [stars.part1Ms, stars.part2Ms].flatMap((ms, i) => (ms === null ? [] : [`part ${i + 1} at ${fmtElapsed(ms)}`]));
   if (revealed)
     return (
-      <p className={`rounded-[10px] p-4 text-2xl font-extrabold ${n ? "bg-meadow text-[#12332b]" : "bg-mist"}`} role="status">
+      <p className={`rounded-[10px] p-4 text-2xl font-extrabold ${n ? "bg-meadow text-[#0f1f3d]" : "bg-mist"}`} role="status">
         {n ? `${"★".repeat(n)} +${result?.points ?? 0}` : "No stars this time. One way to solve it is on the left."}
         {result && (result.first1 || result.first2) && (
           <span className="block text-base font-semibold">
@@ -195,7 +195,7 @@ function Status({ revealed, open, stars, result }: Pick<Props, "revealed" | "ope
     );
   if (n === 2)
     return (
-      <p className="rounded-[10px] bg-meadow p-4 text-2xl font-extrabold text-[#12332b]" role="status">
+      <p className="rounded-[10px] bg-meadow p-4 text-2xl font-extrabold text-[#0f1f3d]" role="status">
         ★★ Both stars! Points go up at the reveal.
         <span className="block text-base font-semibold">{times.join(", ")}</span>
       </p>
@@ -208,7 +208,7 @@ function Status({ revealed, open, stars, result }: Pick<Props, "revealed" | "ope
     );
   if (n === 1)
     return (
-      <p className="rounded-[10px] bg-sun p-4 text-xl font-extrabold text-[#12332b]" role="status">
+      <p className="rounded-[10px] bg-sun p-4 text-xl font-extrabold text-[#0f1f3d]" role="status">
         ★ Part 1 is right ({times[0]}). Part 2 is on the left.
       </p>
     );

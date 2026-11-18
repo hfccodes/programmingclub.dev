@@ -406,7 +406,7 @@ export function PhoneDraw({
       <div ref={top} className={`scroll-mt-20 space-y-3 lg:w-[min((100dvh-12.5rem)*4/3+6.75rem,100vw-26rem,50.75rem)] ${columns}`}>
         {/* One row: the word on the left, Skip on the right. */}
         <div
-          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] bg-sun p-4 text-[#12332b] lg:px-5 lg:py-3 short:p-3"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] bg-sun p-4 text-[#0f1f3d] lg:px-5 lg:py-3 short:p-3"
           role="status"
         >
           <div className="min-w-0 flex-1">
@@ -465,7 +465,7 @@ export function PhoneDraw({
         )}
       </div>
       {status && (
-        <div className={`rounded-[10px] p-5 short:p-3 ${got ? "bg-meadow text-[#12332b]" : "bg-mist"}`} role="status">
+        <div className={`rounded-[10px] p-5 short:p-3 ${got ? "bg-meadow text-[#0f1f3d]" : "bg-mist"}`} role="status">
           <p className="text-3xl leading-none font-extrabold tracking-[-0.03em] short:text-2xl">{status}</p>
           {result && <p className="mt-2 text-2xl font-extrabold">{result}</p>}
           {m?.teammate && !done && <p className="mt-2 font-semibold">Sit this one out and cheer them on.</p>}
@@ -507,7 +507,7 @@ function GuessBox({ token, card }: { token: string; card: string }) {
       if (r !== "right") setText((t) => (t === sent ? "" : t));
       setNote(
         r === "close"
-          ? { text: `So close! “${text.trim()}” isn’t quite it.`, tone: "bg-sun text-[#12332b]" }
+          ? { text: `So close! “${text.trim()}” isn’t quite it.`, tone: "bg-sun text-[#0f1f3d]" }
           : r === "wrong"
             ? { text: `Not “${text.trim()}”.`, tone: "bg-mist" }
             : null,

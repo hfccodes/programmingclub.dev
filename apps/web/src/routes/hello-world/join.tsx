@@ -484,7 +484,7 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
   );
   // A game's slim bar: the team, its place and score, and the clock.
   const bar = (className: string) => (
-    <div className={`theme-pine items-center gap-3 rounded-[10px] p-2 pr-4 ${className}`}>
+    <div className={`theme-night items-center gap-3 rounded-[10px] p-2 pr-4 ${className}`}>
       <div className={`tile ${t.tile} size-11 shrink-0 rounded-[6px]`}>
         <Picto id={t.picto} className="absolute inset-x-[12%] top-1/2 -translate-y-1/2" />
       </div>
@@ -550,13 +550,13 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
               Week {live.week}: {wk.title}
             </p>
             <h1 className={`mt-0.5 text-[clamp(2rem,8vw,3rem)] lowercase wrap-anywhere ${split ? "lg:text-4xl" : ""}`}>{me.name}</h1>
-            {me.practice && <p className="mt-2 font-semibold text-pine">Practice night: nothing tonight counts toward XP.</p>}
+            {me.practice && <p className="mt-2 font-semibold text-school">Practice night: nothing tonight counts toward XP.</p>}
 
             <div className="mt-4 grid grid-cols-[auto_1fr] gap-[3px]">
               <div className={`tile ${t.tile} w-16 sm:w-32 ${split ? "lg:w-20" : ""}`}>
                 <Picto id={t.picto} className="absolute inset-x-[12%] top-1/2 -translate-y-1/2" />
               </div>
-              <div className={`theme-pine min-w-0 p-4 sm:p-6 ${split ? "lg:p-4" : ""}`}>
+              <div className={`theme-night min-w-0 p-4 sm:p-6 ${split ? "lg:p-4" : ""}`}>
                 {hosting ? (
                   <>
                     <p className="text-dim">Officer</p>
@@ -891,7 +891,7 @@ function FixStatus({ live, index, teamId, onOpen }: { live: Live; index: number;
       : "Not fixed yet";
   return (
     <div className="space-y-3">
-      <div className={`rounded-[10px] p-5 ${mine ? "bg-meadow text-[#12332b]" : "bg-mist"}`} role="status">
+      <div className={`rounded-[10px] p-5 ${mine ? "bg-meadow text-[#0f1f3d]" : "bg-mist"}`} role="status">
         <p className="text-4xl leading-none font-extrabold tracking-[-0.03em]">{status}</p>
         {!done && (
           <p className="mt-2 font-semibold">
@@ -947,7 +947,7 @@ function PuzzleStatus({
   const firsts = [mine?.first1, mine?.first2].flatMap((f, i) => (f ? [`part ${i + 1}`] : []));
   return (
     <div className="space-y-3">
-      <div className={`rounded-[10px] p-5 ${n ? "bg-meadow text-[#12332b]" : "bg-mist"}`} role="status">
+      <div className={`rounded-[10px] p-5 ${n ? "bg-meadow text-[#0f1f3d]" : "bg-mist"}`} role="status">
         <p className="text-4xl leading-none font-extrabold tracking-[-0.03em]">{status}</p>
         <p className="mt-2 font-semibold">
           {times.map((ms, i) => `Part ${i + 1}: ${ms === null ? "not yet" : `★ at ${fmtElapsed(ms)}`}`).join(" · ")}

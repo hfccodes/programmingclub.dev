@@ -105,7 +105,7 @@ function Home() {
             </Link>
           </li>
           <li className="tile-in" style={{ animationDelay: "560ms" }}>
-            <Link to="/hello-world/join" className="tile tile-pine group block aspect-square">
+            <Link to="/hello-world/join" className="tile tile-school group block aspect-square">
               <Picto
                 animate="loop"
                 id="people"
@@ -118,7 +118,7 @@ function Home() {
       </Wrap>
 
       {next ? (
-        <section className="theme-pine">
+        <section className="theme-night">
           <Wrap className="grid items-center gap-8 py-10 md:grid-cols-[auto_1fr_auto]">
             <div className={`tile ${weekTile(plan[next.i]).tile} size-28 rounded-[4px]`}>
               <Picto id={weekTile(plan[next.i]).picto} className="absolute inset-[14%]" />
@@ -144,7 +144,7 @@ function Home() {
         </section>
       ) : (
         now !== null && (
-          <section className="theme-pine">
+          <section className="theme-night">
             <Wrap className="py-10 text-2xl font-bold">Season 0 is over. See you in Season 1.</Wrap>
           </section>
         )

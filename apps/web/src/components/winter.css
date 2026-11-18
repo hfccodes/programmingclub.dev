@@ -64,7 +64,7 @@
 }
 .lights path {
   fill: none;
-  stroke: var(--wire, #12332b);
+  stroke: var(--wire, #0f1f3d);
   stroke-width: 2px;
   vector-effect: non-scaling-stroke;
 }
@@ -83,7 +83,7 @@
   height: calc(var(--bulb, 0.7rem) * 0.5);
   margin-inline: auto;
   border-radius: 1px 1px 2px 2px;
-  background: var(--wire, #12332b);
+  background: var(--wire, #0f1f3d);
 }
 .lights-bulb > i {
   display: block;

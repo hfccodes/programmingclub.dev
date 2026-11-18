@@ -427,7 +427,7 @@ function Editor({ w, plan }: { w: WeekPlan; plan: WeekPlan[] }) {
         <button className="btn" onClick={() => setD(original)} disabled={!dirty || resetting}>
           Discard changes
         </button>
-        {status === "saved" && !dirty && <span className="font-semibold text-pine">Saved. It’s live.</span>}
+        {status === "saved" && !dirty && <span className="font-semibold text-school">Saved. It’s live.</span>}
         {dirty && <span className="text-sm text-dim">Unsaved changes</span>}
         {error && (
           <span role="alert" className="font-semibold text-signal">

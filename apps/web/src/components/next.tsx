@@ -603,7 +603,7 @@ export function NextPanel({
   // round's progress, the card up next, and how to run this step. The rounds strip already shows what's next.
   const lines = [
     ready && (
-      <p key="ready" className="font-bold text-pine">
+      <p key="ready" className="font-bold text-school">
         {allIn ? (drawing ? "Everyone guessing got it." : `Every ${w.team} ${allStars ? "has both stars" : "is in"}.`) : "Time’s up."}
       </p>
     ),

@@ -146,7 +146,7 @@ const PICTOS = {
       <path {...F} d="M22 16h52c3 0 5 2 5 5l9 58c1 4-2 7-6 7H14c-4 0-7-3-6-7l9-58c0-3 2-5 5-5Z" />
       <g className="pa pa-press">
         <rect x="24" y="12" width="48" height="50" rx="6" fill="#f8da6a" />
-        <path {...S} stroke="#12332b" strokeWidth="7" d="M60 25v16H40M46 35l-6 6 6 6" />
+        <path {...S} stroke="#0f1f3d" strokeWidth="7" d="M60 25v16H40M46 35l-6 6 6 6" />
       </g>
     </>
   ),
@@ -198,7 +198,7 @@ export const GAME_TILE: Record<string, { picto: PictoId; tile: string }> = {
   bug: { picto: "bug", tile: "tile-meadow" },
   relay: { picto: "relay", tile: "tile-sun" },
   output: { picto: "output", tile: "tile-silver" },
-  pictionary: { picto: "pictionary", tile: "tile-pine" },
+  pictionary: { picto: "pictionary", tile: "tile-school" },
   lang: { picto: "lang", tile: "tile-sky" },
   fix: { picto: "fix", tile: "tile-meadow" },
   puzzle: { picto: "puzzle", tile: "tile-sun" },
@@ -323,7 +323,7 @@ const LOADER = [
   ["tile-meadow", 1],
   ["tile-sun", 2],
   ["tile-silver", 1],
-  ["tile-pine", 2],
+  ["tile-school", 2],
   ["tile-gold", 3],
 ] as const;
 
@@ -358,7 +358,7 @@ const toneOf = (r: Agenda) =>
         : /Opening|Meet|club is|Season 0 works/.test(r.what)
           ? "var(--color-sky)"
           : /Standings|standings|feedback|Wrap/.test(r.what)
-            ? "var(--color-pine)"
+            ? "var(--color-school)"
             : "var(--color-silver)";
 
 /** The hour as a clock face: each arc is that part of the night, drawn to scale. */

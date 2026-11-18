@@ -65,7 +65,7 @@ function Pad() {
     return (
       <div className="grid flex-1 place-items-center text-center">
         <div>
-          <div className="tile tile-pine mx-auto mb-8 size-28">
+          <div className="tile tile-school mx-auto mb-8 size-28">
             <Picto id="pictionary" className="absolute inset-[14%]" />
           </div>
           <h1 className="text-[clamp(2.4rem,6vw,3.6rem)] lowercase">

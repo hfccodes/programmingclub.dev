@@ -303,10 +303,10 @@ const GIFT_TIERS = [
 const WRAPS = [
   ["#e0472f", "#f6efe0"],
   ["#5db760", "#e0472f"],
-  ["#efc12c", "#1f6b52"],
+  ["#efc12c", "#0b4fa3"],
   ["#7ec3eb", "#f6efe0"],
-  ["#f49a1d", "#12332b"],
-  ["#1f6b52", "#efc12c"],
+  ["#f49a1d", "#0f1f3d"],
+  ["#0b4fa3", "#efc12c"],
   ["#c7ced0", "#e0472f"],
 ];
 // Puffs of snow when a present lands: how far out each goes, in hundredths of its width.
@@ -340,19 +340,19 @@ export function WinterLobby({ address, code, joinUrl, roster }: { address: strin
           <path d={CARD} fill="#f6f1e4" />
         </svg>
         <Holly />
-        <div className="relative flex h-full flex-col items-center justify-center px-[2.4cqw] text-center text-[#12332b]">
+        <div className="relative flex h-full flex-col items-center justify-center px-[2.4cqw] text-center text-[#0f1f3d]">
           <p className="text-[3.6cqw] leading-[0.9] font-extrabold tracking-[-0.04em]">join the game</p>
           <div className="mt-[1.4cqw] bg-white p-[0.7cqw]">
             <QRCodeSVG value={joinUrl} size={512} className="size-[17cqw]" marginSize={0} />
           </div>
-          <p className="mt-[1.4cqw] text-[1.3cqw] leading-snug text-[#4f6862]">Scan, or go to</p>
+          <p className="mt-[1.4cqw] text-[1.3cqw] leading-snug text-[#4d5b78]">Scan, or go to</p>
           <p
-            className="font-bold whitespace-nowrap text-[#12332b]"
+            className="font-bold whitespace-nowrap text-[#0f1f3d]"
             style={{ fontSize: `min(2cqw, ${(27 / (address.length * 0.55)).toFixed(2)}cqw)` }}
           >
             {address}
           </p>
-          <p className="text-[1.3cqw] leading-snug text-[#4f6862]">and enter</p>
+          <p className="text-[1.3cqw] leading-snug text-[#4d5b78]">and enter</p>
           <span className="mt-[0.9cqw] flex gap-[0.35cqw] text-[4.4cqw]" aria-label={`Code ${code.split("").join(" ")}`}>
             {code.split("").map((c, i) => (
               <span key={i} className="narrow wn-square">
@@ -372,10 +372,10 @@ export function WinterLobby({ address, code, joinUrl, roster }: { address: strin
         )}
       </ul>
 
-      <div className="absolute right-[3cqw] bottom-[0.9cqw] left-[41cqw] z-10 flex items-center gap-[2.4cqw] text-[1.5cqw] text-[#12332b]">
+      <div className="absolute right-[3cqw] bottom-[0.9cqw] left-[41cqw] z-10 flex items-center gap-[2.4cqw] text-[1.5cqw] text-[#0f1f3d]">
         <p className="font-bold">
           <span className="narrow text-[2.6cqw] font-extrabold">{roster.length}</span> player{roster.length === 1 ? "" : "s"} here
-          {more > 0 && <span className="font-normal text-[#4f6862]"> · {more} more than fit</span>}
+          {more > 0 && <span className="font-normal text-[#4d5b78]"> · {more} more than fit</span>}
         </p>
         <p className="ml-auto flex items-center gap-[0.6cqw] font-bold">
           <InstagramGlyph className="size-[1.2em]" />

@@ -25,7 +25,7 @@ const NAV = [
   { to: "/hello-world/scores", label: "Scores" },
 ] as const;
 
-const STRIP = ["tile-sky", "tile-meadow", "tile-sun", "tile-silver", "tile-pine", "tile-gold"];
+const STRIP = ["tile-sky", "tile-meadow", "tile-sun", "tile-silver", "tile-school", "tile-gold"];
 
 function Layout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -84,7 +84,7 @@ function Nav() {
 
 function Footer() {
   return (
-    <footer className="no-print theme-pine mt-32">
+    <footer className="no-print theme-night mt-32">
       <div className="flex" aria-hidden>
         {STRIP.map((t) => (
           <span key={t} className={`tile ${t} h-2 flex-1`} />

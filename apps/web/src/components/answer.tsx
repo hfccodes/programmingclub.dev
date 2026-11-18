@@ -159,7 +159,7 @@ function LockStep({
 }) {
   if (locked)
     return (
-      <p className="mt-4 rounded-[6px] bg-pine px-4 py-3 font-semibold text-white @min-[60rem]:py-2 @min-[60rem]:text-sm">
+      <p className="mt-4 rounded-[6px] bg-school px-4 py-3 font-semibold text-white @min-[60rem]:py-2 @min-[60rem]:text-sm">
         {w.lockedBy(lockedBy)}: {what}. {w.final}
       </p>
     );
@@ -395,12 +395,12 @@ function BugCode({
           // Once the answer is out, the bug's line is the one marked, and the team's pick reads right or wrong.
           const tone = !mark.length
             ? on
-              ? "bg-pine shadow-[inset_5px_0_0_var(--color-sun)]"
+              ? "bg-school shadow-[inset_5px_0_0_var(--color-sun)]"
               : canTap && l.trim()
                 ? "cursor-pointer hover:bg-white/10"
                 : ""
             : on && bug
-              ? "bg-pine shadow-[inset_5px_0_0_var(--color-meadow)]"
+              ? "bg-school shadow-[inset_5px_0_0_var(--color-meadow)]"
               : on
                 ? "bg-signal/25 shadow-[inset_5px_0_0_var(--color-signal)]"
                 : bug
@@ -587,7 +587,7 @@ function Picked({ game, pick, result }: { game: AnswerGame; pick: TeamPick; resu
         {pick.choice ? (
           <>
             <p className="mt-2 text-2xl font-extrabold">Fix {marked && mark(result?.fix)}</p>
-            <code className="mt-1 block rounded-[6px] bg-pine px-3 py-2 font-code text-sm font-normal whitespace-pre-wrap text-white wrap-anywhere">
+            <code className="mt-1 block rounded-[6px] bg-school px-3 py-2 font-code text-sm font-normal whitespace-pre-wrap text-white wrap-anywhere">
               {pick.choice}
             </code>
           </>
@@ -650,7 +650,7 @@ function ResultBanner({
   w: TeamWords;
 }) {
   const pts = result?.points ?? 0;
-  const tone = result?.correct ? "bg-meadow text-[#12332b]" : pts > 0 ? "bg-sun text-[#12332b]" : "bg-mist";
+  const tone = result?.correct ? "bg-meadow text-[#0f1f3d]" : pts > 0 ? "bg-sun text-[#0f1f3d]" : "bg-mist";
   const nothing = pick.line === undefined && pick.choice === undefined;
   const l = LANGS[index];
   return (
@@ -693,7 +693,7 @@ function Standings({ teams, mine }: { teams: Standing[]; mine?: string }) {
         t ? (
           <li
             key={t._id}
-            className={`flex items-center gap-3 rounded-[6px] px-3 py-2 ${t._id === mine ? "bg-pine text-white" : ""}`}
+            className={`flex items-center gap-3 rounded-[6px] px-3 py-2 ${t._id === mine ? "bg-school text-white" : ""}`}
             aria-current={t._id === mine || undefined}
           >
             <span className="w-10 shrink-0 font-bold">{ordinal(placeOf(t.score, scores))}</span>

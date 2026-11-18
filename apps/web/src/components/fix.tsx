@@ -191,7 +191,7 @@ function Status({ revealed, open, fixed, result }: Pick<Props, "revealed" | "ope
   // A fix the server has, revealed before its points arrive, still reads as fixed.
   if (revealed)
     return (
-      <div className={`${box} ${result || fixed ? "bg-meadow text-[#12332b]" : "bg-mist"}`} role="status">
+      <div className={`${box} ${result || fixed ? "bg-meadow text-[#0f1f3d]" : "bg-mist"}`} role="status">
         <p className="text-2xl font-extrabold">
           {result ? `Fixed! +${result.points}${result.first ? ", first to fix it" : ""}` : fixed ? `✓ Fixed${at}` : "Not fixed this time."}
         </p>
@@ -200,7 +200,7 @@ function Status({ revealed, open, fixed, result }: Pick<Props, "revealed" | "ope
     );
   if (fixed)
     return (
-      <div className={`${box} bg-meadow text-[#12332b]`} role="status">
+      <div className={`${box} bg-meadow text-[#0f1f3d]`} role="status">
         <p className="text-2xl font-extrabold">✓ Fixed{at}</p>
         <p className="font-semibold">Your fix counts. Points go up at the reveal.</p>
       </div>
@@ -405,7 +405,7 @@ function Results({
   return (
     <div className={`card flex flex-col px-4 py-3 ${details ? "shrink-[100] ws:min-h-[11rem]" : "shrink-0"} ${stale ? "opacity-70" : ""}`}>
       <div ref={head} className="shrink-0 scroll-mt-[calc(var(--ws-top,1rem)+0.5rem)]">
-        <p role="status" className={`text-lg leading-snug font-extrabold ${all ? "text-pine" : ""}`}>
+        <p role="status" className={`text-lg leading-snug font-extrabold ${all ? "text-school" : ""}`}>
           <span className="mr-2 text-sm font-bold text-dim">{kind === "run" ? "Run" : "Check"} result</span>
           {all ? "✓ " : "✗ "}
           {summary}

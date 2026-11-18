@@ -44,7 +44,7 @@ function Cup() {
       />
 
       <Wrap className="mt-28">
-        <div className="theme-pine grid gap-12 rounded-[6px] px-8 py-14 md:grid-cols-[1fr_1.2fr] md:px-14">
+        <div className="theme-night grid gap-12 rounded-[6px] px-8 py-14 md:grid-cols-[1fr_1.2fr] md:px-14">
           <div>
             <h2 className="text-[clamp(2.2rem,4vw,3.4rem)] lowercase">the final’s puzzles</h2>
             <p className="mt-5 max-w-[38ch] text-lg text-dim">

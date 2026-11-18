@@ -2,20 +2,22 @@
 
 /*
  * An event identity in the Munich '72 tradition: white ground, flat color fields,
- * pictograms, lowercase type. Gold belongs to the Golden Keycap; signal red is only
- * for urgent moments. `.theme-pine` re-points the tokens for the TV and the slides.
+ * pictograms, lowercase type, in the school's navy and blue. Gold belongs to the Golden
+ * Keycap; signal red is only for urgent moments. `.theme-night` re-points the tokens for
+ * the TV and the slides.
  */
 @theme {
   --color-paper: #ffffff;
-  --color-mist: #eef3f1;
-  --color-ink: #12332b;
-  --color-dim: #4f6862;
-  --color-line: #d6dfdb;
+  --color-mist: #eef2f9;
+  --color-ink: #0f1f3d;
+  --color-dim: #4d5b78;
+  --color-line: #d5dbe7;
   --color-sky: #7ec3eb;
   --color-meadow: #5db760;
   --color-sun: #f49a1d;
   --color-silver: #c7ced0;
-  --color-pine: #1f6b52;
+  /* Henry Ford College blue. */
+  --color-school: #0b4fa3;
   --color-gold: #efc12c;
   --color-signal: #e0472f;
 
@@ -43,24 +45,15 @@
 }
 
 @layer base {
-  .theme-pine {
-    --color-paper: #0f2b24;
-    --color-mist: #173a31;
+  .theme-night {
+    --color-paper: #0c2148;
+    --color-mist: #142d57;
     --color-ink: #ffffff;
-    --color-dim: #a9c2ba;
-    --color-line: #2c5146;
+    --color-dim: #a9b8d4;
+    --color-line: #2a4372;
     background: var(--color-paper);
     color: var(--color-ink);
     color-scheme: dark;
-  }
-
-  /* The club's own pages: navy ink and school blue instead of the event's pine. */
-  .theme-club {
-    --color-ink: #0f1f3d;
-    --color-dim: #4d5b78;
-    --color-line: #d5dbe7;
-    --color-mist: #eef2f9;
-    color: var(--color-ink);
   }
 
   html {
@@ -82,7 +75,7 @@
   }
   ::selection {
     background: var(--color-sky);
-    color: #12332b;
+    color: #0f1f3d;
   }
   :focus-visible {
     outline: 3px solid var(--color-sun);
@@ -148,13 +141,13 @@
   }
   .btn-primary:hover,
   .btn-coin:hover {
-    background: var(--color-pine);
+    background: var(--color-school);
   }
-  .theme-pine :is(.btn-primary, .btn-coin) {
-    color: #12332b;
+  .theme-night :is(.btn-primary, .btn-coin) {
+    color: #0f1f3d;
     background: #ffffff;
   }
-  .theme-pine :is(.btn-primary, .btn-coin):hover {
+  .theme-night :is(.btn-primary, .btn-coin):hover {
     background: var(--color-sky);
   }
   .btn-neon {
@@ -168,7 +161,7 @@
   .btn-on,
   .btn-on:hover {
     color: #fff;
-    background: var(--color-pine);
+    background: var(--color-school);
     box-shadow: none;
   }
   .btn-sm {
@@ -199,7 +192,7 @@
   .tile {
     position: relative;
     overflow: hidden;
-    color: #12332b;
+    color: #0f1f3d;
   }
   .tile-sky {
     background: var(--color-sky);
@@ -216,8 +209,8 @@
   .tile-gold {
     background: var(--color-gold);
   }
-  .tile-pine {
-    background: var(--color-pine);
+  .tile-school {
+    background: var(--color-school);
     color: #fff;
   }
 
@@ -263,19 +256,19 @@
     animation: blink 1.1s steps(1) infinite;
   }
 
-  /* Code sits on deep pine everywhere so the syntax colors stay readable. */
+  /* Code sits on deep navy everywhere so the syntax colors stay readable. */
   .code {
     font: 400 1.1rem/1.65 var(--font-code);
-    color: #f2f7f5;
-    background: #0f2b24;
+    color: #f3f6fc;
+    background: #0c2148;
     border-radius: 10px;
     padding: 1rem 1.25rem;
     overflow-x: auto;
     tab-size: 4;
   }
-  /* On pine itself (the TV, the slides), code would melt into the page: a lifted panel sets it apart, no border. */
-  .theme-pine .code {
-    background: #16392f;
+  /* On the night theme itself (the TV, the slides), code would melt into the page: a lifted panel sets it apart, no border. */
+  .theme-night .code {
+    background: #14305e;
   }
   .code .cl {
     display: block;
@@ -1210,15 +1203,6 @@ html:has(.desk-wallpaper) {
 .group:hover .desk-icon,
 .group:focus-visible .desk-icon {
   background: rgb(255 255 255 / 0.18);
-}
-.theme-club .code {
-  background: #0a2147;
-}
-.theme-club .btn-primary {
-  background: #0f1f3d;
-}
-.theme-club .btn-primary:hover {
-  background: #0b4fa3;
 }
 
 /* Pictogram motion (components/ui.tsx). Parts rest until the pictogram is looping or hovered, then act out their game (reduced motion: see the end). */

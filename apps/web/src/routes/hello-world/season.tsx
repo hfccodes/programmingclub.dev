@@ -68,7 +68,7 @@ function Season() {
                     {GAMES.map((g) => (
                       <td key={g.id} className={`h-12 text-center ${p.has(g.id) ? GAME_TILE[g.id].tile : "bg-mist/50"}`}>
                         {p.has(g.id) && (
-                          <span className={`narrow text-sm font-extrabold ${GAME_TILE[g.id].tile === "tile-pine" ? "text-white" : ""}`}>
+                          <span className={`narrow text-sm font-extrabold ${GAME_TILE[g.id].tile === "tile-school" ? "text-white" : ""}`}>
                             {p.get(g.id) ? "Double" : "●"}
                           </span>
                         )}

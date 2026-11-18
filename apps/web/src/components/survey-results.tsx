@@ -37,7 +37,7 @@ const SURVEY_URL = `https://${CLUB.url}/survey`;
 
 export function SurveyResults() {
   return (
-    <main className="theme-club mx-auto w-[min(1240px,100%-2.5rem)] py-8">
+    <main className="mx-auto w-[min(1240px,100%-2.5rem)] py-8">
       <Link to="/dashboard" className="inline-flex items-center gap-3 text-sm font-semibold text-dim hover:text-ink">
         <ClubLogo className="size-8" />
         Officer dashboard

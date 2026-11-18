@@ -29,7 +29,9 @@ export function TrophyViewer({ className = "" }: { className?: string }) {
       // A product-photo studio for the gold to reflect: a dim navy room with three softboxes,
       // plus one warm key light that casts the shadow.
       const room = new THREE.Scene();
-      room.add(new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), new THREE.MeshBasicMaterial({ color: 0x6f7a96, side: THREE.BackSide })));
+      room.add(
+        new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), new THREE.MeshBasicMaterial({ color: 0x6f7a96, side: THREE.BackSide })),
+      );
       const softbox = (w: number, hh: number, x: number, y: number, z: number, glow: number) => {
         const m = new THREE.Mesh(
           new THREE.PlaneGeometry(w, hh),
@@ -59,7 +61,7 @@ export function TrophyViewer({ className = "" }: { className?: string }) {
         // Polished gold catches the studio; satin black PLA barely does.
         const m = o.material as MeshStandardMaterial;
         // (envMapIntensity only applies when the material has its own envMap.)
-        if (m.name === "gold") Object.assign(m, { envMap: studio, roughness: 0.26, envMapIntensity: 1 }), m.color.setRGB(1, 0.6, 0.18);
+        if (m.name === "gold") (Object.assign(m, { envMap: studio, roughness: 0.26, envMapIntensity: 1 }), m.color.setRGB(1, 0.6, 0.18));
         if (m.name === "black") Object.assign(m, { envMap: studio, roughness: 0.6, envMapIntensity: 0.35 });
         if (m.name === "white") Object.assign(m, { envMap: studio, envMapIntensity: 0.4 });
       });

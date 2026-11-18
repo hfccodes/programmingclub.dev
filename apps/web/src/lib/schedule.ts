@@ -142,7 +142,7 @@ export const IDEA_GROUPS: { name: IdeaGroup; tile: string; ideas: Idea[] }[] = (
     ["Unplugged", "tile-meadow"],
     ["Game shows", "tile-sun"],
     ["Browser races", "tile-silver"],
-    ["Build and demo", "tile-pine"],
+    ["Build and demo", "tile-school"],
   ] as const
 ).map(([name, tile]) => ({ name, tile, ideas: IDEAS.filter((i) => i.group === name) }));
 

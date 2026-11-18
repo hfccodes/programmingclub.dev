@@ -135,7 +135,7 @@ const PREVIEW = [
 
 function ServerPreview() {
   return (
-    <div className="rounded-[12px] bg-[#0f2b24] p-5 text-[#f2f7f5] shadow-[0_18px_40px_-24px_rgb(15_43_36/0.7)]">
+    <div className="rounded-[12px] bg-[#0c2148] p-5 text-[#f3f6fc] shadow-[0_18px_40px_-24px_rgb(12_33_72/0.7)]">
       <p className="flex items-center gap-2.5 border-b border-white/10 pb-3.5 font-bold">
         <ClubLogo className="size-7" />
         {CLUB.name} · HFC
@@ -163,7 +163,7 @@ function ServerPreview() {
 /** The page: the pitch on the left (and on top on phones), the steps or result on the right. */
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <main className="theme-club mx-auto min-h-dvh w-[min(1120px,100%-2.5rem)] pt-8 pb-16">
+    <main className="mx-auto min-h-dvh w-[min(1120px,100%-2.5rem)] pt-8 pb-16">
       <Link to="/" className="inline-flex items-center gap-3 text-sm font-semibold text-dim hover:text-ink">
         <ClubLogo className="size-8" />
         {CLUB.name} at {CLUB.school}

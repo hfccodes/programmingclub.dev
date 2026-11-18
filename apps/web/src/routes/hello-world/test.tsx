@@ -115,7 +115,7 @@ function Tester() {
     <>
       <header className="flex flex-wrap items-end gap-4">
         <div>
-          <p className="font-bold text-pine">Officers</p>
+          <p className="font-bold text-school">Officers</p>
           <h1 className="text-[clamp(2.4rem,6vw,3.6rem)] lowercase">test the decks</h1>
           <p className="mt-2 max-w-[60ch] text-dim">
             Play every card the way a team does on a phone (or, for Fix it for real and puzzles, on a team computer), then reveal to see
@@ -323,7 +323,7 @@ function Play({ game, index, tv }: { game: AnswerGame; index: number; tv: boolea
         </p>
       </div>
       {tv && (
-        <div className="theme-pine min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
+        <div className="theme-night min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
           <p className="mb-3 text-sm font-bold text-dim">TV · {DECKS[game].name}</p>
           <CardView game={game} index={index} answer={revealed} />
         </div>
@@ -421,7 +421,7 @@ function FixPlay({ index, tv, py }: { index: number; tv: boolean; py: Python }) 
         </p>
       </div>
       {tv && (
-        <div className="theme-pine min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
+        <div className="theme-night min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
           <p className="mb-3 text-sm font-bold text-dim">TV · {DECKS.fix.name}</p>
           <CardView game="fix" index={index} answer={revealed} hint={hint} />
         </div>
@@ -563,7 +563,7 @@ function PuzzlePlay({ index, tv, py }: { index: number; tv: boolean; py: Python 
         </p>
       </div>
       {tv && (
-        <div className="theme-pine min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
+        <div className="theme-night min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
           <p className="mb-3 text-sm font-bold text-dim">TV · {DECKS.puzzle.name}</p>
           <CardView game="puzzle" index={index} answer={revealed} hint={hint} />
         </div>
@@ -719,7 +719,7 @@ function WikiPlay({ index, tv }: { index: number; tv: boolean }) {
         </p>
       </div>
       {tv && (
-        <div className="theme-pine min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
+        <div className="theme-night min-w-0 flex-1 basis-[28rem] rounded-[10px] p-6">
           <p className="mb-3 text-sm font-bold text-dim">TV · Wiki Race</p>
           <WikiPair from={race.from} to={race.to} />
         </div>
@@ -831,7 +831,7 @@ function FlagPanel({
         <ul className="mt-2 divide-y divide-line">
           {list.map(({ g, i, f }) => (
             <li key={`${g}:${i}`}>
-              <button className="w-full py-1.5 text-left hover:text-pine" onClick={() => jump(g, i)}>
+              <button className="w-full py-1.5 text-left hover:text-school" onClick={() => jump(g, i)}>
                 <strong>
                   {deckName(g)}, card {i + 1}
                 </strong>

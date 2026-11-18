@@ -221,7 +221,7 @@ function GamePlan() {
         <dl className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {PROMO.map((p) => (
             <div key={p.idea}>
-              <dt className="text-lg font-bold text-pine">{p.idea}</dt>
+              <dt className="text-lg font-bold text-school">{p.idea}</dt>
               <dd className="mt-1 text-dim">{p.how}</dd>
             </div>
           ))}

@@ -272,7 +272,7 @@ export function Survey() {
 
 export function Page({ children }: { children: ReactNode }) {
   return (
-    <main className="theme-club mx-auto min-h-dvh w-[min(760px,100%-2.5rem)] pt-8">
+    <main className="mx-auto min-h-dvh w-[min(760px,100%-2.5rem)] pt-8">
       <Link to="/" className="inline-flex items-center gap-3 text-sm font-semibold text-dim hover:text-ink">
         <ClubLogo className="size-8" />
         {CLUB.name} at {CLUB.school}

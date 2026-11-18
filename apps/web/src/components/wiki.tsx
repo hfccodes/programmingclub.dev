@@ -78,7 +78,7 @@ export function WikiRound(p: RoundProps) {
       {p.revealed ? (
         <RaceBanner result={p.result} you={w.You} />
       ) : finished ? (
-        <div className="rounded-[10px] bg-meadow p-5 text-[#12332b]" role="status">
+        <div className="rounded-[10px] bg-meadow p-5 text-[#0f1f3d]" role="status">
           <p className="text-4xl leading-none font-extrabold tracking-[-0.03em]">You made it!</p>
           <p className="mt-3 font-semibold">
             {[
@@ -172,7 +172,7 @@ export function WikiRound(p: RoundProps) {
 /** "2nd place! +4" or "+1 for playing" once the race is scored. */
 function RaceBanner({ result, you }: { result: RaceResult | null; you: string }) {
   const place = result?.place;
-  const tone = place !== undefined && place <= 3 ? "bg-meadow text-[#12332b]" : place !== undefined ? "bg-sun text-[#12332b]" : "bg-mist";
+  const tone = place !== undefined && place <= 3 ? "bg-meadow text-[#0f1f3d]" : place !== undefined ? "bg-sun text-[#0f1f3d]" : "bg-mist";
   return (
     <div className={`rounded-[10px] p-5 ${tone}`} role="status">
       <p className="text-4xl leading-none font-extrabold tracking-[-0.03em]">

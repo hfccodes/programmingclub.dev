@@ -186,7 +186,7 @@ export function Desktop() {
   const topId = visible.filter((w) => w.phase !== "closing").at(-1)?.id;
 
   return (
-    <div ref={root} className="theme-club desk-wallpaper fixed inset-0 overflow-hidden text-ink" data-october={october || undefined}>
+    <div ref={root} className="desk-wallpaper fixed inset-0 overflow-hidden text-ink" data-october={october || undefined}>
       <div aria-hidden className={`absolute inset-0 ${boot ? "boot-wallpaper" : ""}`}>
         <div className="desk-aerial" />
         {october ? <SpookyScene /> : <Scene />}

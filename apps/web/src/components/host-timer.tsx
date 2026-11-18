@@ -245,7 +245,7 @@ export function HostTimer({
   const portal = useRef<HTMLDivElement>(null);
   const urgent = c.state === "done" || (c.state === "running" && c.remaining <= 10_000);
   const clock = fmtClock(c.remaining);
-  const tone = c.state === "done" ? "text-signal" : c.state === "running" ? "text-pine" : "text-dim";
+  const tone = c.state === "done" ? "text-signal" : c.state === "running" ? "text-school" : "text-dim";
   const status = `${STATUS[c.state]}${cardLabel ? `: ${cardLabel}` : ""}`;
 
   if (variant === "bar") {
@@ -286,7 +286,7 @@ export function HostTimer({
                   </button>
                   <AddTime c={c} />
                 </div>
-                {c.note && <p className="mt-2 text-sm font-semibold text-pine">{c.note}</p>}
+                {c.note && <p className="mt-2 text-sm font-semibold text-school">{c.note}</p>}
                 <hr className="my-3 border-line" />
                 <SetTime c={c} live={live} onSet={() => setOpen(false)} />
                 <hr className="my-3 border-line" />
@@ -354,7 +354,7 @@ export function HostTimer({
       {(c.note || cardLabel || live.timer.relay) && (
         <div className="flex flex-wrap gap-x-3 text-sm text-dim">
           {c.note ? (
-            <p aria-hidden className="font-semibold text-pine">
+            <p aria-hidden className="font-semibold text-school">
               {c.note}
             </p>
           ) : (

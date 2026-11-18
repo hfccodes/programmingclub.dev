@@ -22,8 +22,8 @@ function Terms() {
       </Section>
       <Section title="Club events">
         <p>
-          Club meetings and events follow Henry Ford College’s Student Code of Conduct and student club policies. Participation is open
-          to currently enrolled HFC students.
+          Club meetings and events follow Henry Ford College’s Student Code of Conduct and student club policies. Participation is open to
+          currently enrolled HFC students.
         </p>
       </Section>
       <Section title="No guarantees">
