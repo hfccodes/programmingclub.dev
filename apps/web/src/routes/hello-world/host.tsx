@@ -814,10 +814,18 @@ function ActivityStage({ live, round }: { live: Live; round: Round }) {
           )}
         </p>
       )}
-      <p className="rounded-[6px] bg-mist p-3 text-sm">
-        <strong>Score it by hand</strong> with each {w.team}’s + buttons under Scores{game ? `: ${game.scoring}` : "."} Time it with the
-        clock; Big timer puts it on the TV.
-      </p>
+      {/Snow Quest/.test(round.label) ? (
+        <p className="rounded-[6px] bg-mist p-3 text-sm">
+          <strong>Snow Quest scores itself.</strong> Every solve, secret, and level-up adds Cup points at once, so leave the + buttons
+          alone. Wait until players see “Waiting for the host” before starting this round, which lets everyone in together. Put the
+          scoreboard on the TV and run the clock; when it ends, End night keeps everyone’s points.
+        </p>
+      ) : (
+        <p className="rounded-[6px] bg-mist p-3 text-sm">
+          <strong>Score it by hand</strong> with each {w.team}’s + buttons under Scores{game ? `: ${game.scoring}` : "."} Time it with the
+          clock; Big timer puts it on the TV.
+        </p>
+      )}
     </div>
   );
 }
@@ -1704,7 +1712,7 @@ function CardTool({
                 ? "Off the TV for now · its clock waits until it’s back"
                 : "Preview · only you see this, answer too"}
           </p>
-          <CardView game={game} index={index} answer />
+          <CardView game={game} index={index} answer solo={live.teamSize === 1} />
         </div>
         {status && <div className="min-w-0 @2xl:sticky @2xl:top-0 [&>div]:mt-0">{status}</div>}
       </div>
@@ -1933,7 +1941,7 @@ function PuzzleStatus({ live, index }: { live: Live; index: number }) {
         </ul>
       )}
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <p className="flex-1 text-xs text-dim">
+        <p className="min-w-48 flex-1 text-xs text-dim">
           {board.scored
             ? "Points went on the board when you revealed. Use the score buttons to fix anything."
             : `Each ${w.team} gets a different input. A wrong answer locks the ${w.team} out for 30 seconds. Revealing adds +3 per part 1 star, +5 per part 2 star, and +2 more for the first ${w.team} to each star, doubled on double points. Ending the night scores a puzzle you never revealed.`}

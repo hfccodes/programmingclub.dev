@@ -37,6 +37,8 @@ import { Route as HelloWorldHostRouteImport } from './routes/hello-world/host'
 import { Route as HelloWorldJoinRouteImport } from './routes/hello-world/join'
 import { Route as HelloWorldKickoffRouteImport } from './routes/hello-world/kickoff'
 import { Route as HelloWorldKitRouteImport } from './routes/hello-world/kit'
+import { Route as HelloWorldQuestRouteImport } from './routes/hello-world/quest'
+import { Route as HelloWorldQuestDevRouteImport } from './routes/hello-world/quest-dev'
 import { Route as HelloWorldRulesRouteImport } from './routes/hello-world/rules'
 import { Route as HelloWorldScheduleRouteImport } from './routes/hello-world/schedule'
 import { Route as HelloWorldScoresRouteImport } from './routes/hello-world/scores'
@@ -188,6 +190,16 @@ const HelloWorldKitRoute = HelloWorldKitRouteImport.update({
   path: '/kit',
   getParentRoute: () => HelloWorldRouteRoute,
 } as any)
+const HelloWorldQuestRoute = HelloWorldQuestRouteImport.update({
+  id: '/quest',
+  path: '/quest',
+  getParentRoute: () => HelloWorldRouteRoute,
+} as any)
+const HelloWorldQuestDevRoute = HelloWorldQuestDevRouteImport.update({
+  id: '/quest-dev',
+  path: '/quest-dev',
+  getParentRoute: () => HelloWorldRouteRoute,
+} as any)
 const HelloWorldRulesRoute = HelloWorldRulesRouteImport.update({
   id: '/rules',
   path: '/rules',
@@ -270,6 +282,8 @@ export interface FileRoutesByFullPath {
   '/hello-world/join': typeof HelloWorldJoinRoute
   '/hello-world/kickoff': typeof HelloWorldKickoffRoute
   '/hello-world/kit': typeof HelloWorldKitRoute
+  '/hello-world/quest': typeof HelloWorldQuestRoute
+  '/hello-world/quest-dev': typeof HelloWorldQuestDevRoute
   '/hello-world/rules': typeof HelloWorldRulesRoute
   '/hello-world/schedule': typeof HelloWorldScheduleRoute
   '/hello-world/scores': typeof HelloWorldScoresRoute
@@ -308,6 +322,8 @@ export interface FileRoutesByTo {
   '/hello-world/join': typeof HelloWorldJoinRoute
   '/hello-world/kickoff': typeof HelloWorldKickoffRoute
   '/hello-world/kit': typeof HelloWorldKitRoute
+  '/hello-world/quest': typeof HelloWorldQuestRoute
+  '/hello-world/quest-dev': typeof HelloWorldQuestDevRoute
   '/hello-world/rules': typeof HelloWorldRulesRoute
   '/hello-world/schedule': typeof HelloWorldScheduleRoute
   '/hello-world/scores': typeof HelloWorldScoresRoute
@@ -350,6 +366,8 @@ export interface FileRoutesById {
   '/hello-world/join': typeof HelloWorldJoinRoute
   '/hello-world/kickoff': typeof HelloWorldKickoffRoute
   '/hello-world/kit': typeof HelloWorldKitRoute
+  '/hello-world/quest': typeof HelloWorldQuestRoute
+  '/hello-world/quest-dev': typeof HelloWorldQuestDevRoute
   '/hello-world/rules': typeof HelloWorldRulesRoute
   '/hello-world/schedule': typeof HelloWorldScheduleRoute
   '/hello-world/scores': typeof HelloWorldScoresRoute
@@ -393,6 +411,8 @@ export interface FileRouteTypes {
     | '/hello-world/join'
     | '/hello-world/kickoff'
     | '/hello-world/kit'
+    | '/hello-world/quest'
+    | '/hello-world/quest-dev'
     | '/hello-world/rules'
     | '/hello-world/schedule'
     | '/hello-world/scores'
@@ -431,6 +451,8 @@ export interface FileRouteTypes {
     | '/hello-world/join'
     | '/hello-world/kickoff'
     | '/hello-world/kit'
+    | '/hello-world/quest'
+    | '/hello-world/quest-dev'
     | '/hello-world/rules'
     | '/hello-world/schedule'
     | '/hello-world/scores'
@@ -472,6 +494,8 @@ export interface FileRouteTypes {
     | '/hello-world/join'
     | '/hello-world/kickoff'
     | '/hello-world/kit'
+    | '/hello-world/quest'
+    | '/hello-world/quest-dev'
     | '/hello-world/rules'
     | '/hello-world/schedule'
     | '/hello-world/scores'
@@ -700,6 +724,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelloWorldKitRouteImport
       parentRoute: typeof HelloWorldRouteRoute
     }
+    '/hello-world/quest': {
+      id: '/hello-world/quest'
+      path: '/quest'
+      fullPath: '/hello-world/quest'
+      preLoaderRoute: typeof HelloWorldQuestRouteImport
+      parentRoute: typeof HelloWorldRouteRoute
+    }
+    '/hello-world/quest-dev': {
+      id: '/hello-world/quest-dev'
+      path: '/quest-dev'
+      fullPath: '/hello-world/quest-dev'
+      preLoaderRoute: typeof HelloWorldQuestDevRouteImport
+      parentRoute: typeof HelloWorldRouteRoute
+    }
     '/hello-world/rules': {
       id: '/hello-world/rules'
       path: '/rules'
@@ -788,6 +826,8 @@ interface HelloWorldRouteRouteChildren {
   HelloWorldJoinRoute: typeof HelloWorldJoinRoute
   HelloWorldKickoffRoute: typeof HelloWorldKickoffRoute
   HelloWorldKitRoute: typeof HelloWorldKitRoute
+  HelloWorldQuestRoute: typeof HelloWorldQuestRoute
+  HelloWorldQuestDevRoute: typeof HelloWorldQuestDevRoute
   HelloWorldRulesRoute: typeof HelloWorldRulesRoute
   HelloWorldScheduleRoute: typeof HelloWorldScheduleRoute
   HelloWorldScoresRoute: typeof HelloWorldScoresRoute
@@ -807,6 +847,8 @@ const HelloWorldRouteRouteChildren: HelloWorldRouteRouteChildren = {
   HelloWorldJoinRoute: HelloWorldJoinRoute,
   HelloWorldKickoffRoute: HelloWorldKickoffRoute,
   HelloWorldKitRoute: HelloWorldKitRoute,
+  HelloWorldQuestRoute: HelloWorldQuestRoute,
+  HelloWorldQuestDevRoute: HelloWorldQuestDevRoute,
   HelloWorldRulesRoute: HelloWorldRulesRoute,
   HelloWorldScheduleRoute: HelloWorldScheduleRoute,
   HelloWorldScoresRoute: HelloWorldScoresRoute,

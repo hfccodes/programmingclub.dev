@@ -1,0 +1,171 @@
+{
+ "occluders": [
+  {
+   "name": "lantern tree W and berry bush",
+   "x": 0,
+   "y": 300,
+   "w": 196,
+   "h": 326,
+   "baseY": 616
+  },
+  {
+   "name": "rock W",
+   "x": 115,
+   "y": 463,
+   "w": 100,
+   "h": 75,
+   "baseY": 533,
+   "sheet": 2
+  },
+  {
+   "name": "stump and rocks W",
+   "x": 160,
+   "y": 543,
+   "w": 226,
+   "h": 110,
+   "baseY": 642,
+   "sheet": 2
+  },
+  {
+   "name": "fence W",
+   "x": 144,
+   "y": 645,
+   "w": 247,
+   "h": 126,
+   "baseY": 762
+  },
+  {
+   "name": "berry bush S",
+   "x": 381,
+   "y": 647,
+   "w": 105,
+   "h": 72,
+   "baseY": 715,
+   "sheet": 2
+  },
+  {
+   "name": "rock S",
+   "x": 395,
+   "y": 703,
+   "w": 124,
+   "h": 88,
+   "baseY": 790
+  },
+  {
+   "name": "lantern tree NW",
+   "x": 456,
+   "y": 95,
+   "w": 91,
+   "h": 138,
+   "baseY": 228
+  },
+  {
+   "name": "berry bush N",
+   "x": 539,
+   "y": 141,
+   "w": 70,
+   "h": 64,
+   "baseY": 200,
+   "sheet": 2
+  },
+  {
+   "name": "stair lantern W",
+   "x": 623,
+   "y": 35,
+   "w": 66,
+   "h": 134,
+   "baseY": 162
+  },
+  {
+   "name": "stair lantern E",
+   "x": 852,
+   "y": 35,
+   "w": 61,
+   "h": 134,
+   "baseY": 162
+  },
+  {
+   "name": "lantern tree NE",
+   "x": 996,
+   "y": 95,
+   "w": 113,
+   "h": 168,
+   "baseY": 258
+  },
+  {
+   "name": "stumps NE",
+   "x": 1109,
+   "y": 151,
+   "w": 127,
+   "h": 98,
+   "baseY": 243
+  },
+  {
+   "name": "stumps E",
+   "x": 1203,
+   "y": 440,
+   "w": 126,
+   "h": 98,
+   "baseY": 532
+  },
+  {
+   "name": "berry bush E",
+   "x": 1161,
+   "y": 461,
+   "w": 68,
+   "h": 53,
+   "baseY": 510,
+   "sheet": 2
+  },
+  {
+   "name": "rock E",
+   "x": 1122,
+   "y": 487,
+   "w": 51,
+   "h": 30,
+   "baseY": 515
+  },
+  {
+   "name": "lantern tree E",
+   "x": 1340,
+   "y": 262,
+   "w": 196,
+   "h": 451,
+   "baseY": 708
+  },
+  {
+   "name": "big rock SE",
+   "x": 1135,
+   "y": 610,
+   "w": 281,
+   "h": 161,
+   "baseY": 765,
+   "sheet": 2
+  },
+  {
+   "name": "rocks SE",
+   "x": 1050,
+   "y": 605,
+   "w": 131,
+   "h": 96,
+   "baseY": 700
+  },
+  {
+   "name": "pine tip S",
+   "x": 932,
+   "y": 662,
+   "w": 69,
+   "h": 43,
+   "baseY": 864
+  },
+  {
+   "name": "berry bush SE",
+   "x": 1019,
+   "y": 686,
+   "w": 77,
+   "h": 67,
+   "baseY": 745,
+   "sheet": 2
+  }
+ ]
+}

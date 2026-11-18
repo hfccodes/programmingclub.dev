@@ -1,0 +1,103 @@
+{
+ "occluders": [
+  {
+   "name": "banner lamp left",
+   "x": 183,
+   "y": 263,
+   "w": 60,
+   "h": 159,
+   "baseY": 418
+  },
+  {
+   "name": "rock top-left",
+   "x": 208,
+   "y": 290,
+   "w": 77,
+   "h": 58,
+   "baseY": 340,
+   "sheet": 2
+  },
+  {
+   "name": "berry bush left",
+   "x": 159,
+   "y": 448,
+   "w": 87,
+   "h": 78,
+   "baseY": 520,
+   "sheet": 2
+  },
+  {
+   "name": "bench left",
+   "x": 106,
+   "y": 498,
+   "w": 166,
+   "h": 149,
+   "baseY": 612
+  },
+  {
+   "name": "bottom fence and lamps",
+   "x": 558,
+   "y": 706,
+   "w": 402,
+   "h": 125,
+   "baseY": 818
+  },
+  {
+   "name": "lamp right upper",
+   "x": 1375,
+   "y": 327,
+   "w": 31,
+   "h": 92,
+   "baseY": 414
+  },
+  {
+   "name": "lamp right lower",
+   "x": 1373,
+   "y": 456,
+   "w": 36,
+   "h": 78,
+   "baseY": 530
+  },
+  {
+   "name": "berry bush right",
+   "x": 1250,
+   "y": 563,
+   "w": 68,
+   "h": 84,
+   "baseY": 640
+  },
+  {
+   "name": "big rock right",
+   "x": 1104,
+   "y": 647,
+   "w": 201,
+   "h": 130,
+   "baseY": 765
+  },
+  {
+   "name": "snowman plot left (lamps, fence, rocks)",
+   "x": 543,
+   "y": 259,
+   "w": 126,
+   "h": 164,
+   "baseY": 418
+  },
+  {
+   "name": "snowman plot right (lamps, fence, rocks)",
+   "x": 883,
+   "y": 261,
+   "w": 125,
+   "h": 162,
+   "baseY": 418
+  },
+  {
+   "name": "snowman plot front rocks",
+   "x": 662,
+   "y": 391,
+   "w": 233,
+   "h": 51,
+   "baseY": 440,
+   "sheet": 2
+  }
+ ]
+}

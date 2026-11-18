@@ -1,0 +1,3412 @@
+/*
+ * Snow Quest's overlay look: the painted winter night, not the club website. Every overlay sits inside `.qx`, which
+ * carries the tokens; nothing here uses the site's btn/card/chip classes or its greens.
+ *
+ * Contrast (on --qx-night-1 #141a3d): snow 15.6:1, cream 12.4:1, mute 7.6:1, gold 11.2:1, ice 9.6:1, red-hi 5.6:1.
+ * On the code ink (#0c1027): text 15.9:1, comment 5.1:1.
+ */
+:root {
+  --qx-night-0: #0a0e22;
+  --qx-night-1: #141a3d;
+  --qx-night-2: #1c2452;
+  --qx-night-3: #283270;
+  --qx-line: #3a4588;
+  --qx-ink: #0c1027;
+  --qx-ink-2: #121735;
+  --qx-gold: #ffc95c;
+  --qx-gold-hi: #ffe7a8;
+  --qx-gold-lo: #d08f2c;
+  --qx-gold-deep: #6b4512;
+  --qx-snow: #fbf8f1;
+  --qx-cream: #ece2c9;
+  --qx-mute: #aab4dc;
+  --qx-red: #e2493f;
+  --qx-red-hi: #ff8274;
+  --qx-red-deep: #5a1820;
+  --qx-ice: #93d4ff;
+  --qx-ice-deep: #1d4a78;
+  /* Syntax: warm lamp-light colours, no greens. */
+  --qx-syn-text: #f3ead6;
+  --qx-syn-kw: #ff9d7a;
+  --qx-syn-str: #ffd47f;
+  --qx-syn-num: #d2b1ff;
+  --qx-syn-fn: #93d4ff;
+  --qx-syn-com: #7d87b6;
+  --qx-syn-op: #e8b98a;
+  --qx-display: "Mona Sans", system-ui, sans-serif;
+  --qx-mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, monospace;
+  --qx-ease-out: cubic-bezier(0.2, 0.8, 0.25, 1);
+  --qx-ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+.qx {
+  color: var(--qx-snow);
+  font-family: var(--qx-display);
+  -webkit-font-smoothing: antialiased;
+}
+.qx *,
+.qx *::before,
+.qx *::after {
+  box-sizing: border-box;
+}
+.qx :focus-visible {
+  outline: 3px solid var(--qx-gold);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.qx ::selection {
+  background: rgba(255, 201, 92, 0.35);
+  color: var(--qx-snow);
+}
+
+/* ------------------------------------------------------------------ type */
+.qx-display {
+  font-family: var(--qx-display);
+  font-stretch: 125%;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+.qx-eyebrow {
+  font-family: var(--qx-display);
+  font-stretch: 112%;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--qx-gold);
+}
+.qx-mute {
+  color: var(--qx-mute);
+}
+.qx-code-inline {
+  font-family: var(--qx-mono);
+  font-size: 0.92em;
+  padding: 0.05em 0.35em;
+  border-radius: 5px;
+  background: rgba(255, 201, 92, 0.12);
+  color: var(--qx-gold-hi);
+  box-shadow: inset 0 0 0 1px rgba(255, 201, 92, 0.22);
+}
+
+/* ------------------------------------------------------------------ the frame every panel shares */
+.qx-frame {
+  position: relative;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(255, 201, 92, 0.1), transparent 60%),
+    linear-gradient(180deg, var(--qx-night-2), var(--qx-night-1) 40%, var(--qx-night-0));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 4px rgba(255, 201, 92, 0.55),
+    0 0 0 6px var(--qx-night-0),
+    inset 0 1px 0 rgba(255, 231, 168, 0.18),
+    inset 0 0 60px rgba(255, 180, 80, 0.05),
+    0 24px 60px rgba(4, 6, 20, 0.7),
+    0 6px 0 rgba(4, 6, 20, 0.6);
+}
+.qx-panel > .qx-stud.bl,
+.qx-panel > .qx-stud.br {
+  display: none;
+}
+/* Little gold corner studs, like the brass corners on an old trunk. */
+.qx-frame > .qx-stud {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--qx-gold);
+  pointer-events: none;
+  z-index: 2;
+}
+.qx-stud.tl {
+  top: 8px;
+  left: 8px;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 6px;
+}
+.qx-stud.tr {
+  top: 8px;
+  right: 8px;
+  border-left: 0;
+  border-bottom: 0;
+  border-top-right-radius: 6px;
+}
+.qx-stud.bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: 0;
+  border-top: 0;
+  border-bottom-left-radius: 6px;
+}
+.qx-stud.br {
+  bottom: 8px;
+  right: 8px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: 6px;
+}
+.qx-rule {
+  height: 2px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(90deg, transparent, var(--qx-gold) 12%, var(--qx-gold) 88%, transparent);
+  opacity: 0.6;
+}
+
+/* ------------------------------------------------------------------ keycaps */
+.qx-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7em;
+  height: 1.7em;
+  padding: 0 0.45em;
+  margin: 0 0.12em;
+  border-radius: 6px;
+  font: 700 0.78em/1 var(--qx-mono);
+  color: var(--qx-snow);
+  background: linear-gradient(180deg, #333d7c, #222a5c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px #0a0e22,
+    0 3px 0 #0a0e22;
+  transform: translateY(-1px);
+  vertical-align: middle;
+}
+.qx-key.on-gold {
+  color: #2a1a04;
+  background: linear-gradient(180deg, #fff1c8, #ffd98a);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 0 0 1px var(--qx-gold-deep),
+    0 2px 0 var(--qx-gold-deep);
+}
+
+/* ------------------------------------------------------------------ buttons */
+.qx-btn {
+  --b-face: linear-gradient(180deg, #34408a, #252e68);
+  --b-edge: #0a0e22;
+  --b-text: var(--qx-snow);
+  --b-glow: transparent;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.7em 1.15em;
+  border: 0;
+  border-radius: 12px;
+  font: 800 1rem/1 var(--qx-display);
+  font-stretch: 108%;
+  letter-spacing: 0.01em;
+  color: var(--b-text);
+  background: var(--b-face);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 2px var(--b-edge),
+    0 5px 0 var(--b-edge),
+    0 6px 18px var(--b-glow);
+  transform: translateY(0);
+  transition:
+    transform 0.08s ease-out,
+    box-shadow 0.08s ease-out,
+    filter 0.12s;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.qx-btn:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 2px var(--b-edge),
+    0 6px 0 var(--b-edge),
+    0 8px 24px var(--b-glow);
+}
+.qx-btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 2px var(--b-edge),
+    0 1px 0 var(--b-edge);
+}
+.qx-btn:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.6) brightness(0.85);
+  opacity: 0.7;
+}
+.qx-btn.gold:disabled {
+  filter: saturate(0.7);
+  opacity: 0.5;
+  --b-glow: transparent;
+}
+.qx-btn.gold {
+  --b-face: linear-gradient(180deg, #ffe39a 0%, #ffc95c 45%, #f2a93b 100%);
+  --b-edge: #5e3c0e;
+  --b-text: #2b1904;
+  --b-glow: rgba(255, 190, 80, 0.35);
+}
+.qx-btn.ice {
+  --b-face: linear-gradient(180deg, #c4e9ff 0%, #93d4ff 50%, #66b4ec 100%);
+  --b-edge: #12345a;
+  --b-text: #0b1a33;
+  --b-glow: rgba(120, 190, 255, 0.25);
+}
+.qx-btn.big {
+  padding: 0.8em 1.4em;
+  font-size: 1.15rem;
+  border-radius: 14px;
+}
+.qx-btn.sm {
+  padding: 0.5em 0.8em;
+  font-size: 0.88rem;
+  border-radius: 10px;
+}
+/* A quiet action: no slab, just a soft pill that lights up. */
+.qx-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.42em 0.75em;
+  border: 0;
+  border-radius: 999px;
+  font: 700 0.85rem/1 var(--qx-display);
+  color: var(--qx-mute);
+  background: rgba(147, 212, 255, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.18);
+  cursor: pointer;
+  transition:
+    color 0.12s,
+    background 0.12s,
+    box-shadow 0.12s;
+}
+.qx-quiet:hover:not(:disabled) {
+  color: var(--qx-snow);
+  background: rgba(147, 212, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.4);
+}
+.qx-quiet:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.qx-quiet svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* ------------------------------------------------------------------ code */
+.qx-code {
+  margin: 0;
+  font: 400 1.02rem/1.6 var(--qx-mono);
+  color: var(--qx-syn-text);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 30%), var(--qx-ink);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(147, 212, 255, 0.1),
+    0 1px 0 rgba(255, 231, 168, 0.08);
+  padding: 0.85rem 1.1rem;
+  overflow: auto;
+  white-space: pre;
+  tab-size: 4;
+  scrollbar-color: var(--qx-line) transparent;
+}
+.qx-code.wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.s-kw {
+  color: var(--qx-syn-kw);
+  font-weight: 700;
+}
+.s-str {
+  color: var(--qx-syn-str);
+}
+.s-num {
+  color: var(--qx-syn-num);
+}
+.s-fn {
+  color: var(--qx-syn-fn);
+}
+.s-com {
+  color: var(--qx-syn-com);
+  font-style: italic;
+}
+.s-op {
+  color: var(--qx-syn-op);
+}
+
+/* ------------------------------------------------------------------ the terminal panel */
+.qx-panel-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 18px;
+  background: linear-gradient(90deg, rgba(6, 8, 22, 0.15), rgba(6, 8, 22, 0.55) 55%, rgba(6, 8, 22, 0.75));
+  animation: qx-fade 0.2s ease-out both;
+  user-select: text;
+}
+.qx-panel {
+  width: min(820px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: qx-panel-in 0.32s var(--qx-ease-out) both;
+}
+.qx-panel-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.4rem 1.05rem;
+  background: radial-gradient(80% 140% at 0% 0%, rgba(255, 201, 92, 0.16), transparent 60%), linear-gradient(180deg, #232c62, #19204a);
+  border-bottom: 2px solid rgba(255, 201, 92, 0.35);
+  box-shadow: 0 6px 18px rgba(4, 6, 20, 0.35);
+  z-index: 1;
+}
+.qx-icon-frame {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  padding: 3px;
+  background: linear-gradient(160deg, var(--qx-gold-hi), var(--qx-gold-lo));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 22px rgba(255, 201, 92, 0.35);
+}
+.qx-icon-frame img,
+.qx-icon-frame > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 11px;
+  object-fit: cover;
+  background: var(--qx-night-0);
+  display: block;
+}
+.qx-panel-title {
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  color: var(--qx-snow);
+  text-shadow: 0 3px 0 rgba(6, 8, 22, 0.8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.15rem;
+}
+.qx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+.qx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.28em 0.65em;
+  border-radius: 999px;
+  font: 800 0.8rem/1 var(--qx-display);
+  font-stretch: 108%;
+  letter-spacing: 0.03em;
+}
+.qx-chip.gold {
+  color: #2b1904;
+  background: linear-gradient(180deg, var(--qx-gold-hi), var(--qx-gold));
+  box-shadow: 0 0 0 1px var(--qx-gold-deep);
+}
+.qx-chip.ice {
+  color: var(--qx-ice);
+  background: rgba(147, 212, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.35);
+}
+.qx-chip.red {
+  color: #fff;
+  background: var(--qx-red);
+  box-shadow: 0 0 0 1px var(--qx-red-deep);
+}
+
+.qx-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  scrollbar-color: var(--qx-line) transparent;
+  scrollbar-gutter: stable;
+}
+.qx-panel-body > * {
+  flex-shrink: 0;
+}
+.qx-story {
+  color: var(--qx-cream);
+  max-width: 64ch;
+}
+.qx-story p + p,
+.qx-question-text > * + * {
+  margin-top: 0.7rem;
+}
+.qx-story .qx-code {
+  margin: 0.7rem 0;
+}
+
+/* The question: the hero of the panel. */
+.qx-question {
+  position: relative;
+  padding: 1.15rem 1.25rem 1.25rem;
+  border-radius: 14px;
+  background:
+    radial-gradient(100% 120% at 100% 0%, rgba(255, 201, 92, 0.1), transparent 55%),
+    linear-gradient(180deg, rgba(40, 50, 112, 0.75), rgba(26, 33, 78, 0.75));
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 201, 92, 0.45),
+    inset 0 1px 0 rgba(255, 231, 168, 0.2),
+    0 10px 24px rgba(4, 6, 20, 0.35);
+}
+.qx-question .qx-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+.qx-question .qx-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(255, 201, 92, 0.5), transparent);
+}
+.qx-question-text {
+  font-size: 1.32rem;
+  font-weight: 650;
+  line-height: 1.55;
+  color: var(--qx-snow);
+}
+.qx-question-text .qx-code {
+  font-size: 1.08rem;
+  font-weight: 400;
+  margin: 0.8rem 0 0.2rem;
+}
+
+/* Sections: input, example, hint, scratchpad. */
+.qx-section {
+  border-radius: 14px;
+  background: rgba(10, 14, 34, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.14);
+}
+.qx-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem 0.75rem 1.1rem;
+}
+.qx-section-title {
+  font: 800 1rem/1.2 var(--qx-display);
+  font-stretch: 108%;
+  color: var(--qx-snow);
+}
+.qx-section-sub {
+  font-size: 0.88rem;
+  color: var(--qx-mute);
+}
+.qx-section-body {
+  padding: 0 1.1rem 1.1rem;
+}
+.qx-section-body > * + * {
+  margin-top: 0.75rem;
+}
+.qx-input-code {
+  max-height: 13.5rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1rem;
+  padding: 0.75rem 1rem 0.75rem 0;
+}
+.qx-input-code .ln {
+  text-align: right;
+  color: #4f5a91;
+  user-select: none;
+  padding-left: 0.9rem;
+  padding-right: 0.15rem;
+  border-right: 1px solid rgba(147, 212, 255, 0.1);
+}
+
+/* A toggle that opens a tucked-away section. */
+.qx-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.1rem;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--qx-snow);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background 0.12s;
+}
+.qx-toggle:hover {
+  background: rgba(147, 212, 255, 0.06);
+}
+.qx-toggle .chev {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 201, 92, 0.14);
+  color: var(--qx-gold);
+  transition: transform 0.2s var(--qx-ease-out);
+}
+.qx-toggle[aria-expanded="true"] .chev {
+  transform: rotate(90deg);
+}
+.qx-toggle .glyph {
+  font-size: 1.3rem;
+  line-height: 1;
+  width: 1.6rem;
+  text-align: center;
+}
+.qx-reveal {
+  animation: qx-reveal 0.22s var(--qx-ease-out) both;
+}
+.qx-hint-card {
+  background: radial-gradient(90% 140% at 0% 0%, rgba(255, 201, 92, 0.2), transparent 70%), rgba(42, 30, 12, 0.5);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 201, 92, 0.4);
+}
+.qx-hint-text {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--qx-gold-hi);
+}
+.qx-answer-tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(255, 201, 92, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 201, 92, 0.35);
+  font-weight: 700;
+}
+.qx-answer-tag code {
+  font: 700 1.05rem/1.2 var(--qx-mono);
+  color: var(--qx-gold-hi);
+}
+
+/* The answer dock: always in view at the panel's foot. */
+.qx-dock {
+  position: relative;
+  padding: 1rem 1.4rem 1.2rem;
+  background: radial-gradient(70% 160% at 50% 100%, rgba(255, 201, 92, 0.14), transparent 70%), linear-gradient(180deg, #1b2350, #121838);
+  border-top: 2px solid rgba(255, 201, 92, 0.35);
+  box-shadow: 0 -10px 24px rgba(4, 6, 20, 0.45);
+}
+.qx-dock-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+}
+.qx-dock-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: stretch;
+}
+.qx-answer-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1rem;
+  border-radius: 12px;
+  background: var(--qx-ink);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 2px var(--qx-gold-lo),
+    0 0 0 4px rgba(255, 201, 92, 0.12);
+  transition: box-shadow 0.15s;
+}
+.qx-answer-field:focus-within {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 2px var(--qx-gold),
+    0 0 0 6px rgba(255, 201, 92, 0.25),
+    0 0 26px rgba(255, 201, 92, 0.25);
+}
+.qx-answer-field .prompt {
+  font: 700 1.35rem/1 var(--qx-mono);
+  color: var(--qx-gold);
+  user-select: none;
+}
+.qx-answer-field input {
+  flex: 1;
+  min-width: 0;
+  height: 3.4rem;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: 700 1.4rem/1 var(--qx-mono);
+  color: var(--qx-snow);
+  caret-color: var(--qx-gold);
+}
+.qx-answer-field input::placeholder {
+  color: #6c77ad;
+  font: italic 500 1.05rem/1 var(--qx-display);
+}
+.qx-answer-field input:focus-visible {
+  outline: none;
+}
+.qx-answer-field input:disabled {
+  color: var(--qx-mute);
+}
+.qx-dock.wrong .qx-answer-field {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 2px var(--qx-red),
+    0 0 0 6px rgba(226, 73, 63, 0.22);
+}
+.qx-dock .qx-btn.gold {
+  min-width: 9.5rem;
+}
+.qx-cool {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.qx-cool-msg {
+  flex: 1;
+  font-weight: 650;
+  color: var(--qx-red-hi);
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+.qx-cool-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(226, 73, 63, 0.18);
+  overflow: hidden;
+  margin-top: 0.45rem;
+}
+.qx-cool-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--qx-red), var(--qx-red-hi));
+  transform-origin: left;
+  transition: transform 0.25s linear;
+}
+.qx-error {
+  margin-top: 0.7rem;
+  color: var(--qx-red-hi);
+  font-weight: 650;
+}
+
+/* Solved: the reward card at the top of the panel. */
+.qx-solved {
+  position: relative;
+  overflow: hidden;
+  padding: 1.2rem 1.3rem;
+  border-radius: 16px;
+  color: #2b1904;
+  background: radial-gradient(120% 140% at 10% 0%, #fff4cf, transparent 60%), linear-gradient(180deg, #ffd77a, #f5ae40);
+  box-shadow:
+    0 0 0 2px var(--qx-gold-deep),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(255, 201, 92, 0.35);
+}
+.qx-solved {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+.qx-solved-badge {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 2.1rem;
+  color: var(--qx-gold-hi);
+  background: radial-gradient(circle at 40% 35%, #3a4590, var(--qx-night-1));
+  box-shadow:
+    0 0 0 3px var(--qx-gold-deep),
+    0 0 0 6px rgba(255, 255, 255, 0.35),
+    0 6px 14px rgba(90, 50, 0, 0.35);
+}
+.qx-solved.fresh .qx-solved-badge {
+  animation: qx-twinkle 1.6s ease-in-out 2;
+}
+.qx-solved.fresh {
+  animation: qx-pop 0.5s var(--qx-ease-pop) both;
+}
+.qx-solved-title {
+  font-size: 2rem;
+  color: #2b1904;
+}
+.qx-solved p {
+  font-weight: 650;
+}
+.qx-solved .qx-btn {
+  margin-top: 0.8rem;
+}
+.qx-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.qx-sparks i {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: qx-spark 1.4s ease-out both;
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ Python scratchpad */
+.qx-pad .qx-toggle .glyph {
+  color: var(--qx-ice);
+}
+.qx-editor {
+  position: relative;
+  display: flex;
+  border-radius: 12px;
+  background: var(--qx-ink);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(147, 212, 255, 0.12);
+  font: 400 1rem/1.6 var(--qx-mono);
+  transition: box-shadow 0.15s;
+}
+.qx-editor:focus-within {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    0 0 0 2px var(--qx-ice),
+    0 0 0 5px rgba(147, 212, 255, 0.18);
+}
+.qx-editor-gutter {
+  margin: 0;
+  padding: 0.85rem 0.7rem 0.85rem 0.9rem;
+  text-align: right;
+  color: #4f5a91;
+  user-select: none;
+  font: inherit;
+  border-right: 1px solid rgba(147, 212, 255, 0.1);
+}
+.qx-editor-gutter .bad {
+  display: block;
+  margin-right: -0.7rem;
+  padding-right: 0.7rem;
+  background: var(--qx-red);
+  color: #fff;
+  font-weight: 700;
+}
+.qx-editor-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-color: var(--qx-line) transparent;
+}
+.qx-editor-grid {
+  display: grid;
+  min-width: 100%;
+  width: max-content;
+}
+.qx-editor-grid > * {
+  grid-area: 1 / 1;
+  margin: 0;
+  padding: 0.85rem 1.1rem 0.85rem 0.9rem;
+  font: inherit;
+  white-space: pre;
+  tab-size: 4;
+  border: 0;
+}
+.qx-editor-grid pre {
+  color: var(--qx-syn-text);
+  pointer-events: none;
+}
+.qx-editor-grid textarea {
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--qx-gold);
+  width: 100%;
+}
+.qx-editor-grid textarea::selection {
+  background: rgba(147, 212, 255, 0.3);
+  color: transparent;
+}
+.qx-pad-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+.qx-pad-status {
+  font-size: 0.92rem;
+  color: var(--qx-mute);
+}
+.qx-pad-status.bad {
+  color: var(--qx-red-hi);
+  font-weight: 650;
+}
+.qx-out {
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--qx-ink);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.14);
+  transition: opacity 0.15s;
+}
+.qx-out.stale {
+  opacity: 0.6;
+}
+.qx-out-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem;
+  font: 800 0.8rem/1.2 var(--qx-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qx-ice);
+  background: rgba(147, 212, 255, 0.07);
+  border-bottom: 1px solid rgba(147, 212, 255, 0.12);
+}
+.qx-out-head .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--qx-ice);
+  box-shadow: 0 0 10px var(--qx-ice);
+}
+.qx-out.crashed .qx-out-head {
+  color: var(--qx-red-hi);
+  background: rgba(226, 73, 63, 0.12);
+}
+.qx-out.crashed .qx-out-head .dot {
+  background: var(--qx-red-hi);
+  box-shadow: 0 0 10px var(--qx-red-hi);
+}
+.qx-out .qx-code {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  max-height: 14rem;
+  font-size: 0.95rem;
+}
+.qx-trace {
+  margin: 0 0.9rem 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(226, 73, 63, 0.1);
+  box-shadow: inset 3px 0 0 var(--qx-red);
+}
+.qx-trace-last {
+  font: 700 1rem/1.4 var(--qx-mono);
+  color: var(--qx-red-hi);
+  overflow-wrap: anywhere;
+}
+.qx-trace .qx-code {
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+.qx-trace summary {
+  cursor: pointer;
+  margin-top: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--qx-mute);
+}
+
+/* ------------------------------------------------------------------ dialogue */
+.qx-dialog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3.6rem;
+  margin: 0 auto;
+  width: min(940px, calc(100vw - 32px));
+  display: flex;
+  gap: 1.3rem;
+  padding: 1.3rem 1.5rem 1.1rem;
+  cursor: pointer;
+  animation: qx-rise 0.28s var(--qx-ease-out) both;
+}
+.qx-portrait {
+  position: relative;
+  flex-shrink: 0;
+  width: 148px;
+  align-self: flex-start;
+  margin-top: -3.2rem;
+  padding: 4px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--qx-gold-hi), var(--qx-gold-lo) 60%, var(--qx-gold-deep));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 14px 30px rgba(4, 6, 20, 0.6);
+  transform: rotate(-2deg);
+}
+.qx-portrait img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 30%, #3a4590, #141a3d);
+}
+.qx-nameplate {
+  display: table;
+  margin-top: -2.55rem;
+  margin-bottom: 0.7rem;
+  padding: 0.42rem 1rem 0.45rem;
+  border-radius: 10px;
+  font: 900 1.05rem/1 var(--qx-display);
+  font-stretch: 118%;
+  letter-spacing: 0.02em;
+  color: #2b1904;
+  background: linear-gradient(180deg, var(--qx-gold-hi), var(--qx-gold));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 4px 0 var(--qx-gold-deep),
+    0 6px 12px rgba(4, 6, 20, 0.5);
+}
+.qx-dialog-line {
+  min-height: 4.6em;
+  font-size: 1.32rem;
+  line-height: 1.5;
+  font-weight: 550;
+  color: var(--qx-snow);
+  text-wrap: pretty;
+}
+.qx-dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--qx-mute);
+}
+.qx-pips {
+  display: flex;
+  gap: 6px;
+}
+.qx-pips i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--qx-line);
+}
+.qx-pips i.on {
+  background: var(--qx-gold);
+  box-shadow: 0 0 8px rgba(255, 201, 92, 0.7);
+}
+.qx-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--qx-cream);
+}
+.qx-next .arrow {
+  color: var(--qx-gold);
+  font-size: 1rem;
+  animation: qx-bob 0.9s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------ moments: level up, secret, ending, shed */
+.qx-scrim {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at center, rgba(10, 14, 34, 0.55), rgba(6, 8, 22, 0.88));
+  animation: qx-fade 0.25s ease-out both;
+}
+.qx-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150vmax;
+  height: 150vmax;
+  margin: -75vmax 0 0 -75vmax;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 201, 92, 0.13) 0deg 7deg, transparent 7deg 20deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 45%);
+  animation: qx-spin 40s linear infinite;
+  pointer-events: none;
+}
+.qx-moment {
+  position: relative;
+  text-align: center;
+  animation: qx-pop 0.55s var(--qx-ease-pop) both;
+}
+.qx-ribbon {
+  display: inline-block;
+  padding: 0.5rem 1.6rem 0.55rem;
+  font: 900 1.05rem/1 var(--qx-display);
+  font-stretch: 125%;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, #ff6d62, var(--qx-red) 60%, #b8322b);
+  clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%);
+  text-shadow: 0 2px 0 rgba(90, 24, 32, 0.6);
+}
+.qx-big-num {
+  font-size: clamp(5rem, 12vw, 9.5rem);
+  background: linear-gradient(180deg, #fff6d8 10%, var(--qx-gold) 55%, #e2902c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 0 #3b2608) drop-shadow(0 0 40px rgba(255, 201, 92, 0.45));
+  margin-top: 0.6rem;
+}
+.qx-moment-title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  margin-top: 0.4rem;
+  text-shadow: 0 3px 0 rgba(6, 8, 22, 0.9);
+}
+.qx-moment-line {
+  margin-top: 0.7rem;
+  font-size: 1.25rem;
+  color: var(--qx-cream);
+  text-shadow: 0 2px 8px rgba(6, 8, 22, 0.9);
+}
+.qx-continue {
+  margin-top: 1.8rem;
+  font-size: 0.95rem;
+  color: var(--qx-mute);
+  animation: qx-breathe 1.8s ease-in-out infinite;
+}
+.qx-secret-card {
+  width: min(560px, calc(100vw - 32px));
+  padding: 2.4rem 2.2rem 1.8rem;
+  text-align: center;
+}
+.qx-star {
+  width: 84px;
+  height: 84px;
+  margin: -5rem auto 0.8rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff4cf, var(--qx-gold) 55%, var(--qx-gold-lo));
+  box-shadow:
+    0 0 0 3px var(--qx-night-0),
+    0 0 0 6px rgba(255, 201, 92, 0.5),
+    0 0 50px rgba(255, 201, 92, 0.6);
+  font-size: 2.6rem;
+  color: #3b2608;
+  animation: qx-twinkle 2.4s ease-in-out infinite;
+}
+.qx-ending {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--qx-night-0);
+}
+.qx-ending-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.95;
+}
+.qx-ending-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(10, 14, 34, 0.96) 8%, rgba(10, 14, 34, 0.55) 40%, transparent 70%);
+}
+.qx-ending-text {
+  position: relative;
+  margin-top: 34vh;
+  text-align: center;
+  padding: 0 16px;
+}
+.qx-ending-title {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  text-shadow:
+    0 4px 0 rgba(6, 8, 22, 0.9),
+    0 0 40px rgba(255, 201, 92, 0.35);
+  margin-top: 0.3rem;
+}
+.qx-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+.qx-stat {
+  min-width: 7.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  background: rgba(20, 26, 61, 0.82);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 201, 92, 0.4),
+    0 8px 20px rgba(4, 6, 20, 0.5);
+}
+.qx-stat b {
+  display: block;
+  font: 900 1.7rem/1.1 var(--qx-display);
+  font-stretch: 120%;
+  color: var(--qx-gold);
+}
+.qx-stat span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--qx-mute);
+}
+/* ------------------------------------------------------------------ title and HUD (restyled only) */
+.qx-hud-card {
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(28, 36, 82, 0.92), rgba(16, 21, 50, 0.92));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 3.5px rgba(255, 201, 92, 0.4),
+    inset 0 1px 0 rgba(255, 231, 168, 0.15),
+    0 12px 30px rgba(4, 6, 20, 0.55);
+  backdrop-filter: blur(4px);
+}
+.qx-xp {
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--qx-ink);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 201, 92, 0.3);
+}
+.qx-xp > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fff1c8, var(--qx-gold) 55%, #e8992f);
+  box-shadow: 0 0 10px rgba(255, 201, 92, 0.6);
+  transition: width 0.7s var(--qx-ease-out);
+}
+
+/* The title's logo and the controls strip along the bottom. */
+.qx-logo {
+  font-size: clamp(3.4rem, 8vw, 6.6rem);
+  color: var(--qx-snow);
+  text-shadow:
+    0 2px 0 #d9e4ff,
+    0 6px 0 #1c2452,
+    0 8px 0 #0a0e22,
+    0 0 50px rgba(255, 201, 92, 0.35);
+}
+.qx-pill {
+  border-radius: 999px;
+  background: rgba(16, 21, 50, 0.85);
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 3.5px rgba(255, 201, 92, 0.3),
+    0 8px 20px rgba(4, 6, 20, 0.5);
+  color: var(--qx-cream);
+}
+
+/* ------------------------------------------------------------------ motion */
+@keyframes qx-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes qx-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+  }
+}
+@keyframes qx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+@keyframes qx-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes qx-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes qx-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+.qx-shake {
+  animation: qx-shake 0.42s ease-out;
+}
+@keyframes qx-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2) rotate(0);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(140deg);
+  }
+}
+@keyframes qx-bob {
+  50% {
+    transform: translateY(3px);
+  }
+}
+@keyframes qx-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes qx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes qx-twinkle {
+  50% {
+    transform: scale(1.06) rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qx *,
+  .qx *::before,
+  .qx *::after,
+  .qx {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .qx-rays {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ panel, round two: one clear path */
+.qx-panel-head {
+  padding: 0.75rem 1.1rem 0.75rem 1.2rem;
+  gap: 0.85rem;
+}
+.qx-panel-head .qx-icon-frame {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+}
+.qx-panel-head .qx-icon-frame img,
+.qx-panel-head .qx-icon-frame > div {
+  border-radius: 8px;
+}
+.qx-panel-head .qx-panel-title {
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  margin-top: 0;
+}
+.qx-panel-head .qx-chips {
+  margin-top: 0;
+}
+.qx-panel-body {
+  padding-bottom: 2.75rem;
+  /* Content fades out softly above the pinned answer bar instead of being sliced. */
+  mask-image: linear-gradient(180deg, #000 calc(100% - 2.25rem), transparent);
+}
+.qx-question .qx-question-text p:first-child {
+  margin-top: 0;
+}
+/* The player's own short data, right inside the question. */
+.qx-mine {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1.5px dashed rgba(255, 201, 92, 0.3);
+}
+.qx-mine-label {
+  font: 800 0.8rem/1.2 var(--qx-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qx-gold);
+  margin-bottom: 0.45rem;
+}
+.qx-mine-data {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: 12px;
+  background: var(--qx-ink);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    0 0 0 1.5px rgba(255, 201, 92, 0.35);
+  font: 700 clamp(1.5rem, 2.4vw, 2rem) / 1.35 var(--qx-mono);
+  letter-spacing: 0.06em;
+  word-spacing: 0.35em;
+  color: var(--qx-gold-hi);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.qx-mine .qx-code {
+  font-size: 1.1rem;
+}
+/* Help: two small buttons that open in place. */
+.qx-help-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.qx-help > * + * {
+  margin-top: 0.75rem;
+}
+.qx-help-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem 0.45rem 0.5rem;
+  border: 0;
+  border-radius: 999px;
+  font: 700 0.95rem/1 var(--qx-display);
+  color: var(--qx-cream);
+  background: rgba(147, 212, 255, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.22);
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+.qx-help-btn:hover {
+  background: rgba(147, 212, 255, 0.14);
+  color: var(--qx-snow);
+}
+.qx-help-btn .chev {
+  width: 1.3rem;
+  height: 1.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 201, 92, 0.14);
+  color: var(--qx-gold);
+  transition: transform 0.2s var(--qx-ease-out);
+}
+.qx-help-btn[aria-expanded="true"] {
+  color: var(--qx-snow);
+  background: rgba(147, 212, 255, 0.16);
+}
+.qx-help-btn[aria-expanded="true"] .chev {
+  transform: rotate(90deg);
+}
+/* The example: ice-tinted, labelled, so nobody adds its numbers to their own. */
+.qx-example {
+  padding: 0.9rem 1rem 1rem;
+  border-radius: 14px;
+  background: rgba(29, 74, 120, 0.28);
+  box-shadow: inset 0 0 0 1.5px rgba(147, 212, 255, 0.35);
+  color: var(--qx-cream);
+  font-size: 1rem;
+}
+.qx-example-label {
+  display: inline-block;
+  margin-bottom: 0.55rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font: 800 0.75rem/1 var(--qx-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #0b1a33;
+  background: var(--qx-ice);
+}
+.qx-example .qx-code {
+  background: rgba(8, 20, 40, 0.75);
+  color: #cfe9ff;
+  font-size: 0.95rem;
+}
+.qx-help .qx-hint-card {
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+}
+.qx-list-code {
+  max-height: 11.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.qx-list .qx-section-body > .qx-section-sub {
+  margin-top: -0.2rem;
+}
+.qx-pad.big {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(147, 212, 255, 0.55),
+    0 0 24px rgba(147, 212, 255, 0.12);
+  background: rgba(29, 74, 120, 0.22);
+}
+.qx-pad.big .qx-section-title {
+  color: var(--qx-ice);
+}
+
+/* ------------------------------------------------------------------ HUD: laid over the game box, not the window */
+:root {
+  /* The 16:9 game box the canvas is fitted into (Phaser FIT + centre), and the letterbox bars around it. */
+  --qx-gw: min(100vw, 100dvh * 16 / 9);
+  --qx-gh: min(100dvh, 100vw * 9 / 16);
+  --qx-bar-x: calc((100vw - var(--qx-gw)) / 2);
+  --qx-bar-y: calc((100dvh - var(--qx-gh)) / 2);
+}
+.qx-stage {
+  position: absolute;
+  left: var(--qx-bar-x);
+  top: var(--qx-bar-y);
+  width: var(--qx-gw);
+  height: var(--qx-gh);
+  container-type: size;
+  pointer-events: none;
+  font-size: clamp(11px, 1.02cqw, 18px);
+}
+.qx-stage button {
+  pointer-events: auto;
+}
+/* Text that sits straight on the painting: a soft dark halo instead of a card. */
+.qx-hud-left,
+.qx-hud-right,
+.qx-arrival,
+.qx-controls {
+  text-shadow:
+    0 1px 2px rgba(6, 8, 22, 0.95),
+    0 0 10px rgba(6, 8, 22, 0.75);
+}
+.qx-hud-left,
+.qx-hud-right {
+  position: absolute;
+  top: 1.4cqh;
+  display: flex;
+  border-radius: 1cqw;
+  background: radial-gradient(closest-side, rgba(10, 14, 34, 0.55), rgba(10, 14, 34, 0.3) 70%, transparent);
+}
+.qx-hud-left {
+  left: 1.2cqw;
+  flex-direction: column;
+  gap: 0.35em;
+  max-width: 31cqw;
+  padding: 0.5em 1.2em 0.6em 0.6em;
+}
+.qx-hud-name {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  font-size: 1.3em;
+  line-height: 1;
+}
+.qx-tag {
+  font: 800 0.55em/1 var(--qx-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.35em 0.6em;
+  border-radius: 999px;
+  color: var(--qx-ice);
+  background: rgba(10, 14, 34, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.45);
+  text-shadow: none;
+}
+.qx-tag.live {
+  color: #fff;
+  background: var(--qx-red);
+  box-shadow: none;
+}
+.qx-hud-level {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.86em;
+  color: var(--qx-cream);
+  white-space: nowrap;
+}
+.qx-hud-level b {
+  color: var(--qx-gold);
+}
+.qx-hud-xp {
+  position: relative;
+  width: 7cqw;
+  height: 0.45em;
+  min-height: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(10, 14, 34, 0.8);
+  box-shadow: 0 0 0 1px rgba(255, 201, 92, 0.35);
+}
+.qx-hud-xp > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--qx-gold-lo), var(--qx-gold-hi));
+  box-shadow: 0 0 8px rgba(255, 201, 92, 0.7);
+  transition: width 0.7s var(--qx-ease-out);
+}
+.qx-hud-xpnum {
+  font-size: 0.85em;
+  color: var(--qx-mute);
+}
+.qx-hud-goal {
+  font-size: 0.86em;
+  line-height: 1.3;
+  color: var(--qx-snow);
+  opacity: 0.62;
+  transition: opacity 1.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qx-hud-goal.fresh {
+  opacity: 1;
+  transition-duration: 0.2s;
+}
+.qx-hud-goal b {
+  color: var(--qx-gold);
+}
+.qx-hud-right {
+  right: 1.2cqw;
+  align-items: center;
+  gap: 0.9em;
+  padding: 0.45em 0.6em 0.45em 1.2em;
+}
+.qx-hud-where {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 13cqw;
+  line-height: 1.15;
+}
+.qx-hud-where span {
+  font: 800 0.62em/1.2 var(--qx-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qx-mute);
+}
+.qx-hud-where b {
+  font-size: 0.92em;
+  color: var(--qx-cream);
+  text-align: right;
+}
+.qx-map {
+  height: 6.4cqw;
+  max-height: 11.5cqh;
+  padding: 0.15em 0.35em;
+  border-radius: 0.6em;
+  background: rgba(10, 14, 34, 0.5);
+}
+.qx-map svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  filter: drop-shadow(0 1px 3px rgba(6, 8, 22, 0.9));
+}
+.qx-points {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 6.5cqw;
+  padding: 0.35em 0.8em 0.4em;
+  border-radius: 0.8em;
+  background: linear-gradient(180deg, rgba(40, 30, 10, 0.75), rgba(20, 16, 8, 0.75));
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 201, 92, 0.6),
+    0 0 18px rgba(255, 201, 92, 0.18);
+  text-shadow: none;
+}
+.qx-points-label {
+  font: 800 0.58em/1.2 var(--qx-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qx-gold-hi);
+  white-space: nowrap;
+}
+.qx-points b {
+  font-size: 2.1em;
+  line-height: 1;
+  color: var(--qx-gold);
+  text-shadow: 0 2px 0 #3b2608;
+  font-variant-numeric: tabular-nums;
+}
+.qx-points-rank {
+  font-size: 0.7em;
+  font-weight: 700;
+  color: var(--qx-cream);
+}
+.qx-points.bump b {
+  animation: qx-tick 0.6s var(--qx-ease-pop);
+}
+.qx-points-gain {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  font: 900 1.1em/1 var(--qx-display);
+  color: var(--qx-gold-hi);
+  text-shadow: 0 2px 6px rgba(6, 8, 22, 0.9);
+  animation: qx-gain 1.6s ease-out both;
+}
+@keyframes qx-tick {
+  40% {
+    transform: scale(1.3);
+    color: #fff4cf;
+  }
+}
+@keyframes qx-gain {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, 10%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 60%);
+  }
+}
+.qx-hud-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+.qx-icon-btn {
+  width: 2em;
+  height: 2em;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--qx-cream);
+  background: rgba(10, 14, 34, 0.65);
+  box-shadow: inset 0 0 0 1px rgba(236, 226, 201, 0.3);
+  font: 800 1em/1 var(--qx-display);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    opacity 0.3s;
+}
+.qx-icon-btn:hover {
+  color: var(--qx-gold);
+  background: rgba(10, 14, 34, 0.85);
+}
+.qx-icon-btn svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+/* Controls: a strip at the bottom while you learn, then a small "?" in the bottom corner. */
+.qx-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 1.6cqh;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.9em;
+  color: var(--qx-cream);
+  padding: 0.45em 1.1em;
+  border-radius: 999px;
+  background: rgba(10, 14, 34, 0.6);
+  transition:
+    opacity 0.6s,
+    transform 0.6s;
+}
+.qx-controls.gone {
+  opacity: 0;
+  transform: translate(-50%, 0.6em);
+}
+.qx-help-q {
+  position: absolute;
+  right: 1.2cqw;
+  bottom: 1.6cqh;
+  width: 1.7em;
+  height: 1.7em;
+  font-size: 0.95em;
+  opacity: 0.7;
+}
+.qx-help-q.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Arrival: centred in the top band, between the two corner clusters, never wider than the gap. */
+.qx-arrival {
+  position: absolute;
+  left: 50%;
+  top: 2.2cqh;
+  width: 38cqw;
+  text-align: center;
+  transform: translateX(-50%);
+  animation: qx-arrive 2.2s ease-out both;
+}
+.qx-arrival-eyebrow {
+  font: 800 0.8em/1.2 var(--qx-display);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--qx-gold);
+}
+.qx-arrival-title {
+  font-size: 2.55cqw;
+  margin-top: 0.15em;
+  white-space: nowrap;
+  color: var(--qx-snow);
+  text-shadow:
+    0 3px 0 rgba(6, 8, 22, 0.9),
+    0 0 24px rgba(6, 8, 22, 0.8),
+    0 0 40px rgba(255, 201, 92, 0.3);
+}
+@keyframes qx-arrive {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -0.6em);
+  }
+  14%,
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* Toasts: one home, under the top band, clear of the arrival title and the dialogue box. */
+.qx-toasts {
+  position: absolute;
+  left: 50%;
+  top: 16cqh;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 46cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+.qx-toast {
+  padding: 0.6em 1.1em;
+  border-radius: 0.9em;
+  font-weight: 650;
+  text-align: center;
+  color: var(--qx-snow);
+  background: rgba(20, 26, 61, 0.92);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(147, 212, 255, 0.5),
+    0 10px 24px rgba(4, 6, 20, 0.6);
+  animation: qx-rise 0.25s var(--qx-ease-out) both;
+}
+.qx-toast.good {
+  background: linear-gradient(180deg, rgba(60, 44, 12, 0.95), rgba(36, 26, 8, 0.95));
+  box-shadow:
+    inset 0 0 0 1.5px var(--qx-gold),
+    0 0 22px rgba(255, 201, 92, 0.3),
+    0 10px 24px rgba(4, 6, 20, 0.6);
+}
+.qx-toast.bad {
+  background: rgba(70, 20, 28, 0.94);
+  box-shadow:
+    inset 0 0 0 1.5px var(--qx-red-hi),
+    0 10px 24px rgba(4, 6, 20, 0.6);
+}
+/* The dialogue box sits inside the game box too, also when the window is taller than 16:9. */
+.qx-dialog {
+  bottom: calc(var(--qx-bar-y) + var(--qx-gh) * 0.03);
+  width: min(940px, calc(var(--qx-gw) * 0.72));
+}
+@media (prefers-reduced-motion: reduce) {
+  .qx-arrival {
+    animation: qx-fade-late 2.4s steps(1) both !important;
+  }
+}
+@keyframes qx-fade-late {
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ the hint ladder */
+.qx-hint-step + .qx-hint-step {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1.5px dashed rgba(255, 201, 92, 0.3);
+}
+.qx-hint-num {
+  font: 800 0.75rem/1.2 var(--qx-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qx-gold);
+  margin-bottom: 0.3rem;
+}
+.qx-hint-text > * + * {
+  margin-top: 0.6rem;
+}
+.qx-hint-text .qx-code {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--qx-syn-text);
+}
+.qx-codewrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+.qx-codewrap > .qx-code {
+  align-self: stretch;
+}
+.qx-code-send {
+  color: var(--qx-ice);
+}
+.qx-hint-next {
+  margin-top: 1rem;
+}
+
+/* ------------------------------------------------------------------ HUD polish: readable on dark roofs, a real map */
+/* A soft shadow pooled in the top-left corner behind the text: no card edge, just enough dark for white text. */
+.qx-hud-left {
+  background: none;
+}
+.qx-hud-left::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -1.2cqw;
+  top: -1.4cqh;
+  right: -6cqw;
+  bottom: -3cqh;
+  background: radial-gradient(
+    ellipse 100% 100% at 0% 0%,
+    rgba(6, 8, 22, 0.82),
+    rgba(6, 8, 22, 0.55) 45%,
+    rgba(6, 8, 22, 0.2) 72%,
+    transparent
+  );
+  pointer-events: none;
+}
+.qx-hud-right {
+  background: none;
+}
+.qx-hud-right::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -1.2cqw;
+  top: -1.4cqh;
+  left: -5cqw;
+  bottom: -3cqh;
+  background: radial-gradient(
+    ellipse 100% 100% at 100% 0%,
+    rgba(6, 8, 22, 0.8),
+    rgba(6, 8, 22, 0.5) 45%,
+    rgba(6, 8, 22, 0.18) 72%,
+    transparent
+  );
+  pointer-events: none;
+}
+.qx-hud-left,
+.qx-hud-right {
+  isolation: isolate;
+  text-shadow:
+    0 1px 1px #05061a,
+    0 1px 3px rgba(5, 6, 26, 0.95),
+    0 0 12px rgba(5, 6, 26, 0.85);
+}
+.qx-hud-goal {
+  opacity: 0.85;
+}
+.qx-hud-xpnum {
+  color: var(--qx-cream);
+}
+.qx-map-btn {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 0.6em;
+}
+.qx-map-btn:hover .qx-map {
+  box-shadow: 0 0 0 1.5px rgba(255, 201, 92, 0.6);
+}
+.qx-map {
+  height: 7.4cqw;
+  max-height: 13cqh;
+  background: rgba(10, 14, 34, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(236, 226, 201, 0.25);
+}
+.qx-map-key {
+  position: absolute;
+  left: 50%;
+  bottom: -0.9em;
+  transform: translateX(-50%);
+  font-size: 0.75em;
+}
+.qx-bigmap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(60cqw, 92cqh * 1.1);
+  padding: 1.2em 1.4em 1em;
+  border-radius: 1.2em;
+  text-align: center;
+  background: radial-gradient(100% 70% at 50% 0%, rgba(255, 201, 92, 0.1), transparent 60%), rgba(14, 18, 44, 0.97);
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 4px rgba(255, 201, 92, 0.5),
+    0 24px 60px rgba(4, 6, 20, 0.7);
+  animation: qx-fade 0.15s ease-out both;
+}
+.qx-bigmap-svg svg {
+  display: block;
+  width: 100%;
+  max-height: 72cqh;
+  margin: 0.4em auto 0;
+}
+.qx-bigmap-name {
+  font: 800 17px var(--qx-display);
+  fill: var(--qx-cream);
+}
+.qx-bigmap-name.here {
+  fill: var(--qx-gold);
+}
+.qx-bigmap-note {
+  font: 600 13px var(--qx-display);
+  fill: var(--qx-mute);
+}
+.qx-bigmap-note.todo {
+  fill: var(--qx-gold-hi);
+}
+.qx-bigmap-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.2em;
+  margin-top: 0.4em;
+  font-size: 0.85em;
+  color: var(--qx-cream);
+}
+.qx-bigmap-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.qx-bigmap-legend .dot {
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.here {
+  background: var(--qx-gold);
+}
+.dot.todo {
+  background: var(--qx-gold);
+  box-shadow: 0 0 0 2px #0a0e22;
+  width: 0.55em !important;
+  height: 0.55em !important;
+}
+.dot.locked {
+  background: #141a3d;
+  box-shadow: inset 0 0 0 2px #8f9ac8;
+}
+
+/* ------------------------------------------------------------------ solved: a short celebration, then the terminal closes */
+.qx-won {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: radial-gradient(ellipse at center, rgba(10, 14, 34, 0.55), rgba(6, 8, 22, 0.85));
+  animation: qx-fade 0.15s ease-out both;
+  cursor: pointer;
+}
+.qx-won-card {
+  width: min(520px, 100%);
+}
+.qx-won-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.qx-won-rewards .qx-chip.gold {
+  background: #2b1904;
+  color: var(--qx-gold-hi);
+  box-shadow: none;
+  font-size: 0.95rem;
+}
+.qx-won-timer {
+  margin-top: 0.8rem;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(43, 25, 4, 0.2);
+  overflow: hidden;
+}
+.qx-won-timer > i {
+  display: block;
+  height: 100%;
+  background: #2b1904;
+  transform-origin: left;
+  animation: qx-shrink linear both;
+}
+@keyframes qx-shrink {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ------------------------------------------------------------------ character picker */
+.qx-pick {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 60%, rgba(10, 14, 34, 0.55), rgba(6, 8, 22, 0.88));
+  animation: qx-fade 0.2s ease-out both;
+  z-index: 5;
+}
+.qx-pick-title {
+  margin-top: 0.4rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  text-shadow:
+    0 4px 0 rgba(6, 8, 22, 0.9),
+    0 0 30px rgba(255, 201, 92, 0.3);
+}
+.qx-pick-row {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.5rem, 1.2vw, 1.1rem);
+  margin-top: clamp(1rem, 3vh, 2rem);
+  max-width: 100%;
+}
+.qx-pick-card {
+  position: relative;
+  width: clamp(6.5rem, 12vw, 11rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.7rem 0.5rem 0.8rem;
+  border: 0;
+  border-radius: 16px;
+  cursor: pointer;
+  color: var(--qx-cream);
+  background: linear-gradient(180deg, rgba(40, 50, 112, 0.85), rgba(20, 26, 61, 0.92));
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 3.5px rgba(170, 180, 220, 0.25),
+    0 12px 26px rgba(4, 6, 20, 0.55);
+  transition:
+    transform 0.18s var(--qx-ease-out),
+    box-shadow 0.18s;
+}
+.qx-pick-card:hover {
+  transform: translateY(-3px);
+}
+.qx-pick-card.on {
+  transform: translateY(-8px) scale(1.04);
+  color: #2b1904;
+  background: radial-gradient(100% 70% at 50% 0%, rgba(255, 244, 207, 0.9), transparent 70%), linear-gradient(180deg, #ffd77a, #f2a93b);
+  box-shadow:
+    0 0 0 2px var(--qx-gold-deep),
+    0 0 0 5px rgba(255, 201, 92, 0.45),
+    0 0 36px rgba(255, 201, 92, 0.45),
+    0 16px 30px rgba(4, 6, 20, 0.6);
+}
+.qx-pick-art {
+  display: grid;
+  place-items: end center;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 11px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #3a4590, #141a3d 75%);
+}
+.qx-pick-card.on .qx-pick-art {
+  background: radial-gradient(circle at 50% 35%, #4a56a8, #1c2452 75%);
+}
+.qx-pick-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+}
+.qx-pick-card.on .qx-pick-art > * {
+  animation: qx-idle 1.6s ease-in-out infinite;
+}
+.qx-pick-sprite {
+  display: block;
+  max-width: 100%;
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+}
+@keyframes qx-idle {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.qx-pick-name {
+  margin-top: 0.55rem;
+  font: 900 1.15rem/1 var(--qx-display);
+  font-stretch: 115%;
+}
+.qx-pick-help {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--qx-mute);
+}
+/* With the full map open, the room label beside the small map hides (the map names the room). */
+.qx-hud-right.map-open .qx-hud-where {
+  visibility: hidden;
+}
+
+/* ------------------------------------------------------------------ wide workspace: long-list coding puzzles */
+.qx-panel-wrap.wide {
+  justify-content: center;
+  padding: 14px;
+  background: rgba(6, 8, 22, 0.72);
+}
+.qx-panel-wrap.wide .qx-panel {
+  width: min(1640px, 100%);
+}
+.qx-ws {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+}
+.qx-ws-left {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.1rem 1.4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  scrollbar-color: var(--qx-line) transparent;
+  border-right: 2px solid rgba(255, 201, 92, 0.2);
+}
+.qx-ws-left > * {
+  flex-shrink: 0;
+}
+/* The question stays in view while hints scroll under it. */
+.qx-ws-left .qx-question {
+  position: sticky;
+  top: -1.1rem;
+  z-index: 2;
+  background: linear-gradient(180deg, #2a3474, #1d255a);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 201, 92, 0.45),
+    0 12px 22px rgba(10, 14, 34, 0.85);
+}
+.qx-ws-left .qx-question-text {
+  font-size: 1.18rem;
+}
+.qx-ws-right {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem 1.2rem 0.9rem;
+}
+.qx-strip {
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(10, 14, 34, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.16);
+  padding: 0.5rem 0.7rem 0.6rem 0.9rem;
+}
+.qx-strip-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.qx-strip-peek {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.qx-strip-peek .qx-code {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  padding: 0.4rem 0.8rem;
+  max-height: calc(3 * 1.45em + 0.8rem);
+  overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 60%, transparent);
+}
+.qx-strip-peek.open .qx-code {
+  max-height: 34vh;
+  overflow-y: auto;
+  mask-image: none;
+}
+.qx-strip-more {
+  display: inline-block;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--qx-ice);
+}
+.qx-pad.ws {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem 0.8rem 0.8rem;
+}
+.qx-ws-padhead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.qx-ws-pad {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.qx-ws-pad .qx-editor {
+  flex: 1 1 auto;
+  min-height: 7rem;
+  overflow-y: auto;
+  align-items: flex-start;
+  scrollbar-color: var(--qx-line) transparent;
+}
+.qx-ws-pad .qx-pad-bar {
+  flex-shrink: 0;
+}
+.qx-ws-pad .qx-out {
+  flex: 0 0 24%;
+  min-height: 4.8rem;
+  display: flex;
+  flex-direction: column;
+}
+.qx-ws-pad .qx-out .qx-code,
+.qx-ws-pad .qx-out .qx-trace {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  max-height: none;
+}
+.qx-out-empty {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.92rem;
+  color: var(--qx-mute);
+}
+.qx-use {
+  --b-face: linear-gradient(180deg, #c4e9ff, #93d4ff);
+  --b-edge: #12345a;
+  --b-text: #0b1a33;
+}
+
+@media (max-height: 820px) {
+  .qx-strip-peek .qx-code {
+    max-height: calc(2 * 1.45em + 0.8rem);
+  }
+  .qx-ws-right {
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+  }
+}
+
+/* ------------------------------------------------------------------ the town map: postcards from each room's painting */
+.qx-where-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.35em 0.6em;
+  border: 0;
+  border-radius: 0.7em;
+  color: var(--qx-cream);
+  background: rgba(10, 14, 34, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(236, 226, 201, 0.22);
+  cursor: pointer;
+  font: inherit;
+  text-shadow: inherit;
+}
+.qx-where-btn:hover {
+  background: rgba(10, 14, 34, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 201, 92, 0.6);
+}
+.qx-where-btn .qx-hud-where {
+  align-items: flex-start;
+  max-width: 14cqw;
+}
+.qx-where-btn .qx-hud-where b {
+  text-align: left;
+}
+.qx-map-icon {
+  width: 1.4em;
+  height: 1.4em;
+  color: var(--qx-gold);
+  flex-shrink: 0;
+}
+.qx-where-btn .qx-key {
+  font-size: 0.7em;
+}
+.qx-mapscreen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  background: rgba(6, 8, 22, 0.62);
+  animation: qx-fade 0.15s ease-out both;
+  text-shadow: none;
+}
+.qx-mapcard {
+  padding: 1.6cqh 1.8cqw 2cqh;
+  border-radius: 1.2em;
+  background: radial-gradient(90% 60% at 50% 0%, rgba(255, 201, 92, 0.1), transparent 60%), linear-gradient(180deg, #1a2150, #0f1433);
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 4px rgba(255, 201, 92, 0.5),
+    0 24px 60px rgba(4, 6, 20, 0.75);
+}
+.qx-map-top {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+  margin-bottom: 1cqh;
+}
+.qx-map-title {
+  font-size: 1.7em;
+  color: var(--qx-gold);
+}
+.qx-map-legend {
+  flex: 1;
+  font-size: 0.85em;
+  color: var(--qx-mute);
+}
+.qx-map-board {
+  display: grid;
+  grid-template-columns: auto 12.5cqw 2.6cqw 12.5cqw 2.6cqw 12.5cqw;
+  grid-template-rows: auto 1.8cqh auto 1.8cqh auto 1.8cqh auto 1.8cqh auto;
+}
+.qx-map-zone {
+  align-self: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding-right: 0.9em;
+  font: 800 0.7em/1 var(--qx-display);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--qx-mute);
+  opacity: 0.8;
+  text-align: center;
+}
+/* Snowy dotted paths, only ever in the gaps. */
+.qx-path {
+  align-self: center;
+  justify-self: center;
+}
+.qx-path.h {
+  width: 100%;
+  height: 0;
+  border-top: 0.35em dotted rgba(251, 248, 241, 0.85);
+  margin-top: -1.6cqh;
+}
+.qx-path.v {
+  width: 0;
+  height: 100%;
+  border-left: 0.35em dotted rgba(251, 248, 241, 0.85);
+}
+.qx-path.locked {
+  border-color: rgba(170, 180, 220, 0.3);
+}
+.qx-tile {
+  display: flex;
+  flex-direction: column;
+}
+.qx-tile-pic {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.6em;
+  overflow: hidden;
+  background: #141a3d;
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 3.5px rgba(236, 226, 201, 0.35),
+    0 6px 14px rgba(4, 6, 20, 0.6);
+}
+.qx-tile-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.qx-tile.new .qx-tile-pic img {
+  filter: brightness(0.7) saturate(0.8);
+}
+.qx-tile.locked .qx-tile-pic img {
+  filter: grayscale(1) brightness(0.38);
+}
+.qx-tile.locked .qx-tile-pic {
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 3.5px rgba(143, 154, 200, 0.3);
+}
+.qx-tile.here .qx-tile-pic {
+  box-shadow:
+    0 0 0 2px var(--qx-night-0),
+    0 0 0 5px var(--qx-gold),
+    0 0 26px rgba(255, 201, 92, 0.55);
+}
+.qx-tile-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  grid-auto-flow: column;
+  gap: 0.4em;
+  align-items: center;
+  font: 800 0.85em/1 var(--qx-display);
+  color: var(--qx-cream);
+}
+.qx-lockglyph {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.65em;
+  border-radius: 0.12em;
+  background: currentColor;
+  position: relative;
+  margin-top: 0.3em;
+  vertical-align: baseline;
+}
+.qx-lockglyph::before {
+  content: "";
+  position: absolute;
+  left: 0.14em;
+  right: 0.14em;
+  bottom: 100%;
+  height: 0.38em;
+  border: 0.12em solid currentColor;
+  border-bottom: 0;
+  border-radius: 0.3em 0.3em 0 0;
+}
+.qx-tile-here {
+  position: absolute;
+  left: 0.4em;
+  top: 0.4em;
+  padding: 0.25em 0.55em 0.25em 0.45em;
+  border-radius: 999px;
+  font: 800 0.72em/1 var(--qx-display);
+  color: #2b1904;
+  background: var(--qx-gold);
+  box-shadow: 0 2px 6px rgba(4, 6, 20, 0.6);
+}
+.qx-tile-here::before {
+  content: "●";
+  margin-right: 0.3em;
+  color: var(--qx-red);
+}
+.qx-tile-badges {
+  position: absolute;
+  right: 0.35em;
+  bottom: 0.35em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2em;
+}
+.qx-badge {
+  display: inline-block;
+  padding: 0.22em 0.5em;
+  border-radius: 999px;
+  font: 800 0.68em/1 var(--qx-display);
+  white-space: nowrap;
+}
+.qx-badge.todo {
+  color: #2b1904;
+  background: var(--qx-gold-hi);
+  box-shadow: 0 0 0 1.5px var(--qx-gold-deep);
+}
+.qx-badge.star {
+  color: var(--qx-gold-hi);
+  background: rgba(10, 14, 34, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(255, 201, 92, 0.5);
+}
+.qx-tile-name {
+  margin-top: 0.45em;
+  padding: 0.3em 0.4em;
+  border-radius: 0.4em;
+  text-align: center;
+  font: 800 0.82em/1.15 var(--qx-display);
+  color: var(--qx-cream);
+  background: #0a0e22;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qx-tile.here .qx-tile-name {
+  color: #2b1904;
+  background: var(--qx-gold);
+}
+.qx-tile.locked .qx-tile-name {
+  color: var(--qx-mute);
+}
+
+/* ------------------------------------------------------------------ workspace polish: one-line list peek, slimmer answer bar */
+.qx-strip-peek:not(.open) {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.qx-strip-peek:not(.open) .qx-code {
+  flex: 1;
+  min-width: 0;
+  max-height: none;
+  mask-image: none;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.3rem 0.8rem;
+}
+.qx-strip-peek:not(.open) .qx-strip-more {
+  margin-top: 0;
+  white-space: nowrap;
+}
+.qx-panel-wrap.wide .qx-dock {
+  padding: 0.5rem 1.2rem 0.65rem;
+}
+.qx-panel-wrap.wide .qx-dock-label {
+  margin-bottom: 0.3rem;
+}
+.qx-panel-wrap.wide .qx-dock-label .qx-eyebrow {
+  font-size: 0.68rem;
+}
+.qx-panel-wrap.wide .qx-answer-field input {
+  height: 2.6rem;
+  font-size: 1.2rem;
+}
+.qx-panel-wrap.wide .qx-dock .qx-btn.big {
+  padding: 0.55em 1.2em;
+  font-size: 1.05rem;
+}
+.qx-ws-pad .qx-out {
+  flex-basis: 22%;
+  min-height: calc(3 * 1.6em + 3.2rem);
+}
+.qx-out-head .qx-use {
+  padding: 0.35em 0.75em;
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.qx-out-num {
+  padding: 0 0.3em;
+  border-radius: 4px;
+  color: #2b1904;
+  background: var(--qx-gold);
+  font-weight: 700;
+}
+/* Map paths: one weight everywhere, easy to see. */
+.qx-path.h,
+.qx-path.v {
+  border-color: rgba(251, 248, 241, 0.95);
+}
+.qx-path.h {
+  border-top-width: 0.5em;
+}
+.qx-path.v {
+  border-left-width: 0.5em;
+  min-height: 1.2em;
+}
+.qx-path.locked {
+  border-color: rgba(170, 180, 220, 0.45);
+}
+
+/* ------------------------------------------------------------------ workspace: editor on top, list and output side by side */
+.qx-ws-row {
+  flex: 0 0 auto;
+  height: calc(6 * 1.45 * 0.9rem + 3.4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.7rem;
+}
+.qx-ws-outpane {
+  min-height: 0;
+  display: flex;
+}
+.qx-ws-outpane > .qx-out,
+.qx-ws-pad .qx-ws-outpane > .qx-out {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+.qx-pane {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--qx-ink);
+  box-shadow: inset 0 0 0 1px rgba(147, 212, 255, 0.14);
+}
+.qx-pane-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.9rem;
+  background: rgba(147, 212, 255, 0.07);
+  border-bottom: 1px solid rgba(147, 212, 255, 0.12);
+}
+.qx-pane-title {
+  font: 800 0.8rem/1.2 var(--qx-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qx-ice);
+}
+.qx-pane-sub {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  color: var(--qx-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qx-pane-body,
+.qx-ws-outpane .qx-out .qx-code {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 0.5rem 0.9rem;
+  max-height: none;
+}
+.qx-ws-outpane .qx-out-head {
+  padding: 0.4rem 0.5rem 0.4rem 0.9rem;
+  min-height: 2.35rem;
+}
+.qx-icon-btn.sm {
+  width: 1.8rem;
+  height: 1.8rem;
+  font-size: 0.85rem;
+}
+.qx-ws-pad .qx-editor {
+  min-height: calc(10 * 1.6rem + 1.7rem);
+}
+@media (max-height: 820px) {
+  .qx-ws-pad .qx-editor {
+    font-size: 0.92rem;
+    min-height: calc(10 * 1.6 * 0.92rem + 1.7rem);
+  }
+}
+/* The editor takes whatever height is left, so the panes below are never cut off. */
+.qx-ws-pad .qx-editor,
+.qx-ws-pad .qx-editor {
+  flex: 1 1 0;
+  min-height: 0;
+}
+@media (max-height: 820px) {
+  .qx-ws-pad .qx-editor {
+    font-size: 0.86rem;
+    min-height: 0;
+  }
+  .qx-ws-row {
+    height: calc(5 * 1.45 * 0.85rem + 3rem);
+  }
+  .qx-pane-body,
+  .qx-ws-outpane .qx-out .qx-code {
+    font-size: 0.85rem;
+  }
+  .qx-ws-padhead {
+    margin-bottom: 0.3rem;
+  }
+  .qx-pad.ws {
+    padding: 0.45rem 0.7rem 0.6rem;
+  }
+  .qx-ws-pad {
+    gap: 0.45rem;
+  }
+  .qx-ws-pad .qx-pad-bar .qx-btn {
+    padding: 0.55em 1em;
+  }
+}
+.qx-map-top {
+  justify-content: center;
+}
+.qx-mapcard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.qx-map-board {
+  justify-content: center;
+}
+.qx-tile-zone {
+  display: block;
+  margin-bottom: 0.15em;
+  font: 800 0.68em/1 var(--qx-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qx-mute);
+}
+.qx-tile.here .qx-tile-zone {
+  color: #6b4512;
+}
+.qx-path.h {
+  margin-top: -2.2cqh;
+}
+.qx-pane-sub {
+  white-space: normal;
+  line-height: 1.2;
+}
+/* Fewer boxes in the workspace: the Python area sits straight in the column, no frame around the editor and panes. */
+.qx-pad.ws,
+.qx-pad.big.ws {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.qx-ws-padhead {
+  padding: 0 0.1rem;
+}
+.qx-ws-padhead .qx-section-title {
+  color: var(--qx-ice);
+}
+/* List and output pane headers: one line, the same height. */
+.qx-pane-head,
+.qx-ws-outpane .qx-out-head {
+  height: 2.5rem;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
+.qx-pane-sub {
+  white-space: nowrap;
+  line-height: 1;
+}
+/* Map: tiles sized so five rows always fit the game area's height. */
+.qx-mapcard {
+  --qx-tile: min(12.5cqw, 11.2cqh * 16 / 9);
+  max-height: 96cqh;
+}
+.qx-map-board {
+  grid-template-rows: auto 1.2cqh auto 1.2cqh auto 1.2cqh auto 1.2cqh auto;
+}
+.qx-tile-name {
+  margin-top: 0.3em;
+  padding: 0.2em 0.4em;
+}
+.qx-mapcard {
+  --qx-tile: min(12.5cqw, 10.2cqh * 16 / 9);
+}
+.qx-map-board {
+  grid-template-rows: auto 2.4cqh auto 2.4cqh auto 2.4cqh auto 2.4cqh auto;
+}
+
+/* ------------------------------------------------------------------ run output: one-line header, readable errors */
+.qx-out-head .dot {
+  display: none;
+}
+.qx-out-head {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.qx-out-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qx-out-stale {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.2em 0.55em;
+  border-radius: 999px;
+  font: 700 0.72rem/1 var(--qx-display);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--qx-cream);
+  background: rgba(236, 226, 201, 0.12);
+}
+.qx-out-stale + .qx-use {
+  margin-left: 0.4rem;
+}
+.qx-out-before {
+  padding: 0.5rem 0.9rem 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--qx-mute);
+}
+.qx-out.crashed .qx-code.wrap {
+  flex: 0 0 auto;
+  color: var(--qx-mute);
+  padding-top: 0.2rem;
+}
+.qx-trace {
+  margin: 0.4rem 0.7rem 0.7rem;
+  padding: 0.55rem 0.8rem;
+  overflow-y: auto;
+  scrollbar-color: rgba(226, 73, 63, 0.5) transparent;
+  scrollbar-width: thin;
+}
+.qx-trace-plain {
+  font-size: 0.98rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--qx-snow);
+}
+.qx-trace-last {
+  margin-top: 0.3rem;
+  font: 400 0.8rem/1.35 var(--qx-mono);
+  color: var(--qx-red-hi);
+}
+.qx-trace-plain:only-of-type + .qx-trace-last {
+  margin-top: 0.3rem;
+}
+.qx-trace summary {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+}
+/* A crash: the explanation first, everything in the pane scrolls together. */
+.qx-ws-outpane .qx-out.crashed {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(226, 73, 63, 0.5) transparent;
+}
+.qx-ws-outpane .qx-out.crashed > * {
+  flex: 0 0 auto;
+}
+.qx-ws-outpane .qx-out.crashed .qx-out-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #241426;
+}
+.qx-ws-outpane .qx-out.crashed .qx-trace {
+  overflow: visible;
+}
+.qx-ws-outpane .qx-out.crashed .qx-code.wrap {
+  overflow: visible;
+  padding-bottom: 0.6rem;
+}
+
+/* ------------------------------------------------------------------ errors: plain text, no accent bar */
+.qx-trace,
+.qx-ws-outpane .qx-out.crashed .qx-trace {
+  margin: 0;
+  padding: 0.65rem 0.9rem 0.5rem;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.qx-trace-plain {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--qx-snow);
+}
+.qx-trace-last {
+  font-size: 0.8rem;
+  color: var(--qx-red-hi);
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------------ workspace: one continuous terminal, edge to edge */
+.qx-ws-right {
+  padding: 0;
+  gap: 0;
+  background: var(--qx-ink);
+}
+.qx-pad.ws,
+.qx-ws-pad {
+  gap: 0;
+}
+.qx-ws-padhead {
+  margin: 0;
+  padding: 0.55rem 0.9rem 0.55rem 1.1rem;
+  background: rgba(28, 36, 82, 0.9);
+  border-bottom: 1px solid rgba(147, 212, 255, 0.12);
+}
+.qx-ws-pad .qx-editor {
+  flex: 3 1 0;
+  min-height: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--qx-ink);
+}
+.qx-ws-pad .qx-editor:focus-within {
+  box-shadow: inset 0 0 0 2px rgba(147, 212, 255, 0.45);
+}
+.qx-ws-pad .qx-pad-bar {
+  padding: 0.5rem 0.9rem;
+  background: rgba(28, 36, 82, 0.9);
+  border-top: 1px solid rgba(147, 212, 255, 0.12);
+  border-bottom: 1px solid rgba(147, 212, 255, 0.12);
+}
+.qx-ws-pad .qx-pad-bar .qx-btn {
+  padding: 0.5em 1em;
+  font-size: 0.95rem;
+}
+.qx-ws-row {
+  flex: 2 1 0;
+  height: auto;
+  min-height: 0;
+  gap: 1px;
+  background: rgba(147, 212, 255, 0.12);
+}
+.qx-pane,
+.qx-ws-outpane > .qx-out,
+.qx-ws-pad .qx-ws-outpane > .qx-out {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--qx-ink);
+}
+.qx-pane-head,
+.qx-ws-outpane .qx-out-head {
+  background: rgba(20, 26, 61, 0.95);
+}
+.qx-ws-outpane .qx-out.crashed .qx-out-head {
+  background: #2a1626;
+}
+/* The panel's own edges meet the terminal: no inner frame gap at the bottom-right. */
+.qx-panel-wrap.wide .qx-ws {
+  border-bottom: 1px solid rgba(255, 201, 92, 0.25);
+}
+@media (max-height: 820px) {
+  .qx-ws-row {
+    height: auto;
+  }
+}
+
+/* ------------------------------------------------------------------ HUD, round 4: bigger type, solid chips on the left too */
+.qx-stage {
+  /* About 14px at 1366 wide, 16px at 1920, still scaling with the game area. */
+  font-size: clamp(13px, calc(0.4cqw + 8.5px), 19px);
+}
+.qx-hud-left::before,
+.qx-hud-right::before {
+  display: none;
+}
+.qx-hud-left {
+  gap: 0.4em;
+  max-width: 28cqw;
+  padding: 0;
+  align-items: flex-start;
+}
+.qx-hud-right {
+  padding: 0;
+  gap: 0.6em;
+}
+/* One surface for every HUD chip: the room button's. */
+.qx-hud-chip,
+.qx-where-btn {
+  border-radius: 0.75em;
+  background: rgba(12, 16, 40, 0.84);
+  box-shadow:
+    inset 0 0 0 1px rgba(236, 226, 201, 0.22),
+    0 4px 14px rgba(4, 6, 20, 0.45);
+  backdrop-filter: blur(3px);
+}
+.qx-hud-me {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  padding: 0.5em 0.8em 0.6em;
+}
+.qx-hud-name {
+  font-size: 1.25em;
+}
+.qx-tag {
+  font-size: 0.62em;
+}
+.qx-hud-level {
+  font-size: 0.95em;
+  gap: 0.55em;
+}
+.qx-hud-xp {
+  width: 8.5cqw;
+  height: max(8px, 0.6em);
+  border-radius: 999px;
+}
+.qx-hud-xpnum {
+  font-size: 0.9em;
+  font-weight: 650;
+  color: var(--qx-cream);
+}
+.qx-hud-goal,
+.qx-hud-goal.fresh {
+  opacity: 1;
+  font-size: 0.95em;
+  padding: 0.45em 0.8em;
+  white-space: normal;
+  line-height: 1.3;
+  color: var(--qx-snow);
+}
+.qx-hud-goal.fresh {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 201, 92, 0.7),
+    0 4px 14px rgba(4, 6, 20, 0.45);
+}
+.qx-hud-goal {
+  transition: box-shadow 1.2s ease;
+}
+.qx-where-btn {
+  padding: 0.4em 0.7em;
+}
+.qx-hud-where span {
+  font-size: 0.68em;
+}
+.qx-hud-where b {
+  font-size: 0.98em;
+}
+.qx-points {
+  padding: 0.35em 0.9em 0.45em;
+}
+.qx-points-label {
+  font-size: 0.66em;
+}
+.qx-points b {
+  font-size: 2.35em;
+}
+.qx-icon-btn {
+  width: 2.1em;
+  height: 2.1em;
+}
+.qx-hint-own {
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--qx-mute);
+}
+
+/* ------------------------------------------------------------------ title screen: a living sky over the painting */
+.qx-title {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* The painting's own sky colour, sampled from title.png's top rows. */
+  background: #09124d;
+}
+.qx-title-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 100%;
+}
+/* The sky band: deeper at the very top, melting into the painting's flat navy so there's no seam. */
+.qx-title-sky {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 62%;
+  background: linear-gradient(180deg, #040824 0%, #070f3f 45%, rgba(9, 18, 77, 0.6) 75%, rgba(9, 18, 77, 0) 100%);
+  pointer-events: none;
+}
+.qx-stars {
+  position: absolute;
+  inset: 0 0 18% 0;
+  background-repeat: repeat;
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+}
+.qx-stars.a {
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent), radial-gradient(1px 1px at 90px 80px, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 150px 20px, #ffe7a8, transparent), radial-gradient(1px 1px at 210px 110px, #fff, transparent),
+    radial-gradient(1px 1px at 60px 140px, #cfe4ff, transparent);
+  background-size: 240px 160px;
+  animation: qx-twinkle-a 4s ease-in-out infinite;
+}
+.qx-stars.b {
+  background-image:
+    radial-gradient(1px 1px at 40px 60px, #fff, transparent), radial-gradient(2px 2px at 130px 120px, #fff, transparent),
+    radial-gradient(1px 1px at 280px 40px, #ffe7a8, transparent), radial-gradient(1.5px 1.5px at 330px 150px, #cfe4ff, transparent);
+  background-size: 370px 190px;
+  animation: qx-twinkle-a 5.5s ease-in-out -2s infinite reverse;
+}
+@keyframes qx-twinkle-a {
+  50% {
+    opacity: 0.45;
+  }
+}
+.qx-moon {
+  position: absolute;
+  right: 11%;
+  top: 9%;
+  width: clamp(48px, 6vw, 96px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 36%, #fffaf0, #f4ead0 55%, #d9cba6);
+  box-shadow:
+    0 0 30px 8px rgba(255, 244, 207, 0.35),
+    0 0 120px 40px rgba(255, 220, 150, 0.12);
+}
+.qx-aurora {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 14%;
+  height: 26%;
+  background: linear-gradient(
+    100deg,
+    transparent 10%,
+    rgba(120, 200, 255, 0.16) 30%,
+    rgba(170, 140, 255, 0.14) 50%,
+    rgba(120, 220, 255, 0.12) 68%,
+    transparent 88%
+  );
+  filter: blur(28px);
+  transform: skewY(-4deg);
+  animation: qx-aurora 18s ease-in-out infinite alternate;
+}
+@keyframes qx-aurora {
+  to {
+    transform: skewY(-2deg) translateX(6%);
+    opacity: 0.7;
+  }
+}
+/* Snow over everything, like the rooms. */
+.qx-title-snow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+}
+.qx-title-snow.a {
+  background-image:
+    radial-gradient(2px 2px at 30px 40px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2.5px 2.5px at 160px 120px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 260px 220px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(2px 2px at 90px 300px, rgba(255, 255, 255, 0.7), transparent);
+  background-size: 320px 340px;
+  animation: qx-snowfall 14s linear infinite;
+}
+.qx-title-snow.b {
+  background-image:
+    radial-gradient(3px 3px at 70px 90px, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(2.5px 2.5px at 330px 260px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(3.5px 3.5px at 210px 30px, rgba(255, 255, 255, 0.6), transparent);
+  background-size: 460px 420px;
+  animation: qx-snowfall-b 9s linear infinite;
+  opacity: 0.85;
+}
+@keyframes qx-snowfall {
+  to {
+    background-position: 60px 340px;
+  }
+}
+@keyframes qx-snowfall-b {
+  to {
+    background-position: -80px 420px;
+  }
+}
+/* A soft dark pool at the bottom for the button and the controls. */
+.qx-title-ground {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30%;
+  background: radial-gradient(48% 90% at 50% 100%, rgba(6, 8, 30, 0.82), rgba(6, 8, 30, 0.45) 55%, transparent 80%);
+  pointer-events: none;
+}
+.qx-title-head {
+  position: absolute;
+  left: 50%;
+  top: max(4vh, 24px);
+  width: min(92vw, 900px);
+  transform: translateX(-50%);
+  text-align: center;
+}
+.qx-title-eyebrow {
+  font-size: clamp(0.8rem, 1.1vw, 1rem);
+  text-shadow: 0 2px 8px #040824;
+}
+.qx-title-logo {
+  margin-top: 0.4rem;
+  font-size: min(8vw, 12.5vh, 7rem);
+  text-shadow:
+    0 2px 0 #d9e4ff,
+    0 6px 0 #1c2452,
+    0 8px 0 #040824,
+    0 0 60px rgba(160, 200, 255, 0.45),
+    0 0 120px rgba(255, 220, 150, 0.2);
+}
+.qx-title-sub {
+  margin: 0.9rem auto 0;
+  max-width: 46ch;
+  font-size: clamp(1.05rem, 1.45vw, 1.35rem);
+  font-weight: 550;
+  line-height: 1.45;
+  color: var(--qx-cream);
+  text-shadow: 0 2px 10px #040824;
+}
+.qx-title-foot {
+  position: absolute;
+  left: 50%;
+  bottom: max(4vh, 20px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  white-space: nowrap;
+}
+.qx-title-keys {
+  font-size: 0.95rem;
+  color: var(--qx-cream);
+  text-shadow: 0 1px 6px #040824;
+}
+/* The character picker sits on the same backdrop, dimmed. */
+.qx-title .qx-pick {
+  background: rgba(4, 8, 36, 0.62);
+}
+.qx-title-lobby {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(4, 8, 36, 0.44);
+}
+.qx-title-lobby-panel {
+  width: min(100%, 34rem);
+  max-height: 100%;
+  overflow: auto;
+  padding: clamp(1rem, 4vh, 2.25rem);
+  text-align: center;
+}
+.qx-title-lobby-name {
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  overflow-wrap: anywhere;
+}
+.qx-title-lobby-character {
+  margin: 0.7rem auto;
+  color: var(--qx-cream);
+  font-weight: 700;
+}
+.qx-title-lobby-character img {
+  height: clamp(3.5rem, 15vh, 7rem);
+  margin: auto;
+  object-fit: contain;
+}
+.qx-title-wait,
+.qx-title-go {
+  margin: 0.8rem 0;
+  color: var(--qx-gold-hi);
+}
+.qx-title-wait {
+  font-size: 1.15rem;
+  font-weight: 750;
+  animation: qx-lobby-pulse 2.6s ease-in-out infinite;
+}
+.qx-title-go {
+  font-size: 2.75rem;
+}
+.qx-title-lobby-roster {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.8rem;
+  max-height: 7rem;
+  overflow: auto;
+  margin: 0.85rem 0;
+  color: var(--qx-ice);
+  overflow-wrap: anywhere;
+}
+@keyframes qx-lobby-pulse {
+  50% {
+    opacity: 0.76;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qx-title-wait,
+  .qx-title-snow,
+  .qx-aurora,
+  .qx-stars {
+    animation: none !important;
+  }
+}
+.qx-ws-padhead .qx-section-title {
+  white-space: nowrap;
+}
+.qx-ws-padhead .qx-section-sub {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qx-ws-padhead .qx-quiet {
+  flex-shrink: 0;
+}
+/* The town always spans the full width with its ground on the bottom edge; taller windows get more sky. */
+.qx-title-art {
+  inset: auto 0 0 0;
+  width: 100%;
+  height: calc(100vw * 9 / 16);
+  object-fit: cover;
+  object-position: 50% 100%;
+}
+.qx-title-sky {
+  height: max(62%, calc(100% - 100vw * 9 / 16 * 0.55));
+}
+.qx-title-sub {
+  text-wrap: balance;
+}
+.qx-title-head {
+  width: min(94vw, 1500px);
+}
+.qx-title-logo {
+  white-space: nowrap;
+}

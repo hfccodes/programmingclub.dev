@@ -1,0 +1,79 @@
+{
+ "occluders": [
+  {
+   "name": "lamp post bottom middle",
+   "x": 727,
+   "y": 633,
+   "w": 45,
+   "h": 178,
+   "baseY": 806
+  },
+  {
+   "name": "hanging lamp bottom right",
+   "x": 1144,
+   "y": 628,
+   "w": 75,
+   "h": 162,
+   "baseY": 788
+  },
+  {
+   "name": "crates bottom right",
+   "x": 1111,
+   "y": 716,
+   "w": 75,
+   "h": 106,
+   "baseY": 820,
+   "sheet": 2
+  },
+  {
+   "name": "berry bush bottom",
+   "x": 794,
+   "y": 724,
+   "w": 142,
+   "h": 93,
+   "baseY": 812
+  },
+  {
+   "name": "stall bottom left (scarves)",
+   "x": 102,
+   "y": 627,
+   "w": 222,
+   "h": 192,
+   "baseY": 815
+  },
+  {
+   "name": "stall bottom middle (pots)",
+   "x": 387,
+   "y": 628,
+   "w": 234,
+   "h": 197,
+   "baseY": 815
+  },
+  {
+   "name": "stall bottom right (honey)",
+   "x": 1206,
+   "y": 604,
+   "w": 249,
+   "h": 209,
+   "baseY": 802,
+   "sheet": 2
+  },
+  {
+   "name": "hanging lamp left",
+   "x": 54,
+   "y": 472,
+   "w": 93,
+   "h": 189,
+   "baseY": 656,
+   "sheet": 2
+  },
+  {
+   "name": "hanging lamp right",
+   "x": 1374,
+   "y": 289,
+   "w": 87,
+   "h": 90,
+   "baseY": 400
+  }
+ ]
+}

@@ -21,6 +21,7 @@ import type * as lib from "../lib.js";
 import type * as officers from "../officers.js";
 import type * as players from "../players.js";
 import type * as puzzles from "../puzzles.js";
+import type * as quest from "../quest.js";
 import type * as schedule from "../schedule.js";
 import type * as seed from "../seed.js";
 import type * as sessions from "../sessions.js";
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   officers: typeof officers;
   players: typeof players;
   puzzles: typeof puzzles;
+  quest: typeof quest;
   schedule: typeof schedule;
   seed: typeof seed;
   sessions: typeof sessions;

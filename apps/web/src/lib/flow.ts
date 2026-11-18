@@ -142,7 +142,7 @@ export const roundTitle = (r: Round) => `Round ${r.index + 1}${r.double ? ", dou
 export const revealable = (r: Round) =>
   r.kind === "wiki" || r.kind === "puzzle" || r.kind === "pictionary" || (r.kind === "deck" && (isAnswerGame(r.game) || r.game === "fix"));
 
-/** A puzzle's name for the button, e.g. "Road to the Cup". */
+/** A puzzle's name for the button, e.g. "Lost Mittens". */
 export const puzzleTitle = (i: number) =>
   PUZZLES[i].name.replace(/\b\w+/g, (w, at: number) =>
     at > 0 && ["a", "of", "the", "to"].includes(w) ? w : w[0].toUpperCase() + w.slice(1),

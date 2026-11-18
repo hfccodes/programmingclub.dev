@@ -404,7 +404,7 @@ describe("Fix it for real", () => {
 describe("puzzles", () => {
   const right = () => "MEXJPN";
 
-  test("clocks come from the deck: 10 and 13 minutes for the relays, 26 for the Final's second puzzle", () => {
+  test("clocks come from the deck: 10 minutes for the relay, 13 and 26 for the Final", () => {
     expect(PUZZLES.map((_, i) => cardSeconds("puzzle", i))).toEqual([600, 780, 1560]);
   });
 

@@ -30,7 +30,8 @@ const STRIP = ["tile-sky", "tile-meadow", "tile-sun", "tile-silver", "tile-schoo
 function Layout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const bare = ["/hello-world/tv", "/hello-world/kickoff", "/hello-world/join", "/hello-world/draw"].some((p) => path.startsWith(p));
-  if (bare) return <Outlet />;
+  // Snow Quest fills the window too: with the site's header and footer behind it, Tab could reach their links.
+  if (bare || path.replace(/\/$/, "") === "/hello-world/quest") return <Outlet />;
   // The host console has its own bar at the top and fills the screen, so the site's header and footer step aside.
   if (path.startsWith("/hello-world/host"))
     return (

@@ -1,0 +1,96 @@
+{
+ "occluders": [
+  {
+   "name": "fence NW",
+   "x": 377,
+   "y": 195,
+   "w": 192,
+   "h": 102,
+   "baseY": 290
+  },
+  {
+   "name": "fence N",
+   "x": 621,
+   "y": 230,
+   "w": 260,
+   "h": 69,
+   "baseY": 290
+  },
+  {
+   "name": "lamp post",
+   "x": 781,
+   "y": 164,
+   "w": 70,
+   "h": 163,
+   "baseY": 322,
+   "sheet": 2
+  },
+  {
+   "name": "woodshed",
+   "x": 1383,
+   "y": 318,
+   "w": 153,
+   "h": 183,
+   "baseY": 436
+  },
+  {
+   "name": "stump and axe",
+   "x": 1351,
+   "y": 443,
+   "w": 64,
+   "h": 72,
+   "baseY": 510,
+   "sheet": 2
+  },
+  {
+   "name": "log pile",
+   "x": 1415,
+   "y": 473,
+   "w": 62,
+   "h": 58,
+   "baseY": 526,
+   "sheet": 2
+  },
+  {
+   "name": "rowboat",
+   "x": 1172,
+   "y": 600,
+   "w": 307,
+   "h": 171,
+   "baseY": 768,
+   "sheet": 2
+  },
+  {
+   "name": "boat fence",
+   "x": 1129,
+   "y": 672,
+   "w": 407,
+   "h": 192,
+   "baseY": 850
+  },
+  {
+   "name": "berry bush W",
+   "x": 81,
+   "y": 598,
+   "w": 99,
+   "h": 99,
+   "baseY": 690
+  },
+  {
+   "name": "berry bush S",
+   "x": 271,
+   "y": 727,
+   "w": 166,
+   "h": 104,
+   "baseY": 815
+  },
+  {
+   "name": "berry bush SE",
+   "x": 1041,
+   "y": 756,
+   "w": 88,
+   "h": 81,
+   "baseY": 830
+  }
+ ]
+}

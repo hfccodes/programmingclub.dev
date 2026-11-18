@@ -49,24 +49,21 @@ describe("puzzle rounds", () => {
   test("each puzzle round plays the puzzle its label names", () => {
     const preview = round("Final round, double points: Advent-style puzzle (Final preview)", true);
     expect([preview.kind, preview.puzzle, preview.game]).toEqual(["puzzle", 0, undefined]);
-    expect(round("Puzzle 1: easy, played as a relay").puzzle).toBe(1);
-    expect(round("Final round, double points: Puzzle 2, medium").puzzle).toBe(2);
+    expect(round("Puzzle 1: One Bad Bulb").puzzle).toBe(1);
+    expect(round("Final round, double points: Puzzle 2, Lost Mittens").puzzle).toBe(2);
     expect(revealable(preview)).toBe(true);
   });
 
-  test("Code Relay's last round and both rounds of the Final are puzzles, with their own clocks", () => {
+  test("Code Relay's last round is a puzzle, the Final is one Snow Quest round run by hand, and puzzles keep their own clocks", () => {
     const plan = (title: string) => DEFAULT_PLAN.find((w) => w.title === title)!.lineup.map((g, i) => roundOf(g, i));
     const relay = plan("Code Relay");
     expect(relay.filter((r) => r.kind === "puzzle").map((r) => [r.index, r.puzzle])).toEqual([[relay.length - 1, 0]]);
     const final = plan("The Final");
-    expect(final.map((r) => [r.kind, r.puzzle, r.double])).toEqual([
-      ["puzzle", 1, false],
-      ["puzzle", 2, true],
-    ]);
-    // 10:00 and 13:00 relays with chimes, then 26:00 for Puzzle 2.
+    expect(final.map((r) => [r.label, r.kind, r.puzzle, r.double])).toEqual([["Snow Quest", "other", undefined, false]]);
+    // Only the preview uses relay chimes.
     expect([0, 1, 2].map((i) => [cardSeconds("puzzle", i), !!PUZZLES[i].relay])).toEqual([
       [600, true],
-      [780, true],
+      [780, false],
       [1560, false],
     ]);
   });
@@ -76,7 +73,7 @@ describe("puzzle rounds", () => {
   });
 
   test("the button names the puzzle", () => {
-    expect([0, 1, 2].map(puzzleTitle)).toEqual(["Sticker Swap", "Comeback Kings", "Road to the Cup"]);
+    expect([0, 1, 2].map(puzzleTitle)).toEqual(["Sticker Swap", "One Bad Bulb", "Lost Mittens"]);
   });
 });
 
@@ -249,7 +246,7 @@ describe("the big button", () => {
   });
 
   test("a puzzle: show it, the hint once it unlocks, reveal and score, scores, then the next round", () => {
-    const p = round("Final round, double points: Puzzle 2, medium", true, 1);
+    const p = round("Final round, double points: Puzzle 2, Lost Mittens", true, 1);
     const up = { mode: "card", game: "puzzle", index: 2 };
     expect(step(p, { mode: "message" })).toBe("show");
     expect(step(p, up)).toBe("reveal");
@@ -260,7 +257,7 @@ describe("the big button", () => {
   });
 
   test("a puzzle comes back for its reveal, and last round's puzzle leads to this one", () => {
-    const p = round("Final round, double points: Puzzle 2, medium", true, 1);
+    const p = round("Final round, double points: Puzzle 2, Lost Mittens", true, 1);
     expect(step(p, { mode: "scoreboard", game: "puzzle", index: 2 })).toBe("reveal");
     expect(step(p, { mode: "card", game: "puzzle", index: 1 })).toBe("show");
     expect(step(p, { mode: "scoreboard", game: "puzzle", index: 1, revealed: true })).toBe("show");
@@ -279,7 +276,7 @@ describe("round lengths", () => {
     const labels = ["Guess the Language (warm-up)", "Output?", "Bug Hunt: medium", "Fix it for real", "Code Relay: round 1"];
     expect(labels.map((l) => roundLength(round(l)))).toEqual([5, 5, 4, 2, 2]);
     expect([roundLength(round("Wiki Race: Classic")), roundLength(round("Tech Pictionary"))]).toEqual([2, 6]);
-    expect(roundLength(round("Puzzle 1: easy, played as a relay"))).toBeNull();
+    expect(roundLength(round("Puzzle 1: One Bad Bulb"))).toBeNull();
     expect(roundLength(round("Meet the officers"))).toBeNull();
   });
 
@@ -306,7 +303,10 @@ describe("round lengths", () => {
       "drawing",
       "puzzle",
     ]);
-    expect([roundNoun(round("Wiki Race")), roundNoun(round("Final round, double points: Puzzle 2, medium"))]).toEqual(["race", "puzzle"]);
+    expect([roundNoun(round("Wiki Race")), roundNoun(round("Final round, double points: Puzzle 2, Lost Mittens"))]).toEqual([
+      "race",
+      "puzzle",
+    ]);
   });
 
   test("only this round's game counts, in the order it went up", () => {
@@ -357,7 +357,7 @@ describe("round lengths", () => {
     const raced = { mode: "scoreboard", wikiFrom: "A", wikiTo: "B", revealed: true };
     expect([1, 2].map((played) => stepFor({ round: wiki, screen: raced, teams: 3, played }))).toEqual(["choose", "done"]);
     // A puzzle round has no count: the next round after its scores, as before.
-    const puzzle = round("Final round, double points: Puzzle 2, medium", true, 1);
+    const puzzle = round("Final round, double points: Puzzle 2, Lost Mittens", true, 1);
     const shown = { mode: "scoreboard", game: "puzzle", index: 2, revealed: true };
     expect(stepFor({ round: puzzle, screen: shown, teams: 3, played: 9 })).toBe("next");
   });

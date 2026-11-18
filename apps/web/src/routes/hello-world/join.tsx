@@ -475,6 +475,8 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
   const timed = (!!live.timer.startedAt || s.mode === "timer") && !done;
   const clock = fmtClock(remaining);
   const hosting = me.officer && !me.playing;
+  // The Final is Snow Quest, played in its own page on a laptop or lab computer.
+  const quest = wk.lineup.some((g) => /Snow Quest/i.test(g.label));
   // The game's column is as wide as it needs (a drawing sizes itself to the screen), and the pair sits centered.
   const columns = s.mode === "draw" ? "lg:grid-cols-[20rem_auto]" : "lg:grid-cols-[20rem_minmax(0,52rem)]";
   const phoneView = !laptop && (
@@ -604,6 +606,7 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
                 {clock}
               </p>
             )}
+            {quest && me.team && <PlaySnowQuest laptop={laptop} />}
             {split && footer("mt-4 hidden lg:flex")}
           </div>
 
@@ -724,6 +727,24 @@ function MyGame({ token, me, live, onSwitch }: { token: string; me: Me; live: Li
 }
 
 /** An officer's Playing / Just hosting switch. Officers check in playing; hosting takes them off the teams. */
+/** The Final's big button. The game runs on a laptop or a lab computer, which joins with the same HawkMail. */
+function PlaySnowQuest({ laptop }: { laptop: boolean }) {
+  return (
+    <div className="mt-5 rounded-[10px] border-2 border-ink bg-mist p-5 text-center">
+      <h2 className="text-3xl lowercase">snow quest</h2>
+      <p className="mt-2 text-dim">
+        {laptop
+          ? "Open the game now, pick a character, and wait there for the host to start."
+          : "On a laptop or lab computer, join with the same HawkMail, then open Snow Quest, pick a character, and wait for the host to start."}
+      </p>
+      {/* A plain link: the game's page is its own bundle. */}
+      <a href="/hello-world/quest" className="btn btn-primary mt-4 block w-full py-4 text-xl">
+        Play Snow Quest
+      </a>
+    </div>
+  );
+}
+
 function PlayTonight({ token, playing }: { token: string; playing: boolean }) {
   const setPlaying = useMutation(api.players.setPlaying);
   const [error, setError] = useState("");

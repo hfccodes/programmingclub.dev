@@ -1,0 +1,88 @@
+/* Snow Quest overlay animations. */
+@keyframes quest-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes quest-zoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes quest-slide {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes quest-banner {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  15%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes quest-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes quest-shake {
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+.quest-pop {
+  animation: quest-pop 0.18s ease-out both;
+}
+.quest-zoom {
+  animation: quest-zoom 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.quest-slide {
+  animation: quest-slide 0.2s ease-out both;
+}
+.quest-banner {
+  animation: quest-banner 2.6s ease-out both;
+}
+.quest-blink {
+  animation: quest-blink 1.4s ease-in-out infinite;
+}
+.quest-shake {
+  animation: quest-shake 0.3s linear;
+}
+@keyframes qx-map-pulse {
+  50% {
+    opacity: 0.1;
+  }
+}
+.qx-map-pulse {
+  animation: qx-map-pulse 1.2s ease-in-out infinite;
+}

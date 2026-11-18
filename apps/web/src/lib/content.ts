@@ -59,8 +59,8 @@ export const WEEKS: Week[] = [
     kind: "cup",
     title: "The Final",
     pitch:
-      "The Season 0 championship: two Advent of Code–style puzzles, a warm-up for the real thing in December. Everyone starts at zero, the Midseason champions defend the Keycap, and the winners sign it. Then the Season 0 awards.",
-    games: ["Puzzle 1: easy, played as a relay", "Final round, double points: Puzzle 2, medium"],
+      "The Season 0 championship is one big game: Snow Quest. Walk a snowy Pine Street on a laptop, solve small coding puzzles in the town’s terminals, level up to open new parts of town, and find the hidden secrets. Solo, any language, and every solve scores right away. Everyone starts at zero, the Midseason champions defend the Keycap, and the winner signs it. Then the Season 0 awards.",
+    games: ["Snow Quest"],
     bonus: "Stay to the end for the awards and an invite to the club’s Advent of Code private leaderboard. It starts Dec 1.",
     showXp: 3,
   },
@@ -234,52 +234,41 @@ export const FINAL_AGENDA: Agenda[] = [
     len: 15,
     what: "Officers set up",
     detail:
-      "Open /tv on the TV and /host on an officer laptop. Players play on their join page, phone or laptop; lab computers in use open /hello-world/fix and type the key from a phone. Teams who’d rather use another language can open an editor or onecompiler.com too.",
+      "Open /tv on the TV and /host on an officer laptop, and start the week. Open programmingclub.dev/hello-world/quest on every lab computer players will use, and play the first terminal yourself (it runs as practice until someone joins on that computer).",
   },
   {
     t: "5:00",
     len: 6,
     what: "Check-in & squad up",
     detail:
-      "Join on your phone. Everyone plays solo by default; Teams of 2 or 3 in /host reshuffles everyone into teams if the room fills up.",
+      "Join on your phone, then open Snow Quest from the big button on your join page. It needs a laptop or a lab computer: on a lab computer, join there too with the same HawkMail. Everyone plays solo: keep teams off tonight.",
   },
   {
     t: "5:06",
     len: 3,
     what: "Opening",
     detail:
-      "Introduce the Midseason champions. Everyone starts at 0. Explain stars (3 points for part 1, 5 for part 2, +2 for the first team to each), the 30-second lockout for a wrong answer, and that Puzzle 2 counts double.",
+      "Introduce the Midseason champions. Everyone starts at 0. Every terminal you solve, every level you reach, and every secret you find scores at once. Levels open new parts of town. A wrong answer makes that terminal wait 20 seconds. The last puzzle, at the festival, is worth the most.",
   },
   {
     t: "5:09",
-    len: 13,
-    what: "Puzzle 1: easy",
+    len: 40,
+    what: "Snow Quest",
     detail:
-      "A relay: one keyboard per team, swap drivers every 2 minutes. Each team gets its own input on its join page. Two short parts, and part 2 unlocks once part 1 is right.",
+      "Everyone opens Snow Quest, picks a character, and waits in the game. Start round 1 in /host to let everyone in together, then show the scoreboard on the TV and start the 40-minute clock. Everyone plays solo in any language, and the points move on the TV as people solve. Officers walk the room and help players find the examples and hints.",
   },
   {
-    t: "5:22",
-    len: 2,
-    what: "Standings",
-    detail: "Show the scoreboard. Puzzle 2 counts double, so anyone can still win.",
-  },
-  {
-    t: "5:24",
-    len: 26,
-    what: "Final round, double points: Puzzle 2",
-    detail: "Two parts, real code, and everyone on the team helps. A hint goes up halfway, for whichever part each team is on.",
-  },
-  {
-    t: "5:50",
-    len: 3,
+    t: "5:49",
+    len: 4,
     what: "Final standings",
-    detail: "Reveal from last place to first. If there’s a tie, play one sudden-death question.",
+    detail:
+      "Time’s up: hands off the keyboards. Note the standings on the TV, then End night in /host right away: the clock doesn’t stop the scoring, End night does. Reveal from last place to first. If there’s a tie, the higher quest level wins, then one sudden-death question.",
   },
   {
     t: "5:53",
     len: 3,
     what: "Trophy",
-    detail: "Winners sign the Golden Keycap. Post the puzzle solutions in the Teams group afterward.",
+    detail: "The winner signs the Golden Keycap. (End night already kept everyone’s points and handed out tonight’s XP.)",
   },
   {
     t: "5:56",
@@ -352,7 +341,7 @@ export const GAMES: Game[] = [
     variants: [
       "Whiteboard Relay (no laptops): each person writes one line, then passes the marker.",
       "Silent Relay: nobody talks. Comments in the code are the only way to communicate.",
-      "Advent-style puzzle (Code Relay’s final round and the Final): a story, a worked example, and a two-part puzzle. Each team gets its own input on the join page, solves it in any language, and types in the answer there, on a phone or a laptop (a laptop gets a Python editor too). Part 2 unlocks once part 1 is right, and a wrong answer locks the team out for 30 seconds. +3 for part 1, +5 for part 2, +2 more for the first team to each.",
+      "Advent-style puzzle (Code Relay’s final round): a story, a worked example, and a two-part puzzle. Each team or player gets its own input on the join page, solves it in any language, and types in the answer there, on a phone or a laptop (a laptop gets a Python editor too). Part 2 unlocks once part 1 is right, and a wrong answer locks you out for 30 seconds. +3 for part 1, +5 for part 2, +2 more for the first to each.",
     ],
     tip: "Any language works: Python, Java, C++, JavaScript, whatever your team knows. If the lab computers don’t have an editor set up, onecompiler.com runs most languages in the browser with no account.",
   },
@@ -490,8 +479,9 @@ export const PREP: string[] = [
   "Open programmingclub.dev/host on an officer laptop or phone and start tonight’s week.",
   "Put out markers, paper, and the prize stash.",
   "Code Relay or Cup nights: make sure every team computer has an editor or onecompiler.com open.",
-  "Fix it for real and puzzle nights (Spooky Bugs, the Midseason Cup, Code Relay, the Final): players use their join page: a phone answers puzzles, and a laptop gets the full editor (join again on it with the same HawkMail). Lab computers in use open programmingclub.dev/hello-world/fix and type the key from a phone (also on /host). Python loads by itself.",
+  "The Final is Snow Quest: players join on the laptop or lab computer they’ll play on, check the game says Live with their own name, and leave the + buttons, Make teams, and Reset scores alone all night. Fix it for real and puzzle nights (Spooky Bugs, the Midseason Cup, Code Relay): players use their join page: a phone answers puzzles, and a laptop gets the full editor (join again on it with the same HawkMail). Lab computers in use open programmingclub.dev/hello-world/fix and type the key from a phone (also on /host). Python loads by itself.",
   "Puzzle nights: try the puzzle at /hello-world/test first, so you know the example and how part 2 twists part 1.",
+  "The Final (Snow Quest): open programmingclub.dev/hello-world/quest on each lab computer. It plays as practice until a player joins on that computer with their HawkMail.",
   "Tech Pictionary nights: charge the officer tablet, sign in on it, and open programmingclub.dev/hello-world/draw. Set its screen timeout to 10 minutes so it doesn’t lock between drawings, and set it where drawers can walk up to it.",
 ];
 export const NEWCOMERS: string[] = [
@@ -1680,6 +1670,14 @@ export const LANGS: LangQ[] = [
 // Round lengths and scoring are suggestions sized for a 60-minute night with teams of 2–3.
 export const IDEAS: Idea[] = [
   // Coding challenges: any language, answers checked by output.
+  {
+    name: "Snow Quest",
+    group: "Coding challenges",
+    how: "The Final’s game. Players walk a snowy town on a laptop or lab computer (programmingclub.dev/hello-world/quest, from the big button on their join page), solve coding puzzles in its terminals, level up, and find secrets. Every solve, level-up, and secret adds points on its own, live, so there’s nothing to score by hand. Put the scoreboard on the TV and run a 40-minute clock (Big timer); when it runs out, show the final standings.",
+    time: "40 min",
+    need: "A laptop or lab computer per player; each one joins with the player’s HawkMail",
+    cup: true,
+  },
   {
     name: "Black Box",
     group: "Coding challenges",

@@ -1,0 +1,136 @@
+{
+ "occluders": [
+  {
+   "name": "lamp left",
+   "x": 104,
+   "y": 302,
+   "w": 47,
+   "h": 144,
+   "baseY": 442
+  },
+  {
+   "name": "fence left",
+   "x": 0,
+   "y": 391,
+   "w": 121,
+   "h": 50,
+   "baseY": 440,
+   "sheet": 2
+  },
+  {
+   "name": "fence low",
+   "x": 39,
+   "y": 519,
+   "w": 124,
+   "h": 66,
+   "baseY": 584
+  },
+  {
+   "name": "lamp top",
+   "x": 614,
+   "y": 128,
+   "w": 42,
+   "h": 137,
+   "baseY": 262
+  },
+  {
+   "name": "berry bush cabin",
+   "x": 525,
+   "y": 245,
+   "w": 79,
+   "h": 73,
+   "baseY": 310
+  },
+  {
+   "name": "pine small",
+   "x": 863,
+   "y": 183,
+   "w": 60,
+   "h": 69,
+   "baseY": 242
+  },
+  {
+   "name": "campfire",
+   "x": 701,
+   "y": 634,
+   "w": 133,
+   "h": 103,
+   "baseY": 737
+  },
+  {
+   "name": "log left",
+   "x": 591,
+   "y": 647,
+   "w": 83,
+   "h": 85,
+   "baseY": 728
+  },
+  {
+   "name": "log right",
+   "x": 861,
+   "y": 646,
+   "w": 76,
+   "h": 83,
+   "baseY": 728
+  },
+  {
+   "name": "bench log",
+   "x": 700,
+   "y": 746,
+   "w": 136,
+   "h": 52,
+   "baseY": 800,
+   "sheet": 2
+  },
+  {
+   "name": "barrel",
+   "x": 485,
+   "y": 289,
+   "w": 51,
+   "h": 64,
+   "baseY": 346,
+   "sheet": 2
+  },
+  {
+   "name": "rock steps",
+   "x": 1275,
+   "y": 354,
+   "w": 76,
+   "h": 56,
+   "baseY": 402
+  },
+  {
+   "name": "lamp right",
+   "x": 1406,
+   "y": 340,
+   "w": 50,
+   "h": 143,
+   "baseY": 481
+  },
+  {
+   "name": "berry bush right",
+   "x": 1356,
+   "y": 482,
+   "w": 86,
+   "h": 75,
+   "baseY": 548,
+   "sheet": 2
+  },
+  {
+   "name": "rock bottom left",
+   "x": 515,
+   "y": 813,
+   "w": 79,
+   "h": 37,
+   "baseY": 842
+  },
+  {
+   "name": "rock bottom right",
+   "x": 965,
+   "y": 807,
+   "w": 71,
+   "h": 47,
+   "baseY": 846
+  }
+ ]
+}

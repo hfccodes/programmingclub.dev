@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AgendaList, HourDial, Picto, Wrap } from "#/components/ui";
 import { CUP_AGENDA, FINAL_AGENDA } from "#/lib/content";
+import { ITEMS, LEVELS, WAIT_MS } from "#/lib/quest";
 import { useSchedule } from "#/lib/schedule";
 import { CLUB, fmtDate } from "#/lib/season";
 import type { Agenda } from "#/lib/types";
@@ -11,6 +12,8 @@ export const Route = createFileRoute("/hello-world/cup")({
 });
 
 const noSetup = (rows: Agenda[]) => rows.filter((r) => r.what !== "Officers set up");
+const puzzles = ITEMS.filter((i) => i.kind === "puzzle");
+const levels = LEVELS.filter((l) => l.points > 0);
 
 function Cup() {
   const plan = useSchedule();
@@ -39,27 +42,45 @@ function Cup() {
       />
       <Night
         title="the final"
-        intro="Two Advent of Code–style puzzles, and the second one counts double. The Midseason champions defend the Keycap."
+        intro="One game, all night: Snow Quest, played solo on a laptop or lab computer. Points come in all game long, so the scoreboard moves the whole time. The Midseason champions defend the Keycap."
         rows={noSetup(FINAL_AGENDA)}
       />
 
       <Wrap className="mt-28">
         <div className="theme-night grid gap-12 rounded-[6px] px-8 py-14 md:grid-cols-[1fr_1.2fr] md:px-14">
           <div>
-            <h2 className="text-[clamp(2.2rem,4vw,3.4rem)] lowercase">the final’s puzzles</h2>
+            <h2 className="text-[clamp(2.2rem,4vw,3.4rem)] lowercase">snow quest</h2>
             <p className="mt-5 max-w-[38ch] text-lg text-dim">
-              Built like Advent of Code, so the Final doubles as a warm-up for the real thing in December.
+              Pine Street is getting ready for winter, and the town’s terminals need help. Walk around town, solve small coding puzzles,
+              level up, and find the secrets hidden along the way.
             </p>
+            {/* A plain link: the game's route is its own bundle. */}
+            <a href="/hello-world/quest" className="btn mt-6 inline-block">
+              Try it now (practice)
+            </a>
           </div>
           <div>
             <ol className="steps text-xl">
-              <li>Each puzzle tells a short story and works through a small example.</li>
-              <li>Every team gets its own input on the join page. Solve it any way you like, then answer on a phone or laptop.</li>
-              <li>A right answer to part 1 earns a star (3 points) and unlocks part 2, which twists it. Part 2’s star is worth 5.</li>
-              <li>The first team to each star gets 2 more. A wrong answer locks you out for 30 seconds.</li>
-              <li>Puzzle 1 is a relay. Puzzle 2 counts double, and the whole team helps.</li>
+              <li>
+                Join on your phone like every night, then tap Play Snow Quest. Play on a laptop or a lab computer; on a lab computer, join
+                there too with the same HawkMail.
+              </li>
+              <li>
+                Walk up to a terminal to open a puzzle. Each one has a short story, a worked example, and a hint. Solve it in any language,
+                or by hand, and type in your answer.
+              </li>
+              <li>
+                Every puzzle you solve scores right away ({puzzles.map((p) => p.points).join(", ")} points, easiest to hardest). The last
+                one, at the festival, is worth the most.
+              </li>
+              <li>
+                Solving earns XP. Level-ups add {levels.map((l) => l.points).join(", ")} points, and each opens the next part of town. Two
+                puzzles, or one puzzle and a secret, always get you there.
+              </li>
+              <li>Secrets are hidden around town: some you just find, some you have to crack. They score too.</li>
+              <li>A wrong answer makes that terminal wait {WAIT_MS / 1000} seconds. Everyone plays solo, for about 40 minutes.</li>
             </ol>
-            <p className="mt-6 text-dim">Any language works. Tiebreaker: one sudden-death question.</p>
+            <p className="mt-6 text-dim">Tiebreaker: the higher quest level, then one sudden-death question.</p>
           </div>
         </div>
       </Wrap>

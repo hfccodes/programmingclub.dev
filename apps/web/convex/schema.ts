@@ -346,6 +346,29 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_email", ["email"]),
 
+  // Snow Quest (the Final): one row per item a player claimed (src/lib/quest.ts), plus "level:N" rows for level-up
+  // bonuses (xp 0). `points` were awarded to the player's team when the row went in. See convex/quest.ts.
+  quest: defineTable({
+    sessionId: v.id("sessions"),
+    teamId: v.id("teams"),
+    key: v.string(),
+    points: v.number(),
+    xp: v.number(),
+    at: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_team_key", ["teamId", "key"]),
+
+  // Snow Quest: a player's wrong answers on one item, so the wait after a wrong answer holds on the server.
+  questTries: defineTable({
+    sessionId: v.id("sessions"),
+    teamId: v.id("teams"),
+    key: v.string(),
+    wrong: v.number(),
+    waitUntil: v.number(),
+    lastWrong: v.string(),
+  }).index("by_team_key", ["teamId", "key"]),
+
   // Anonymous "I'm interested" hearts on events, one per browser (a random id kept in localStorage).
   interest: defineTable({
     event: v.string(),

@@ -1,0 +1,162 @@
+{
+ "occluders": [
+  {
+   "name": "big tree",
+   "x": 639,
+   "y": 261,
+   "w": 276,
+   "h": 320,
+   "baseY": 584
+  },
+  {
+   "name": "tree ring front-left lamp",
+   "x": 620,
+   "y": 525,
+   "w": 81,
+   "h": 94,
+   "baseY": 606,
+   "sheet": 2
+  },
+  {
+   "name": "tree ring front-right lamp",
+   "x": 842,
+   "y": 525,
+   "w": 80,
+   "h": 93,
+   "baseY": 604,
+   "sheet": 2
+  },
+  {
+   "name": "tree ring back-left lamp",
+   "x": 597,
+   "y": 384,
+   "w": 92,
+   "h": 93,
+   "baseY": 466,
+   "sheet": 2
+  },
+  {
+   "name": "tree ring back-right lamp",
+   "x": 849,
+   "y": 385,
+   "w": 94,
+   "h": 92,
+   "baseY": 466,
+   "sheet": 2
+  },
+  {
+   "name": "lamp post top-left",
+   "x": 218,
+   "y": 279,
+   "w": 39,
+   "h": 130,
+   "baseY": 409
+  },
+  {
+   "name": "lamp post top-right",
+   "x": 1285,
+   "y": 279,
+   "w": 42,
+   "h": 137,
+   "baseY": 411
+  },
+  {
+   "name": "lamp post right",
+   "x": 1303,
+   "y": 507,
+   "w": 45,
+   "h": 129,
+   "baseY": 631
+  },
+  {
+   "name": "lamp post bottom-right",
+   "x": 1220,
+   "y": 635,
+   "w": 39,
+   "h": 138,
+   "baseY": 771
+  },
+  {
+   "name": "lamp post bottom-left",
+   "x": 263,
+   "y": 635,
+   "w": 39,
+   "h": 139,
+   "baseY": 775
+  },
+  {
+   "name": "bridge lamp left",
+   "x": 651,
+   "y": 101,
+   "w": 45,
+   "h": 120,
+   "baseY": 217
+  },
+  {
+   "name": "bridge lamp right",
+   "x": 841,
+   "y": 100,
+   "w": 44,
+   "h": 120,
+   "baseY": 217
+  },
+  {
+   "name": "bench top-left",
+   "x": 263,
+   "y": 312,
+   "w": 101,
+   "h": 85,
+   "baseY": 398
+  },
+  {
+   "name": "bench top-right",
+   "x": 1146,
+   "y": 311,
+   "w": 101,
+   "h": 85,
+   "baseY": 395
+  },
+  {
+   "name": "bench bottom-right",
+   "x": 1103,
+   "y": 695,
+   "w": 116,
+   "h": 95,
+   "baseY": 790
+  },
+  {
+   "name": "bench bottom-left",
+   "x": 315,
+   "y": 698,
+   "w": 116,
+   "h": 92,
+   "baseY": 792
+  },
+  {
+   "name": "fence bottom-left",
+   "x": 223,
+   "y": 771,
+   "w": 355,
+   "h": 83,
+   "baseY": 842,
+   "sheet": 2
+  },
+  {
+   "name": "fence bottom-right",
+   "x": 955,
+   "y": 774,
+   "w": 374,
+   "h": 82,
+   "baseY": 842,
+   "sheet": 2
+  },
+  {
+   "name": "berry bush by bottom-right lamp",
+   "x": 1264,
+   "y": 717,
+   "w": 58,
+   "h": 60,
+   "baseY": 776
+  }
+ ]
+}

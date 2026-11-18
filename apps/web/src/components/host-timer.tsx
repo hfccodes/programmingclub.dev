@@ -12,7 +12,8 @@ import { heldKey } from "#/lib/flow";
 
 type Live = NonNullable<FunctionReturnType<typeof api.sessions.live>>;
 
-const PRESETS = [30, 45, 60, 90, 120, 300, 720];
+// 40:00 is the Final's Snow Quest.
+const PRESETS = [30, 45, 60, 90, 120, 300, 720, 2400];
 
 type ClockState = "ready" | "running" | "paused" | "parked" | "done";
 
