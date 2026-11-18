@@ -18,6 +18,7 @@ import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as DesktopIndexRouteImport } from './routes/_desktop/index'
 import { Route as DesktopAboutRouteImport } from './routes/_desktop/about'
 import { Route as DesktopClubDiscordRouteImport } from './routes/_desktop/club-discord'
+import { Route as DesktopContributeRouteImport } from './routes/_desktop/contribute'
 import { Route as DesktopDashboardRouteImport } from './routes/_desktop/dashboard'
 import { Route as DesktopHackathonsRouteImport } from './routes/_desktop/hackathons'
 import { Route as DesktopHowToJoinRouteImport } from './routes/_desktop/how-to-join'
@@ -90,6 +91,11 @@ const DesktopAboutRoute = DesktopAboutRouteImport.update({
 const DesktopClubDiscordRoute = DesktopClubDiscordRouteImport.update({
   id: '/club-discord',
   path: '/club-discord',
+  getParentRoute: () => DesktopRoute,
+} as any)
+const DesktopContributeRoute = DesktopContributeRouteImport.update({
+  id: '/contribute',
+  path: '/contribute',
   getParentRoute: () => DesktopRoute,
 } as any)
 const DesktopDashboardRoute = DesktopDashboardRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
   '/club-discord': typeof DesktopClubDiscordRoute
+  '/contribute': typeof DesktopContributeRoute
   '/dashboard': typeof DesktopDashboardRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/wiki': typeof WikiRoute
   '/about': typeof DesktopAboutRoute
   '/club-discord': typeof DesktopClubDiscordRoute
+  '/contribute': typeof DesktopContributeRoute
   '/dashboard': typeof DesktopDashboardRoute
   '/hackathons': typeof DesktopHackathonsRoute
   '/how-to-join': typeof DesktopHowToJoinRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/wiki': typeof WikiRoute
   '/_desktop/about': typeof DesktopAboutRoute
   '/_desktop/club-discord': typeof DesktopClubDiscordRoute
+  '/_desktop/contribute': typeof DesktopContributeRoute
   '/_desktop/dashboard': typeof DesktopDashboardRoute
   '/_desktop/hackathons': typeof DesktopHackathonsRoute
   '/_desktop/how-to-join': typeof DesktopHowToJoinRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/about'
     | '/club-discord'
+    | '/contribute'
     | '/dashboard'
     | '/hackathons'
     | '/how-to-join'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/about'
     | '/club-discord'
+    | '/contribute'
     | '/dashboard'
     | '/hackathons'
     | '/how-to-join'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/wiki'
     | '/_desktop/about'
     | '/_desktop/club-discord'
+    | '/_desktop/contribute'
     | '/_desktop/dashboard'
     | '/_desktop/hackathons'
     | '/_desktop/how-to-join'
@@ -553,6 +565,13 @@ declare module '@tanstack/react-router' {
       path: '/club-discord'
       fullPath: '/club-discord'
       preLoaderRoute: typeof DesktopClubDiscordRouteImport
+      parentRoute: typeof DesktopRoute
+    }
+    '/_desktop/contribute': {
+      id: '/_desktop/contribute'
+      path: '/contribute'
+      fullPath: '/contribute'
+      preLoaderRoute: typeof DesktopContributeRouteImport
       parentRoute: typeof DesktopRoute
     }
     '/_desktop/dashboard': {
@@ -806,6 +825,7 @@ const HelloWorldRouteRouteWithChildren = HelloWorldRouteRoute._addFileChildren(
 interface DesktopRouteChildren {
   DesktopAboutRoute: typeof DesktopAboutRoute
   DesktopClubDiscordRoute: typeof DesktopClubDiscordRoute
+  DesktopContributeRoute: typeof DesktopContributeRoute
   DesktopDashboardRoute: typeof DesktopDashboardRoute
   DesktopHackathonsRoute: typeof DesktopHackathonsRoute
   DesktopHowToJoinRoute: typeof DesktopHowToJoinRoute
@@ -820,6 +840,7 @@ interface DesktopRouteChildren {
 const DesktopRouteChildren: DesktopRouteChildren = {
   DesktopAboutRoute: DesktopAboutRoute,
   DesktopClubDiscordRoute: DesktopClubDiscordRoute,
+  DesktopContributeRoute: DesktopContributeRoute,
   DesktopDashboardRoute: DesktopDashboardRoute,
   DesktopHackathonsRoute: DesktopHackathonsRoute,
   DesktopHowToJoinRoute: DesktopHowToJoinRoute,

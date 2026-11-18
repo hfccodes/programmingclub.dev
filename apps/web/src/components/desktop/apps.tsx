@@ -14,11 +14,12 @@ import type { Hackathon } from "#/lib/hackathons";
 import { STAGES } from "#/lib/learn";
 import type { Price, Stage } from "#/lib/learn";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
-import { CALENDAR, CLUB, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
+import { CALENDAR, CLUB, OFFICERS, REPO_URL, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
 import { api } from "../../../convex/_generated/api";
 import { Dashboard } from "./dashboard";
 
-export type AppId = "about" | "meetings" | "world-cup" | "learn" | "hackathons" | "officers" | "join" | "discord" | "site" | "dashboard";
+export type AppId =
+  "about" | "meetings" | "world-cup" | "learn" | "hackathons" | "officers" | "join" | "discord" | "contribute" | "site" | "dashboard";
 
 export interface App {
   id: AppId;
@@ -322,6 +323,50 @@ function Discord() {
   );
 }
 
+/* ---------- contribute: CONTRIBUTING.md, the site is open source ---------- */
+
+const HELP_WITH = [
+  ["Fix something small", "A typo, a button that looks off on your phone, a broken link. Small pull requests are the best first ones."],
+  ["Make a game better", "New puzzles and bugs for game nights, or a fix for something that annoyed you mid-round."],
+  ["Build a new app", "Every window on this desktop is one file’s worth of React. Add your own."],
+] as const;
+
+function Contribute() {
+  return (
+    <div className="space-y-5">
+      <p className="text-lg leading-relaxed">
+        This whole site is open source, built by club members: the desktop, the game nights, even the Discord bot. Read the code, run it on
+        your laptop, and send a pull request.
+      </p>
+      <pre className="code text-[0.8rem] whitespace-pre-wrap [overflow-wrap:anywhere]">
+        <span className="text-[#9fd3ff]">git clone</span> {REPO_URL}
+      </pre>
+      <ul className="space-y-3">
+        {HELP_WITH.map(([title, body]) => (
+          <li key={title} className="border-l-[3px] border-school pl-3">
+            <p className="font-bold">{title}</p>
+            <p className="text-[0.95rem] text-dim">{body}</p>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
+          View the code
+        </a>
+        <a href={`${REPO_URL}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noopener noreferrer" className="btn btn-sm">
+          How to contribute
+        </a>
+        <a href={`${REPO_URL}/issues/new/choose`} target="_blank" rel="noopener noreferrer" className="link ml-1 text-sm">
+          Report a bug
+        </a>
+      </div>
+      <p className="text-sm text-dim">
+        New to Git? That’s fine. An officer reviews every pull request, and your work shows up on your GitHub profile.
+      </p>
+    </div>
+  );
+}
+
 /* ---------- site: about this site (required disclaimer) ---------- */
 
 function Site() {
@@ -345,6 +390,9 @@ function Site() {
         <Link to="/hello-world/host" className="link">
           Officer sign-in
         </Link>
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="link">
+          Source code
+        </a>
       </p>
     </div>
   );
@@ -812,6 +860,23 @@ export const APPS: App[] = [
     at: { left: 48, top: 20 },
     width: "28rem",
     Content: Discord,
+  },
+  {
+    id: "contribute",
+    path: "/contribute",
+    title: "CONTRIBUTING.md",
+    label: "Contribute",
+    glyph: (
+      <svg viewBox="0 0 24 24" {...G}>
+        <circle cx="6.5" cy="5.5" r="2" />
+        <circle cx="6.5" cy="18.5" r="2" />
+        <circle cx="17.5" cy="8.5" r="2" />
+        <path d="M6.5 7.5v9M17.5 10.5c0 4-11 2.5-11 6" />
+      </svg>
+    ),
+    at: { left: 38, top: 16 },
+    width: "30rem",
+    Content: Contribute,
   },
   {
     id: "site",

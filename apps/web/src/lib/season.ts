@@ -27,6 +27,9 @@ export const CALENDAR = {
 
 export const INSTAGRAM_URL = `https://www.instagram.com/${CLUB.instagram}/`;
 
+/** This site's code, open source: members are welcome to read it and send pull requests. */
+export const REPO_URL = "https://github.com/hfccodes/programmingclub.dev";
+
 /** HFC student (@hawkmail.hfcc.edu) and staff (@hfcc.edu) emails: the only ones members join with, since the club is HFC-only. */
 export const isHfcEmail = (email: string) => /@(hawkmail\.)?hfcc\.edu$/i.test(email.trim());
 
