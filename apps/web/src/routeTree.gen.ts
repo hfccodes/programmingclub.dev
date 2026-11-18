@@ -26,6 +26,7 @@ import { Route as DesktopMeetingsRouteImport } from './routes/_desktop/meetings'
 import { Route as DesktopOfficersRouteImport } from './routes/_desktop/officers'
 import { Route as DesktopSiteRouteImport } from './routes/_desktop/site'
 import { Route as DesktopWorldCupRouteImport } from './routes/_desktop/world-cup'
+import { Route as DiscordVerifyRouteImport } from './routes/discord/verify'
 import { Route as HelloWorldIndexRouteImport } from './routes/hello-world/index'
 import { Route as HelloWorldCupRouteImport } from './routes/hello-world/cup'
 import { Route as HelloWorldDrawRouteImport } from './routes/hello-world/draw'
@@ -129,6 +130,11 @@ const DesktopWorldCupRoute = DesktopWorldCupRouteImport.update({
   id: '/world-cup',
   path: '/world-cup',
   getParentRoute: () => DesktopRoute,
+} as any)
+const DiscordVerifyRoute = DiscordVerifyRouteImport.update({
+  id: '/discord/verify',
+  path: '/discord/verify',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const HelloWorldIndexRoute = HelloWorldIndexRouteImport.update({
   id: '/',
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/officers': typeof DesktopOfficersRoute
   '/site': typeof DesktopSiteRoute
   '/world-cup': typeof DesktopWorldCupRoute
+  '/discord/verify': typeof DiscordVerifyRoute
   '/hello-world/cup': typeof HelloWorldCupRoute
   '/hello-world/draw': typeof HelloWorldDrawRoute
   '/hello-world/fix': typeof HelloWorldFixRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/officers': typeof DesktopOfficersRoute
   '/site': typeof DesktopSiteRoute
   '/world-cup': typeof DesktopWorldCupRoute
+  '/discord/verify': typeof DiscordVerifyRoute
   '/hello-world/cup': typeof HelloWorldCupRoute
   '/hello-world/draw': typeof HelloWorldDrawRoute
   '/hello-world/fix': typeof HelloWorldFixRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/_desktop/officers': typeof DesktopOfficersRoute
   '/_desktop/site': typeof DesktopSiteRoute
   '/_desktop/world-cup': typeof DesktopWorldCupRoute
+  '/discord/verify': typeof DiscordVerifyRoute
   '/hello-world/cup': typeof HelloWorldCupRoute
   '/hello-world/draw': typeof HelloWorldDrawRoute
   '/hello-world/fix': typeof HelloWorldFixRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/officers'
     | '/site'
     | '/world-cup'
+    | '/discord/verify'
     | '/hello-world/cup'
     | '/hello-world/draw'
     | '/hello-world/fix'
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/officers'
     | '/site'
     | '/world-cup'
+    | '/discord/verify'
     | '/hello-world/cup'
     | '/hello-world/draw'
     | '/hello-world/fix'
@@ -430,6 +441,7 @@ export interface FileRouteTypes {
     | '/_desktop/officers'
     | '/_desktop/site'
     | '/_desktop/world-cup'
+    | '/discord/verify'
     | '/hello-world/cup'
     | '/hello-world/draw'
     | '/hello-world/fix'
@@ -459,6 +471,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   WikiRoute: typeof WikiRoute
+  DiscordVerifyRoute: typeof DiscordVerifyRoute
   SignInSplatRoute: typeof SignInSplatRoute
   SurveyResultsRoute: typeof SurveyResultsRoute
   SurveyIndexRoute: typeof SurveyIndexRoute
@@ -584,6 +597,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/world-cup'
       preLoaderRoute: typeof DesktopWorldCupRouteImport
       parentRoute: typeof DesktopRoute
+    }
+    '/discord/verify': {
+      id: '/discord/verify'
+      path: '/discord/verify'
+      fullPath: '/discord/verify'
+      preLoaderRoute: typeof DiscordVerifyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/hello-world/': {
       id: '/hello-world/'
@@ -801,6 +821,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   WikiRoute: WikiRoute,
+  DiscordVerifyRoute: DiscordVerifyRoute,
   SignInSplatRoute: SignInSplatRoute,
   SurveyResultsRoute: SurveyResultsRoute,
   SurveyIndexRoute: SurveyIndexRoute,

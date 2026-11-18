@@ -302,6 +302,31 @@ export default defineSchema({
     .index("by_team_card", ["teamId", "card"])
     .index("by_attendance_card", ["attendanceId", "card"]),
 
+  // Discord verification (/discord/verify): the Discord account each verified HawkMail linked, so verifying again moves
+  // the roles instead of piling them up. One row per email, and one email per Discord account.
+  discord: defineTable({
+    email: v.string(),
+    discordId: v.string(),
+    // Their Discord handle when they verified, for showing back to them.
+    username: v.string(),
+    // Interest ids from src/lib/discord.ts.
+    interests: v.array(v.string()),
+    verifiedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_discord", ["discordId"]),
+
+  // A "Connect Discord" click waiting for Discord to send the member back. Used once, within 15 minutes.
+  discordStates: defineTable({
+    state: v.string(),
+    email: v.string(),
+    kind: v.union(v.literal("student"), v.literal("staff")),
+    interests: v.array(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_state", ["state"])
+    .index("by_email", ["email"]),
+
   // The member survey (/survey): one row per HawkMail, signed in, so members can come back and change their answers.
   // Option ids and slots are in src/lib/survey.ts.
   survey: defineTable({

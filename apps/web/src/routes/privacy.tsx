@@ -30,6 +30,11 @@ function Privacy() {
             experience, how often and where you’d meet, and the hours you’re usually free. Only officers see it.
           </li>
           <li>
+            <strong>Joining the club Discord:</strong> to check you’re an HFC student, you sign in with your HawkMail and connect Discord.
+            We keep your HawkMail, your Discord user ID and username, and the topics you pick, so the club’s bot can give you your roles. We
+            don’t read your messages, servers, or friends.
+          </li>
+          <li>
             <strong>“I’m interested” hearts:</strong> a random ID stored in your browser so you can’t heart an event twice. It isn’t linked
             to your name or email.
           </li>
@@ -46,7 +51,7 @@ function Privacy() {
       <Section title="Who handles it">
         <p>
           The site is hosted by Vercel. Game and attendance data is stored with Convex, and officer sign-in is handled by Clerk (and Google,
-          if you choose Google). These services process data only to run the site.
+          if you choose Google). Discord handles the connection for the club Discord. These services process data only to run the site.
         </p>
       </Section>
       <Section title="How long we keep it">

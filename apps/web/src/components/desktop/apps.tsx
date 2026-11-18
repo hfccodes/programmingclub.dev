@@ -14,7 +14,7 @@ import type { Hackathon } from "#/lib/hackathons";
 import { STAGES } from "#/lib/learn";
 import type { Price, Stage } from "#/lib/learn";
 import { nextMeeting, useSchedule } from "#/lib/schedule";
-import { CALENDAR, CLUB, DISCORD_URL, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
+import { CALENDAR, CLUB, OFFICERS, fmtDate, isHalloweenMonth, roomFor } from "#/lib/season";
 import { api } from "../../../convex/_generated/api";
 import { Dashboard } from "./dashboard";
 
@@ -298,7 +298,7 @@ function Discord() {
         </div>
         {/* Desktop visitors are usually on a laptop: scan to join on the phone, where Discord lives. */}
         <QRCodeSVG
-          value={DISCORD_URL}
+          value={`https://${CLUB.url}/discord/verify`}
           title="Scan to join the club Discord"
           size={512}
           marginSize={2}
@@ -313,10 +313,10 @@ function Discord() {
         ))}
       </ul>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-4">
-        <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
-          Join the Discord
-        </a>
-        <p className="text-sm text-dim">Pick your interests when you join to get pinged about what you care about.</p>
+        <Link to="/discord/verify" className="btn btn-primary btn-sm">
+          Join with HawkMail
+        </Link>
+        <p className="text-sm text-dim">For HFC students: sign in with your HawkMail, connect Discord, and you’re in.</p>
       </div>
     </div>
   );

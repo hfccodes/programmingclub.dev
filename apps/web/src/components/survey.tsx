@@ -270,7 +270,7 @@ export function Survey() {
   );
 }
 
-function Page({ children }: { children: ReactNode }) {
+export function Page({ children }: { children: ReactNode }) {
   return (
     <main className="theme-club mx-auto min-h-dvh w-[min(760px,100%-2.5rem)] pt-8">
       <Link to="/" className="inline-flex items-center gap-3 text-sm font-semibold text-dim hover:text-ink">
@@ -282,7 +282,7 @@ function Page({ children }: { children: ReactNode }) {
   );
 }
 
-function Question({ n, title, hint, children }: { n: number; title: string; hint?: string; children: ReactNode }) {
+export function Question({ n, title, hint, children }: { n: number; title: string; hint?: string; children: ReactNode }) {
   return (
     <fieldset>
       <legend className="flex items-baseline gap-3">
@@ -325,7 +325,7 @@ function Choice({
   );
 }
 
-function Chips({
+export function Chips({
   options,
   picked,
   onChange,
