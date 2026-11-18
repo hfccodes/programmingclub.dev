@@ -5,7 +5,9 @@ import { Link } from "@tanstack/react-router";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useState } from "react";
-import { Chips, Page, Question } from "#/components/survey";
+import type { ReactNode } from "react";
+import { ClubLogo } from "#/components/site";
+import { Chips, Question } from "#/components/survey";
 import { Loading } from "#/components/ui";
 import { DISCORD_INTERESTS, VERIFY_ERRORS } from "#/lib/discord";
 import type { VerifyError } from "#/lib/discord";
@@ -22,9 +24,9 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
 
   if (isLoading || (isAuthenticated && mine === undefined))
     return (
-      <Page>
+      <Shell>
         <Loading />
-      </Page>
+      </Shell>
     );
 
   const interests = picked ?? mine?.interests ?? [];
@@ -32,8 +34,8 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
 
   if (done)
     return (
-      <Page>
-        <div className="card mt-10 p-8">
+      <Shell>
+        <div className="card p-8">
           <p className="text-sm font-bold text-[#0b4fa3]">Verified</p>
           <h2 className="mt-2 text-4xl lowercase">you’re in, @{done}!</h2>
           <p className="mt-4 text-lg text-dim">Your roles are set. Open Discord and the whole server is there.</p>
@@ -46,7 +48,7 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
             </Link>
           </div>
         </div>
-      </Page>
+      </Shell>
     );
 
   async function connect() {
@@ -61,22 +63,14 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
   }
 
   return (
-    <Page>
-      <header className="mt-10">
-        <h1 className="text-[clamp(2.6rem,8vw,4.2rem)] leading-[0.92] lowercase">join the club discord</h1>
-        <p className="mt-4 max-w-[52ch] text-lg text-dim">
-          The server is for {CLUB.school} students, so we check your HawkMail first. It takes about 30 seconds, and you’re added to the
-          server right after.
-        </p>
-      </header>
-
+    <Shell>
       {problem && (
-        <p role="alert" className="mt-8 rounded-[6px] bg-signal/10 px-4 py-3 font-semibold text-signal">
+        <p role="alert" className="mb-8 rounded-[6px] bg-signal/10 px-4 py-3 font-semibold text-signal">
           {problem}
         </p>
       )}
 
-      <div className="mt-10 space-y-12">
+      <div className="space-y-12 lg:space-y-8">
         <Question n={1} title="Sign in with your HawkMail">
           {!mine ? (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -128,6 +122,65 @@ export function DiscordVerify({ done, error }: { done?: string; error?: VerifyEr
           </p>
         </Question>
       </div>
-    </Page>
+    </Shell>
+  );
+}
+
+/** What's inside, drawn like Discord's channel list: shown beside the steps on wide screens. */
+const PREVIEW = [
+  { name: "Welcome", channels: ["welcome", "rules", "announcements"] },
+  { name: "Club", channels: ["general", "introductions", "meeting-chat", "opportunities"] },
+  { name: "Code", channels: ["help", "projects", "ai", "gamedev", "cybersecurity", "challenges"] },
+];
+
+function ServerPreview() {
+  return (
+    <div className="rounded-[12px] bg-[#0f2b24] p-5 text-[#f2f7f5] shadow-[0_18px_40px_-24px_rgb(15_43_36/0.7)]">
+      <p className="flex items-center gap-2.5 border-b border-white/10 pb-3.5 font-bold">
+        <ClubLogo className="size-7" />
+        {CLUB.name} · HFC
+      </p>
+      <dl className="mt-3.5 space-y-3">
+        {PREVIEW.map((g) => (
+          <div key={g.name} className="grid grid-cols-[5.5rem_1fr] items-baseline gap-3">
+            <dt className="text-[0.7rem] font-bold tracking-[0.08em] text-white/50 uppercase">{g.name}</dt>
+            <dd className="flex flex-wrap gap-x-3.5 gap-y-1 font-mono text-[0.85rem] text-white/85">
+              {g.channels.map((c) => (
+                <span key={c}>
+                  <span className="text-white/40">#</span>
+                  {c}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-4 border-t border-white/10 pt-3.5 text-sm text-white/60">Plus voice rooms for hanging out and studying together.</p>
+    </div>
+  );
+}
+
+/** The page: the pitch on the left (and on top on phones), the steps or result on the right. */
+function Shell({ children }: { children: ReactNode }) {
+  return (
+    <main className="theme-club mx-auto min-h-dvh w-[min(1120px,100%-2.5rem)] pt-8 pb-16">
+      <Link to="/" className="inline-flex items-center gap-3 text-sm font-semibold text-dim hover:text-ink">
+        <ClubLogo className="size-8" />
+        {CLUB.name} at {CLUB.school}
+      </Link>
+      <div className="mt-10 lg:mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] lg:items-start lg:gap-16">
+        <header className="lg:sticky lg:top-10">
+          <h1 className="text-[clamp(2.6rem,8vw,4.2rem)] leading-[0.92] lowercase">join the club discord</h1>
+          <p className="mt-4 max-w-[52ch] text-lg text-dim">
+            The server is for {CLUB.school} students, so we check your HawkMail first. It takes about 30 seconds, and you’re added to the
+            server right after.
+          </p>
+          <div className="mt-8 max-lg:hidden">
+            <ServerPreview />
+          </div>
+        </header>
+        <div className="max-lg:mt-10">{children}</div>
+      </div>
+    </main>
   );
 }
