@@ -101,7 +101,7 @@ export const caesar = (text: string, by: number) =>
 const BINARY = "110010";
 
 /** Every answerable item's right answer for a seed. */
-const ANSWERS: Record<string, (seed: number) => string> = {
+const ANSWERS: Partial<Record<string, (seed: number) => string>> = {
   "z1-lights": () => LIGHTS_ANSWER,
   "z1-shovel": (seed) => solveShovel(shovelInput(seed)),
   "z2-cocoa": solveCocoa,

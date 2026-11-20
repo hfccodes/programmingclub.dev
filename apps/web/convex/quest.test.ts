@@ -34,7 +34,7 @@ async function night({ started = true, practice = false } = {}) {
 
 const right = async (t: Awaited<ReturnType<typeof night>>["t"], token: string, key: string) => {
   const me = (await t.query(api.quest.me, { token }))!;
-  return t.mutation(api.quest.claim, { token, key, answer: answerFor(key, me.seed) });
+  return t.mutation(api.quest.claim, { token, key, answer: answerFor(key, me.seed) ?? undefined });
 };
 
 describe("Snow Quest", () => {
