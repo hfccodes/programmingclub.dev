@@ -41,6 +41,8 @@ test("Learn to Code walks through its four stages", async ({ page }, testInfo) =
 test("Hackathons lists what's coming up and how a hackathon works", async ({ page }, testInfo) => {
   await page.goto("/hackathons", { waitUntil: "networkidle" });
   const hack = win(page, "Hackathons");
+  // The soonest hackathon opens first, and that changes as events end, so pick SpartaHack's tab by name.
+  await hack.getByRole("tab", { name: /SpartaHack/ }).click();
   await expect(hack.getByRole("heading", { name: "SpartaHack 12" })).toBeVisible();
   await expect(hack.getByRole("link", { name: /Apply at spartahack\.com/ })).toHaveAttribute("href", "https://www.spartahack.com/");
   await page.screenshot({ path: testInfo.outputPath("hackathons.png") });
