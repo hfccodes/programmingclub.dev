@@ -1,7 +1,14 @@
 package-lock.json
 pnpm-lock.yaml
-yarn.lockconvex/_generated
+yarn.lock
+bun.lock
+convex/_generated
 src/routeTree.gen.ts
+public/quest/rooms/*.depth.json
 .agents
 .claude
-bun.lock
+.nitro
+.output
+.tanstack
+.vercel
+test-results

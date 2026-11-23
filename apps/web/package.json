@@ -14,7 +14,9 @@
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --check .",
     "typecheck": "tsc --noEmit && tsc --noEmit -p convex",
-    "test:ui": "playwright test"
+    "test": "bun test src/ convex/",
+    "test:ui": "playwright test",
+    "verify": "bun run typecheck && bun run lint && bun run check && bun run test && bun run build"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -1,5 +1,11 @@
 # Agent notes
 
+## Verification & feature map
+
+- Run `bun run verify` from the repo root before finishing a change (`typecheck`, `lint`, Prettier `check`, unit + Convex `test`, and `build` — the same gate CI runs).
+- For UI changes, run the relevant Playwright specs in `apps/web/e2e` against a running dev server (`cd apps/web && BASE_UI_TEST_URL=http://localhost:3000 bun run test:ui`).
+- Read [docs/feature-map.md](docs/feature-map.md) for routes, desktop window selectors, E2E fixture harnesses, and lint-enforced architecture boundaries.
+
 ## Service access: use CLIs before computer use
 
 On the owner's machine (Juan's), these CLIs are installed and authenticated. Use them for any dashboard-style task (env vars, deploys, logs, settings, users, projects) before reaching for computer use or asking the owner to click through a web console. Fall back to computer use only when the CLI genuinely can't do it, and say why.

@@ -8,7 +8,10 @@
   "scripts": {
     "dev": "bun run --filter @programming-club/web dev",
     "build": "bun run --filter @programming-club/web build",
+    "check": "bun run --filter @programming-club/web check",
     "typecheck": "bun run --filter '*' typecheck",
-    "lint": "bun run --filter '*' lint"
+    "lint": "bun run --filter '*' lint",
+    "test": "bun run --filter @programming-club/web test",
+    "verify": "bun run typecheck && bun run lint && bun run check && bun run test && bun run build"
   }
 }
