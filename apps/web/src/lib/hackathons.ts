@@ -34,28 +34,6 @@ export interface Hackathon {
 
 export const HACKATHONS: Hackathon[] = [
   {
-    id: "buildathon-2026",
-    name: "Buildathon",
-    start: "2026-11-20",
-    end: "2026-11-22",
-    when: "Fri–Sun, Nov 20–22, 2026 · Fully virtual, Fri 6 p.m. to Sun 11 a.m.",
-    place: "Online, from anywhere (kickoff and closing at Ohio State are optional)",
-    city: "Columbus, Ohio",
-    drive: "3 hr",
-    host: "Builders at Ohio State",
-    color: "#f2a7a2",
-    url: "https://www.joinbuilders.org/buildathon/register",
-    cta: "Register at joinbuilders.org",
-    blurb:
-      "Builders at Ohio State invited our club to this one, and it’s fully virtual: you can do the whole thing from home. The kickoff and closing ceremony in Columbus are optional, and you don’t need to attend either to compete or win. Each track is a real company problem, scored on a hidden set of 100 test cases with a live leaderboard. Any current student can enter; register with your HawkMail.",
-    facts: [
-      ["Prizes", "$20,000: $5,000 to each track’s winner, paid online"],
-      ["Tracks", "Databricks, RWX, Machina, and Builders"],
-      ["Teams", "Solo or with one teammate"],
-    ],
-    deadline: { at: "2026-11-22T11:00:00-05:00", label: "Submissions close Sun, Nov 22 at 11 a.m." },
-  },
-  {
     id: "spartahack-12",
     name: "SpartaHack 12",
     start: "2027-02-06",
